@@ -28,4 +28,12 @@ export class LMClient implements LMFeedClientInterface {
       });
     } catch (error) {}
   }
+
+  async logout(refreshToken: string) {
+    try {
+      const apiCallResponse = await this.client.logout({
+        refreshToken: refreshToken,
+      });
+    } catch (error) {}
+  }
 }
