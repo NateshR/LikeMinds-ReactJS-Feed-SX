@@ -8,9 +8,6 @@ import { useEffect } from "react";
 import { lmFeedClient } from ".";
 
 function App() {
-  useEffect(() => {
-    lmFeedClient.initiateUser("28f7f107-5916-4cce-bbb7-4ee48b35e64d", false);
-  }, []);
   return (
     <div>
       <div className="header">

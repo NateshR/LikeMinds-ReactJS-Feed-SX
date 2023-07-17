@@ -1,21 +1,47 @@
 import userImg from "../assets/images/user.png";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PostOptions from "./PostOptions";
+import DialogBox from "./dialog/DialogBox";
+import CreatePostDialog from "./dialog/createPost/CreatePostDialog";
+import { lmFeedClient } from "..";
 
 const CreatePost: React.FC = () => {
+  const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
+  function closeCreatePostDialog() {
+    setOpenCreatePostDialog(false);
+  }
+  function openCreatePostDialogBox() {
+    setOpenCreatePostDialog(true);
+  }
+  useEffect(() => {
+    lmFeedClient.fetchFeed();
+  });
   return (
-    <div className="lmWrapper__feed__creatPost">
-      <div className="lmWrapper__feed__creatPost__write">
-        <div className="lmWrapper__feed__creatPost__write--userImg">
-          <img src={userImg} alt="user image" />
+    <>
+      <DialogBox
+        openCreatePostDialog={openCreatePostDialog}
+        closeCreatePostDialog={closeCreatePostDialog}
+        // children={<CreatePostDialog/>}
+      >
+        <CreatePostDialog />
+      </DialogBox>
+      <div className="lmWrapper__feed__creatPost">
+        <div className="lmWrapper__feed__creatPost__write">
+          <div className="lmWrapper__feed__creatPost__write--userImg">
+            <img src={userImg} alt="user_image" />
+          </div>
+          <div className="lmWrapper__feed__creatPost__write--inputBox">
+            <input
+              type="text"
+              placeholder="Wtire something here..."
+              onSelect={openCreatePostDialogBox}
+            />
+          </div>
         </div>
-        <div className="lmWrapper__feed__creatPost__write--inputBox">
-          <input type="text" placeholder="Wtire something here..." />
-        </div>
+        <PostOptions />
       </div>
-      <PostOptions />
-    </div>
+    </>
   );
 };
 
