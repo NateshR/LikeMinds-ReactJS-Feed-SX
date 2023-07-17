@@ -1,9 +1,10 @@
 import userImg from "../assets/images/user.png";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PostOptions from "./PostOptions";
 import DialogBox from "./dialog/DialogBox";
 import CreatePostDialog from "./dialog/createPost/CreatePostDialog";
+import { lmFeedClient } from "..";
 
 const CreatePost: React.FC = () => {
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
@@ -13,6 +14,9 @@ const CreatePost: React.FC = () => {
   function openCreatePostDialogBox() {
     setOpenCreatePostDialog(true);
   }
+  useEffect(() => {
+    lmFeedClient.fetchFeed();
+  });
   return (
     <>
       <DialogBox

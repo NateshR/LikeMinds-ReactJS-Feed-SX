@@ -60,4 +60,13 @@ export class LMClient
       }
     } catch (error) {}
   }
+
+  async fetchFeed() {
+    try {
+      let apiCallResponse = await this.client.getFeed({
+        page: 1,
+        pageSize: 10,
+      });
+    } catch (error) {}
+  }
 }
