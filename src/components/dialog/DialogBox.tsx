@@ -1,17 +1,12 @@
-import React, { useRef } from "react";
-import "./dialogBox.css";
-import { relative } from "path";
+import React, { useRef } from 'react';
+import './dialogBox.css'; 
 
 type DialogBoxType = {
   children: any;
   openCreatePostDialog: boolean;
   closeCreatePostDialog: any;
 };
-const DialogBox = ({
-  children,
-  openCreatePostDialog,
-  closeCreatePostDialog,
-}: any) => {
+const DialogBox = ({ children, openCreatePostDialog, closeCreatePostDialog }: any) => {
   const dialogBoxRef = useRef<any>(null);
 
   function passPropToChildren() {
@@ -19,7 +14,7 @@ const DialogBox = ({
       if (React.isValidElement(child)) {
         return React.cloneElement<any>(child, {
           dialogBoxRef,
-          closeCreatePostDialog,
+          closeCreatePostDialog
         });
       }
     });
@@ -30,7 +25,7 @@ const DialogBox = ({
       ref={dialogBoxRef}
       className="lmWrapper-dialog"
       style={{
-        display: openCreatePostDialog ? "block" : "none",
+        display: openCreatePostDialog ? 'block' : 'none'
       }}
     >
       {passPropToChildren()}

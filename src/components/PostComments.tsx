@@ -1,6 +1,6 @@
 // src/Header/Header.tsx
 
-import React from "react";
+import React from 'react';
 
 const PostComents: React.FC = () => {
   return (

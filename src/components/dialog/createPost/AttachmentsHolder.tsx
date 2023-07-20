@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import "./attachmentsHolder.css";
-import phoneImageSample from "../../../assets/images/phoneImgaeSample.png";
+import React, { useEffect, useState } from 'react';
+import './attachmentsHolder.css';
+import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 const AttachmentsHolder = ({
   showMediaUploadBar,
   setShowMediaUploadBar,
@@ -11,7 +11,7 @@ const AttachmentsHolder = ({
   attachmentType,
   setAttachmentType,
   showInitiateUploadComponent,
-  setShowInitiateUploadComponent,
+  setShowInitiateUploadComponent
 }: any) => {
   function setAttachmentTypeImage() {
     setShowMediaUploadBar(false);
@@ -151,11 +151,7 @@ const AttachmentsHolder = ({
   }
   function setUploadedView() {
     if (attachmentType === 1) {
-      return (
-        <ImageVideoAttachmentView
-          imageOrVideoUploadArray={imageOrVideoUploadArray}
-        />
-      );
+      return <ImageVideoAttachmentView imageOrVideoUploadArray={imageOrVideoUploadArray} />;
     } else if (attachmentType === 2) {
       return (
         <DocumentUploadAttachmentContainer
@@ -229,7 +225,7 @@ const InitiateUploadView = ({
   documentUploadArray,
   setDocumentUploadArray,
   attachmentType,
-  setAttachmentType,
+  setAttachmentType
 }: any) => {
   function handleImageMediaUpload(e: any) {
     setImageOrVideoUploadArray(e.target.files);
@@ -258,9 +254,7 @@ const InitiateUploadView = ({
             </svg>
           </span>
           {/* heading */}
-          <p className="initiateMediaUploadBox--headingOne">
-            Add Photos/Videos
-          </p>
+          <p className="initiateMediaUploadBox--headingOne">Add Photos/Videos</p>
           <p className="initiateMediaUploadBox--headingTwo">or drag and drop</p>
 
           <input
@@ -291,9 +285,7 @@ const InitiateUploadView = ({
             </svg>
           </span>
           {/* heading */}
-          <p className="initiateMediaUploadBox--headingOne">
-            Add Files/Documents
-          </p>
+          <p className="initiateMediaUploadBox--headingOne">Add Files/Documents</p>
           <p className="initiateMediaUploadBox--headingTwo">or drag and drop</p>
           <input
             type="file"
@@ -349,7 +341,7 @@ const InitiateUploadView = ({
 
 function ImageVideoAttachmentView({ imageOrVideoUploadArray }: any) {
   let length = imageOrVideoUploadArray?.length;
-  console.log("the image array: ", imageOrVideoUploadArray);
+  console.log('the image array: ', imageOrVideoUploadArray);
   switch (length) {
     case undefined || 0 || null: {
       return null;
@@ -394,10 +386,7 @@ function HolderWithCross({ children, onCloseFunction }: any) {
     </div>
   );
 }
-function DocumentUploadAttachmentContainer({
-  documentUploadArray,
-  setDocumentUploadArray,
-}: any) {
+function DocumentUploadAttachmentContainer({ documentUploadArray, setDocumentUploadArray }: any) {
   function removeADocument(index: number) {
     const newDocumentUploadArray: any[] = [...documentUploadArray];
     newDocumentUploadArray.splice(index, 1);
@@ -406,10 +395,7 @@ function DocumentUploadAttachmentContainer({
   function renderUploadedDocuments() {
     return documentUploadArray?.map((docItem: any, docIndex: number) => {
       return (
-        <HolderWithCross
-          key={docItem.name + docIndex}
-          onCloseFunction={removeADocument}
-        >
+        <HolderWithCross key={docItem.name + docIndex} onCloseFunction={removeADocument}>
           <div className="attachedDocumentWrapper">
             {/* pdf icon */}
             <span>
@@ -435,9 +421,7 @@ function DocumentUploadAttachmentContainer({
               </svg>
             </span>
             <div className="attachedDocumentWrapper--attachmentBody">
-              <p className="attachedDocumentWrapper__attachmentBody--headingMain">
-                Event Document
-              </p>
+              <p className="attachedDocumentWrapper__attachmentBody--headingMain">Event Document</p>
               <p className="attachedDocumentWrapper__attachmentBody--headingSub">
                 2 Pages 278 Kb PDF
               </p>
@@ -447,10 +431,6 @@ function DocumentUploadAttachmentContainer({
       );
     });
   }
-  return (
-    <div className="documentAttachmentContainer">
-      {renderUploadedDocuments()}
-    </div>
-  );
+  return <div className="documentAttachmentContainer">{renderUploadedDocuments()}</div>;
 }
 export default AttachmentsHolder;

@@ -1,20 +1,13 @@
-import LMFeedClient from "@likeminds.community/feed-js-beta";
-import { HelperFunctionsClass } from "./helper";
+import LMFeedClient from '@likeminds.community/feed-js-beta';
+import { HelperFunctionsClass } from './helper';
 interface LMFeedClientInterface {
-  initiateUser(
-    userUniqueId: string,
-    isGuestMember: boolean,
-    username?: string
-  ): Promise<any>;
+  initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string): Promise<any>;
   logout(refreshToken: string): Promise<any>;
   addPost(text: string, attachments: []): Promise<any>;
   addPost(text: string): Promise<any>;
 }
 
-export class LMClient
-  extends HelperFunctionsClass
-  implements LMFeedClientInterface
-{
+export class LMClient extends HelperFunctionsClass implements LMFeedClientInterface {
   client: LMFeedClient;
   public constructor() {
     super();
@@ -24,15 +17,11 @@ export class LMClient
       .build();
   }
 
-  async initiateUser(
-    userUniqueId: string,
-    isGuestMember: boolean,
-    username?: string
-  ) {
+  async initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string) {
     try {
       const apiCallResponse = await this.client.initiateUser({
         userUniqueId,
-        isGuest: isGuestMember,
+        isGuest: isGuestMember
       });
       return this.parseDataLayerResponse(apiCallResponse);
     } catch (error) {}
@@ -41,7 +30,7 @@ export class LMClient
   async logout(refreshToken: string) {
     try {
       const apiCallResponse = await this.client.logout({
-        refreshToken: refreshToken,
+        refreshToken: refreshToken
       });
       return this.parseDataLayerResponse(apiCallResponse);
     } catch (error) {}
@@ -54,7 +43,7 @@ export class LMClient
       } else {
         const apiCallResponse = await this.client.addPost({
           text: text,
-          attachments: validLinksArray,
+          attachments: validLinksArray
         });
         return this.parseDataLayerResponse(apiCallResponse);
       }
@@ -65,7 +54,7 @@ export class LMClient
     try {
       let apiCallResponse = await this.client.getFeed({
         page: 1,
-        pageSize: 10,
+        pageSize: 10
       });
     } catch (error) {}
   }
