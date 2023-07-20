@@ -1,6 +1,6 @@
-import userImg from "../assets/images/user.png";
+import userImg from '../assets/images/user.png';
 
-import React from "react";
+import React from 'react';
 
 const PostHeader: React.FC = () => {
   return (

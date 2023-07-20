@@ -1,7 +1,7 @@
-import photoIcon from "../assets/images/photo.svg";
-import videoIcon from "../assets/images/video.svg";
-import pollIcon from "../assets/images/poll.svg";
-import React from "react";
+import photoIcon from '../assets/images/photo.svg';
+import videoIcon from '../assets/images/video.svg';
+import pollIcon from '../assets/images/poll.svg';
+import React from 'react';
 
 const PostOptions: React.FC = () => {
   return (

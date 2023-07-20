@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 const UserContext = React.createContext<UserContextInterface>({
   user: null,
-  setUser: null,
+  setUser: null
 });
 
 interface UserContextInterface {
