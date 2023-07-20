@@ -1,32 +1,25 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from 'react';
 
-import "./createPostDialog.css";
-import defaultUserImage from "../../../assets/images/defaultUserImage.png";
-import UserContext from "../../../contexts/UserContext";
-import { lmFeedClient } from "../../..";
-import AttachmentsHolder from "./AttachmentsHolder";
+import './createPostDialog.css';
+import defaultUserImage from '../../../assets/images/defaultUserImage.png';
+import UserContext from '../../../contexts/UserContext';
+import { lmFeedClient } from '../../..';
+import AttachmentsHolder from './AttachmentsHolder';
 const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
     const imageLink = userContext?.user?.image_url;
-    if (imageLink !== "") {
+    if (imageLink !== '') {
       return <img src={imageLink} alt={userContext.user?.image_url} />;
     } else {
       return <img src={defaultUserImage} alt={userContext.user?.image_url} />;
     }
   }
-  const [text, setText] = useState("");
-  const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(
-    true
-  );
-  const [showInitiateUploadComponent, setShowInitiateUploadComponent] =
-    useState<boolean>(false);
-  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<
-    null | any[]
-  >(null);
-  const [documentUploadArray, setDocumentUploadArray] = useState<null | any[]>(
-    null
-  );
+  const [text, setText] = useState('');
+  const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
+  const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
+  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | any[]>(null);
+  const [documentUploadArray, setDocumentUploadArray] = useState<null | any[]>(null);
   const [attachmentType, setAttachmentType] = useState<null | number>(0);
   const attachmentProps = {
     showMediaUploadBar,
@@ -38,14 +31,14 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
     attachmentType,
     setAttachmentType,
     showInitiateUploadComponent,
-    setShowInitiateUploadComponent,
+    setShowInitiateUploadComponent
   };
 
   function resetContext() {
     setShowMediaUploadBar(true);
     setImageOrVideoUploadArray(null);
     setDocumentUploadArray(null);
-    setText("");
+    setText('');
     setAttachmentType(null);
     setShowInitiateUploadComponent(false);
   }

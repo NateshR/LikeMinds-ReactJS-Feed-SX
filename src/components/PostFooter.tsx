@@ -1,10 +1,10 @@
-import liked from "../assets/images/liked.svg";
-import comment from "../assets/images/comment.svg";
-import bookmark from "../assets/images/bookmark.svg";
-import share from "../assets/images/share.svg";
+import liked from '../assets/images/liked.svg';
+import comment from '../assets/images/comment.svg';
+import bookmark from '../assets/images/bookmark.svg';
+import share from '../assets/images/share.svg';
 
-import React from "react";
-import PostComents from "./PostComments";
+import React from 'react';
+import PostComents from './PostComments';
 
 const PostFooter: React.FC = () => {
   return (

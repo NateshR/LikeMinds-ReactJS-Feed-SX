@@ -1,7 +1,7 @@
-import filterCaretIcon from "../assets/images/filter_caret.svg";
-import downArrow from "../assets/images/Frame.svg";
+import filterCaretIcon from '../assets/images/filter_caret.svg';
+import downArrow from '../assets/images/Frame.svg';
 
-import React from "react";
+import React from 'react';
 
 const FeedFilter: React.FC = () => {
   return (

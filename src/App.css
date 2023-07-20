@@ -249,7 +249,7 @@
 }
 
 .lmWrapper__feed__post__header--info .subTitle span:before {
-  content: "";
+  content: '';
   width: 8px;
   height: 8px;
   border-radius: 50%;

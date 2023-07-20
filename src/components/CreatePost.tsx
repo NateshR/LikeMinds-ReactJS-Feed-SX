@@ -1,10 +1,10 @@
-import userImg from "../assets/images/user.png";
+import userImg from '../assets/images/user.png';
 
-import React, { useEffect, useState } from "react";
-import PostOptions from "./PostOptions";
-import DialogBox from "./dialog/DialogBox";
-import CreatePostDialog from "./dialog/createPost/CreatePostDialog";
-import { lmFeedClient } from "..";
+import React, { useEffect, useState } from 'react';
+import PostOptions from './PostOptions';
+import DialogBox from './dialog/DialogBox';
+import CreatePostDialog from './dialog/createPost/CreatePostDialog';
+import { lmFeedClient } from '..';
 
 const CreatePost: React.FC = () => {
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);

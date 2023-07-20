@@ -14,7 +14,7 @@ export class HelperFunctionsClass implements HelperFunctionsInterface {
 
   parseDataLayerResponse(response: any) {
     return {
-      ...response,
+      ...response
     };
   }
 
