@@ -1,0 +1,456 @@
+import React, { useEffect, useState } from "react";
+import "./attachmentsHolder.css";
+import phoneImageSample from "../../../assets/images/phoneImgaeSample.png";
+const AttachmentsHolder = ({
+  showMediaUploadBar,
+  setShowMediaUploadBar,
+  imageOrVideoUploadArray,
+  setImageOrVideoUploadArray,
+  documentUploadArray,
+  setDocumentUploadArray,
+  attachmentType,
+  setAttachmentType,
+  showInitiateUploadComponent,
+  setShowInitiateUploadComponent,
+}: any) => {
+  function setAttachmentTypeImage() {
+    setShowMediaUploadBar(false);
+    setShowInitiateUploadComponent(true);
+    setAttachmentType(1);
+  }
+  function setAttachmentTypeDocument() {
+    setShowMediaUploadBar(false);
+    setShowInitiateUploadComponent(true);
+    setAttachmentType(2);
+  }
+
+  function setMediaUploadBar() {
+    if (showMediaUploadBar) {
+      return (
+        <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-attachment-wrapper">
+          <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--add-post-text">
+            Add to your post
+          </span>
+          {/* Image upload icon */}
+          <span
+            className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
+            onClick={setAttachmentTypeImage}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.75 9.375C15.75 9.67337 15.6315 9.95952 15.4205 10.1705C15.2095 10.3815 14.9234 10.5 14.625 10.5C14.3266 10.5 14.0405 10.3815 13.8295 10.1705C13.6185 9.95952 13.5 9.67337 13.5 9.375C13.5 9.07663 13.6185 8.79048 13.8295 8.5795C14.0405 8.36853 14.3266 8.25 14.625 8.25C14.9234 8.25 15.2095 8.36853 15.4205 8.5795C15.6315 8.79048 15.75 9.07663 15.75 9.375ZM21.75 5.25V17.25V18.75C21.75 19.1478 21.592 19.5294 21.3107 19.8107C21.0294 20.092 20.6478 20.25 20.25 20.25H3.75C3.35218 20.25 2.97064 20.092 2.68934 19.8107C2.40804 19.5294 2.25 19.1478 2.25 18.75V15.75V5.25C2.25 4.85218 2.40804 4.47064 2.68934 4.18934C2.97064 3.90804 3.35218 3.75 3.75 3.75H20.25C20.6478 3.75 21.0294 3.90804 21.3107 4.18934C21.592 4.47064 21.75 4.85218 21.75 5.25ZM20.25 15.4406V5.25H3.75V13.9406L7.19062 10.5C7.47302 10.2217 7.85355 10.0658 8.25 10.0658C8.64645 10.0658 9.02698 10.2217 9.30938 10.5L13.5 14.6906L15.4406 12.75C15.723 12.4717 16.1036 12.3158 16.5 12.3158C16.8964 12.3158 17.277 12.4717 17.5594 12.75L20.25 15.4406Z"
+                fill="#ED8031"
+              />
+            </svg>
+          </span>
+          {/* Video upload icons */}
+          <span
+            className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
+            onClick={setAttachmentTypeImage}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M16.5 8.625V17.625C16.5 18.0228 16.342 18.4044 16.0607 18.6857C15.7794 18.967 15.3978 19.125 15 19.125H4.5C4.00754 19.125 3.51991 19.028 3.06494 18.8395C2.60997 18.6511 2.19657 18.3749 1.84835 18.0267C1.14509 17.3234 0.75 16.3696 0.75 15.375V6.375C0.75 5.97718 0.908035 5.59564 1.18934 5.31434C1.47064 5.03304 1.85218 4.875 2.25 4.875H12.75C13.7446 4.875 14.6984 5.27009 15.4017 5.97335C16.1049 6.67661 16.5 7.63044 16.5 8.625ZM22.875 6.85312C22.762 6.78442 22.6323 6.74808 22.5 6.74808C22.3677 6.74808 22.238 6.78442 22.125 6.85312L18.375 8.99063C18.26 9.05702 18.1647 9.15276 18.0988 9.26806C18.0329 9.38336 17.9988 9.51408 18 9.64688V14.3531C17.9988 14.4859 18.0329 14.6166 18.0988 14.7319C18.1647 14.8472 18.26 14.943 18.375 15.0094L22.125 17.1469C22.2393 17.2124 22.3683 17.2479 22.5 17.25C22.6319 17.2492 22.7612 17.2136 22.875 17.1469C22.9899 17.0828 23.0854 16.9888 23.1514 16.875C23.2174 16.7611 23.2515 16.6316 23.25 16.5V7.5C23.2515 7.36841 23.2174 7.23886 23.1514 7.12501C23.0854 7.01116 22.9899 6.91723 22.875 6.85312Z"
+                fill="#7B61FF"
+              />
+            </svg>
+          </span>
+          {/* q/a upload icon */}
+          <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M14.2509 9.58201C14.2509 13.1067 11.2846 15.9641 7.62544 15.9641C6.45964 15.9641 5.36418 15.674 4.41255 15.1648L1.9439 16.2235L2.71942 13.8713C1.65107 12.7381 1 11.2333 1 9.58201C1 6.0573 3.96631 3.19995 7.62544 3.19995C11.2846 3.19995 14.2509 6.0573 14.2509 9.58201ZM7.81514 11.428C7.70258 11.4484 7.58503 11.4585 7.4625 11.4585C7.19883 11.4585 6.95664 11.4107 6.73594 11.315C6.51719 11.2193 6.32773 11.0816 6.16758 10.9019C6.00742 10.7222 5.8834 10.5044 5.79551 10.2486C5.70762 9.99077 5.66367 9.70073 5.66367 9.37847V9.15874C5.66367 8.83452 5.70664 8.54448 5.79258 8.28862C5.88047 8.03276 6.00352 7.81499 6.16172 7.6353C6.32188 7.45366 6.51133 7.31499 6.73008 7.21929C6.95078 7.12358 7.19297 7.07573 7.45664 7.07573C7.72227 7.07573 7.96445 7.12358 8.1832 7.21929C8.40391 7.31499 8.59336 7.45366 8.75156 7.6353C8.91172 7.81499 9.03477 8.03276 9.1207 8.28862C9.20859 8.54448 9.25254 8.83452 9.25254 9.15874V9.37847C9.25254 9.70073 9.20957 9.99077 9.12363 10.2486C9.03769 10.5044 8.91465 10.7222 8.75449 10.9019C8.67974 10.9868 8.59822 11.0623 8.50994 11.1285L9.23203 11.7017L8.71641 12.15L7.81514 11.428ZM8.43809 9.15288V9.37847C8.43809 9.60894 8.4166 9.81304 8.37363 9.99077C8.33066 10.1685 8.26719 10.3189 8.1832 10.4419C8.10117 10.563 7.99961 10.6548 7.87852 10.7173C7.75742 10.7798 7.61875 10.8111 7.4625 10.8111C7.3082 10.8111 7.16953 10.7798 7.04648 10.7173C6.92539 10.6548 6.82188 10.563 6.73594 10.4419C6.65195 10.3189 6.5875 10.1685 6.54258 9.99077C6.49961 9.81304 6.47813 9.60894 6.47813 9.37847V9.15288C6.47813 8.92046 6.49961 8.71636 6.54258 8.54058C6.5875 8.36284 6.65195 8.21343 6.73594 8.09233C6.81992 7.97124 6.92246 7.88042 7.04355 7.81987C7.16465 7.75737 7.30234 7.72612 7.45664 7.72612C7.61289 7.72612 7.75156 7.75737 7.87266 7.81987C7.99375 7.88042 8.09629 7.97124 8.18027 8.09233C8.26621 8.21343 8.33066 8.36284 8.37363 8.54058C8.4166 8.71636 8.43809 8.92046 8.43809 9.15288Z"
+                fill="#F2994A"
+              />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M22.9999 14.1584C22.9999 10.6337 20.0336 7.77637 16.3745 7.77637C15.7714 7.77637 15.1872 7.85398 14.6319 7.99941C15.1674 9.88522 15.005 14.1515 10.0713 16.1301C10.9336 18.6899 13.4297 20.5405 16.3745 20.5405C17.5403 20.5405 18.6358 20.2504 19.5874 19.7412L22.056 20.7999L21.2805 18.4477C22.3489 17.3146 22.9999 15.8097 22.9999 14.1584ZM16.3737 11.5343H16.5729L18.1755 15.7999H17.32L16.9995 14.8507H15.4065L15.0876 15.7999H14.235L15.8288 11.5343H16.0251H16.3737ZM15.6202 14.2149H16.7848L16.2011 12.4862L15.6202 14.2149Z"
+                fill="#F2994A"
+              />
+            </svg>
+          </span>
+          {/* poll upload icon */}
+          <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12.0002 3.19995C11.4167 3.19995 10.8571 3.43174 10.4446 3.84432C10.032 4.2569 9.80019 4.81647 9.80019 5.39995V18.5999C9.80019 19.1834 10.032 19.743 10.4446 20.1556C10.8571 20.5682 11.4167 20.7999 12.0002 20.7999C12.5837 20.7999 13.1432 20.5682 13.5558 20.1556C13.9684 19.743 14.2002 19.1834 14.2002 18.5999V5.39995C14.2002 4.81647 13.9684 4.2569 13.5558 3.84432C13.1432 3.43174 12.5837 3.19995 12.0002 3.19995ZM5.4002 12C4.81672 12 4.25714 12.2317 3.84456 12.6443C3.43198 13.0569 3.2002 13.6165 3.2002 14.2V18.5999C3.2002 19.1834 3.43198 19.743 3.84456 20.1556C4.25714 20.5682 4.81672 20.7999 5.4002 20.7999C5.98367 20.7999 6.54325 20.5682 6.95583 20.1556C7.36841 19.743 7.60019 19.1834 7.60019 18.5999V14.2C7.60019 13.6165 7.36841 13.0569 6.95583 12.6443C6.54325 12.2317 5.98367 12 5.4002 12ZM18.6002 7.59995C18.0167 7.59995 17.4571 7.83174 17.0446 8.24432C16.632 8.6569 16.4002 9.21647 16.4002 9.79995V18.5999C16.4002 19.1834 16.632 19.743 17.0446 20.1556C17.4571 20.5682 18.0167 20.7999 18.6002 20.7999C19.1837 20.7999 19.7432 20.5682 20.1558 20.1556C20.5684 19.743 20.8002 19.1834 20.8002 18.5999V9.79995C20.8002 9.21647 20.5684 8.6569 20.1558 8.24432C19.7432 7.83174 19.1837 7.59995 18.6002 7.59995Z"
+                fill="#F75266"
+              />
+            </svg>
+          </span>
+          {/* document type uppload icon */}
+          <span
+            className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
+            onClick={setAttachmentTypeDocument}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 17.25C18 16.8358 17.6642 16.5 17.25 16.5H6.5C4.29 16.5 2.5 14.71 2.5 12.5C2.5 10.29 4.29 8.5 6.5 8.5H19C20.38 8.5 21.5 9.62 21.5 11C21.5 12.38 20.38 13.5 19 13.5H10.5C9.95 13.5 9.5 13.05 9.5 12.5C9.5 11.95 9.95 11.5 10.5 11.5H17.25C17.6642 11.5 18 11.1642 18 10.75C18 10.3358 17.6642 10 17.25 10H10.5C9.12 10 8 11.12 8 12.5C8 13.88 9.12 15 10.5 15H19C21.21 15 23 13.21 23 11C23 8.79 21.21 7 19 7H6.5C3.46 7 1 9.46 1 12.5C1 15.54 3.46 18 6.5 18H17.25C17.6642 18 18 17.6642 18 17.25Z"
+                fill="#484F67"
+              />
+            </svg>
+          </span>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+  function setInitiateUploadBlock() {
+    if (showInitiateUploadComponent) {
+      return (
+        <InitiateUploadView
+          showMediaUploadBar={showMediaUploadBar}
+          setShowMediaUploadBar={setShowMediaUploadBar}
+          imageOrVideoUploadArray={imageOrVideoUploadArray}
+          setImageOrVideoUploadArray={setImageOrVideoUploadArray}
+          documentUploadArray={documentUploadArray}
+          setDocumentUploadArray={setDocumentUploadArray}
+          attachmentType={attachmentType}
+          setAttachmentType={setAttachmentType}
+          showInitiateUploadComponent={showInitiateUploadComponent}
+          setShowInitiateUploadComponent={setShowInitiateUploadComponent}
+        />
+      );
+    } else {
+      return null;
+    }
+  }
+  function setUploadedView() {
+    if (attachmentType === 1) {
+      return (
+        <ImageVideoAttachmentView
+          imageOrVideoUploadArray={imageOrVideoUploadArray}
+        />
+      );
+    } else if (attachmentType === 2) {
+      return (
+        <DocumentUploadAttachmentContainer
+          documentUploadArray={documentUploadArray}
+          setDocumentUploadArray={setDocumentUploadArray}
+        />
+      );
+    }
+  }
+
+  return (
+    <>
+      <div className="attachmentHolder">
+        {/* <MaxTwoImage /> */}
+        {setInitiateUploadBlock()}
+        {setUploadedView()}
+        {setMediaUploadBar()}
+      </div>
+    </>
+  );
+};
+
+const MaxTwoImage = () => {
+  return (
+    <>
+      <div className="attachmentHolder__imgBlock">
+        <img src={phoneImageSample} alt="sampleImg" />
+      </div>
+      <div className="attachmentHolder__imgBlock">
+        <img src={phoneImageSample} alt="sampleImg" />
+      </div>
+    </>
+  );
+};
+
+const SingleImage = ({ imageOrVideoUploadArray }: any) => {
+  return (
+    <>
+      <div className="attachmentHolder__singleBlock">
+        <label>
+          <span className="attachmentHolder__addMoreButton">
+            <input type="file" />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 8C0 8.2205 0.0791909 8.40999 0.237573 8.56847C0.395954 8.72007 0.581881 8.79587 0.795352 8.79587H7.20981V15.2145C7.20981 15.4281 7.28556 15.6107 7.43706 15.7623C7.59544 15.9208 7.78481 16 8.00517 16C8.21864 16 8.40112 15.9208 8.55262 15.7623C8.70411 15.6107 8.77986 15.4281 8.77986 15.2145V8.79587H15.215C15.4284 8.79587 15.6109 8.72007 15.7624 8.56847C15.9208 8.40999 16 8.2205 16 8C16 7.78639 15.9208 7.60379 15.7624 7.4522C15.6109 7.29371 15.4284 7.21447 15.215 7.21447H8.77986V0.78553C8.77986 0.578811 8.70411 0.39621 8.55262 0.237726C8.40112 0.079242 8.21864 0 8.00517 0C7.78481 0 7.59544 0.079242 7.43706 0.237726C7.28556 0.39621 7.20981 0.578811 7.20981 0.78553V7.21447H0.795352C0.581881 7.21447 0.395954 7.29371 0.237573 7.4522C0.0791909 7.60379 0 7.78639 0 8Z"
+                fill="#5046E5"
+              />
+            </svg>
+            Add More
+          </span>
+        </label>
+        <img src={phoneImageSample} alt="sampleImg" />
+      </div>
+    </>
+  );
+};
+
+const InitiateUploadView = ({
+  showMediaUploadBar,
+  setShowMediaUploadBar,
+  showInitiateUploadComponent,
+  setShowInitiateUploadComponent,
+  imageOrVideoUploadArray,
+  setImageOrVideoUploadArray,
+  documentUploadArray,
+  setDocumentUploadArray,
+  attachmentType,
+  setAttachmentType,
+}: any) => {
+  function handleImageMediaUpload(e: any) {
+    setImageOrVideoUploadArray(e.target.files);
+    setShowInitiateUploadComponent(false);
+  }
+  function handleDocumentMediaUpload(e: any) {
+    setDocumentUploadArray(e.target.files);
+  }
+  function renderInputBox() {
+    if (attachmentType === 1) {
+      return (
+        <>
+          {/* attachment image icon svg */}
+          <span>
+            <svg
+              width="20"
+              height="18"
+              viewBox="0 0 20 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.75 6.375C13.75 6.67337 13.6315 6.95952 13.4205 7.1705C13.2095 7.38147 12.9234 7.5 12.625 7.5C12.3266 7.5 12.0405 7.38147 11.8295 7.1705C11.6185 6.95952 11.5 6.67337 11.5 6.375C11.5 6.07663 11.6185 5.79048 11.8295 5.5795C12.0405 5.36853 12.3266 5.25 12.625 5.25C12.9234 5.25 13.2095 5.36853 13.4205 5.5795C13.6315 5.79048 13.75 6.07663 13.75 6.375ZM19.75 2.25V14.25V15.75C19.75 16.1478 19.592 16.5294 19.3107 16.8107C19.0294 17.092 18.6478 17.25 18.25 17.25H1.75C1.35218 17.25 0.970644 17.092 0.68934 16.8107C0.408035 16.5294 0.25 16.1478 0.25 15.75V12.75V2.25C0.25 1.85218 0.408035 1.47064 0.68934 1.18934C0.970644 0.908035 1.35218 0.75 1.75 0.75H18.25C18.6478 0.75 19.0294 0.908035 19.3107 1.18934C19.592 1.47064 19.75 1.85218 19.75 2.25ZM18.25 12.4406V2.25H1.75V10.9406L5.19062 7.5C5.47302 7.22175 5.85355 7.06577 6.25 7.06577C6.64645 7.06577 7.02698 7.22175 7.30938 7.5L11.5 11.6906L13.4406 9.75C13.723 9.47175 14.1036 9.31577 14.5 9.31577C14.8964 9.31577 15.277 9.47175 15.5594 9.75L18.25 12.4406Z"
+                fill="#ED8031"
+              />
+            </svg>
+          </span>
+          {/* heading */}
+          <p className="initiateMediaUploadBox--headingOne">
+            Add Photos/Videos
+          </p>
+          <p className="initiateMediaUploadBox--headingTwo">or drag and drop</p>
+
+          <input
+            type="file"
+            accept="image/*, video/*"
+            multiple
+            // value={imageOrVideoUploadArray}
+            onChange={handleImageMediaUpload}
+          />
+        </>
+      );
+    } else if (attachmentType === 2) {
+      return (
+        <>
+          {/* attachment pin icon svg */}
+          <span>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 17.25C18 16.8358 17.6642 16.5 17.25 16.5H6.5C4.29 16.5 2.5 14.71 2.5 12.5C2.5 10.29 4.29 8.5 6.5 8.5H19C20.38 8.5 21.5 9.62 21.5 11C21.5 12.38 20.38 13.5 19 13.5H10.5C9.95 13.5 9.5 13.05 9.5 12.5C9.5 11.95 9.95 11.5 10.5 11.5H17.25C17.6642 11.5 18 11.1642 18 10.75C18 10.3358 17.6642 10 17.25 10H10.5C9.12 10 8 11.12 8 12.5C8 13.88 9.12 15 10.5 15H19C21.21 15 23 13.21 23 11C23 8.79 21.21 7 19 7H6.5C3.46 7 1 9.46 1 12.5C1 15.54 3.46 18 6.5 18H17.25C17.6642 18 18 17.6642 18 17.25Z"
+                fill="#484F67"
+              />
+            </svg>
+          </span>
+          {/* heading */}
+          <p className="initiateMediaUploadBox--headingOne">
+            Add Files/Documents
+          </p>
+          <p className="initiateMediaUploadBox--headingTwo">or drag and drop</p>
+          <input
+            type="file"
+            accept=".doc, .docx, .pdf, .txt"
+            multiple
+            onChange={handleDocumentMediaUpload}
+          />
+        </>
+      );
+    }
+  }
+  function handleCloseIconInitiateMediaUploadBox(e: any) {
+    e.stopPropagation();
+    e.preventDefault();
+    setAttachmentType(0);
+    setShowMediaUploadBar(true);
+    setShowInitiateUploadComponent(false);
+    setImageOrVideoUploadArray(null);
+    setDocumentUploadArray(null);
+  }
+  return (
+    <label className="initiateMediaUploadBox">
+      {/* close icon for the upload box */}
+      <span
+        className="initiateMediaUploadBox--closeIcon"
+        onClick={handleCloseIconInitiateMediaUploadBox}
+      >
+        <svg
+          width="26"
+          height="26"
+          viewBox="0 0 26 26"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="13" cy="13" r="12" stroke="#484F67" />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M13.6857 13L17.1141 9.5716L16.4284 8.88592L13 12.3143L9.5716 8.88592L8.88592 9.5716L12.3143 13L8.88592 16.4284L9.5716 17.1141L13 13.6857L16.4284 17.1141L17.1141 16.4284L13.6857 13Z"
+            fill="#484F67"
+          />
+          <path
+            d="M17.1141 9.5716L17.4676 9.92515L17.8212 9.5716L17.4676 9.21804L17.1141 9.5716ZM13.6857 13L13.3321 12.6464L12.9786 13L13.3321 13.3535L13.6857 13ZM16.4284 8.88592L16.782 8.53236L16.4284 8.17881L16.0748 8.53236L16.4284 8.88592ZM13 12.3143L12.6464 12.6679L13 13.0214L13.3536 12.6679L13 12.3143ZM9.5716 8.88592L9.92516 8.53236L9.5716 8.17881L9.21805 8.53236L9.5716 8.88592ZM8.88592 9.5716L8.53237 9.21804L8.17882 9.5716L8.53237 9.92515L8.88592 9.5716ZM12.3143 13L12.6679 13.3535L13.0214 13L12.6679 12.6464L12.3143 13ZM8.88592 16.4284L8.53237 16.0748L8.17882 16.4284L8.53237 16.7819L8.88592 16.4284ZM9.5716 17.1141L9.21805 17.4676L9.5716 17.8212L9.92516 17.4676L9.5716 17.1141ZM13 13.6857L13.3536 13.3321L13 12.9786L12.6464 13.3321L13 13.6857ZM16.4284 17.1141L16.0748 17.4676L16.4284 17.8212L16.7819 17.4676L16.4284 17.1141ZM17.1141 16.4284L17.4676 16.7819L17.8212 16.4284L17.4676 16.0748L17.1141 16.4284ZM16.7605 9.21804L13.3321 12.6464L14.0392 13.3535L17.4676 9.92515L16.7605 9.21804ZM16.0748 9.23947L16.7605 9.92515L17.4676 9.21804L16.782 8.53236L16.0748 9.23947ZM13.3536 12.6679L16.782 9.23947L16.0748 8.53236L12.6464 11.9608L13.3536 12.6679ZM9.21805 9.23947L12.6464 12.6679L13.3536 11.9608L9.92516 8.53236L9.21805 9.23947ZM9.23948 9.92515L9.92516 9.23947L9.21805 8.53236L8.53237 9.21804L9.23948 9.92515ZM12.6679 12.6464L9.23948 9.21804L8.53237 9.92515L11.9608 13.3535L12.6679 12.6464ZM9.23948 16.7819L12.6679 13.3535L11.9608 12.6464L8.53237 16.0748L9.23948 16.7819ZM9.92516 16.7605L9.23948 16.0748L8.53237 16.7819L9.21805 17.4676L9.92516 16.7605ZM12.6464 13.3321L9.21805 16.7605L9.92516 17.4676L13.3536 14.0392L12.6464 13.3321ZM16.7819 16.7605L13.3536 13.3321L12.6464 14.0392L16.0748 17.4676L16.7819 16.7605ZM16.7605 16.0748L16.0748 16.7605L16.7819 17.4676L17.4676 16.7819L16.7605 16.0748ZM13.3321 13.3535L16.7605 16.7819L17.4676 16.0748L14.0392 12.6464L13.3321 13.3535Z"
+            fill="#484F67"
+          />
+        </svg>
+      </span>
+
+      {renderInputBox()}
+    </label>
+  );
+};
+
+function ImageVideoAttachmentView({ imageOrVideoUploadArray }: any) {
+  let length = imageOrVideoUploadArray?.length;
+  console.log("the image array: ", imageOrVideoUploadArray);
+  switch (length) {
+    case undefined || 0 || null: {
+      return null;
+    }
+    case 1: {
+      return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
+    }
+    case 2: {
+      return <MaxTwoImage />;
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
+function HolderWithCross({ children, onCloseFunction }: any) {
+  return (
+    <div className="holderWithCrossContainer">
+      <span className="holderWithCrossContainer--closeIcon">
+        <svg
+          width="26"
+          height="26"
+          viewBox="0 0 26 26"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="13" cy="13" r="12" fill="white" stroke="#484F67" />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M13.6857 13L17.1141 9.5716L16.4284 8.88592L13 12.3143L9.5716 8.88592L8.88592 9.5716L12.3143 13L8.88592 16.4284L9.5716 17.1141L13 13.6857L16.4284 17.1141L17.1141 16.4284L13.6857 13Z"
+            fill="#484F67"
+          />
+          <path
+            d="M17.1141 9.5716L17.4676 9.92515L17.8212 9.5716L17.4676 9.21804L17.1141 9.5716ZM13.6857 13L13.3321 12.6464L12.9786 13L13.3321 13.3535L13.6857 13ZM16.4284 8.88592L16.782 8.53236L16.4284 8.17881L16.0748 8.53236L16.4284 8.88592ZM13 12.3143L12.6464 12.6679L13 13.0214L13.3536 12.6679L13 12.3143ZM9.5716 8.88592L9.92516 8.53236L9.5716 8.17881L9.21805 8.53236L9.5716 8.88592ZM8.88592 9.5716L8.53237 9.21804L8.17882 9.5716L8.53237 9.92515L8.88592 9.5716ZM12.3143 13L12.6679 13.3535L13.0214 13L12.6679 12.6464L12.3143 13ZM8.88592 16.4284L8.53237 16.0748L8.17882 16.4284L8.53237 16.7819L8.88592 16.4284ZM9.5716 17.1141L9.21805 17.4676L9.5716 17.8212L9.92516 17.4676L9.5716 17.1141ZM13 13.6857L13.3536 13.3321L13 12.9786L12.6464 13.3321L13 13.6857ZM16.4284 17.1141L16.0748 17.4676L16.4284 17.8212L16.7819 17.4676L16.4284 17.1141ZM17.1141 16.4284L17.4676 16.7819L17.8212 16.4284L17.4676 16.0748L17.1141 16.4284ZM16.7605 9.21804L13.3321 12.6464L14.0392 13.3535L17.4676 9.92515L16.7605 9.21804ZM16.0748 9.23947L16.7605 9.92515L17.4676 9.21804L16.782 8.53236L16.0748 9.23947ZM13.3536 12.6679L16.782 9.23947L16.0748 8.53236L12.6464 11.9608L13.3536 12.6679ZM9.21805 9.23947L12.6464 12.6679L13.3536 11.9608L9.92516 8.53236L9.21805 9.23947ZM9.23948 9.92515L9.92516 9.23947L9.21805 8.53236L8.53237 9.21804L9.23948 9.92515ZM12.6679 12.6464L9.23948 9.21804L8.53237 9.92515L11.9608 13.3535L12.6679 12.6464ZM9.23948 16.7819L12.6679 13.3535L11.9608 12.6464L8.53237 16.0748L9.23948 16.7819ZM9.92516 16.7605L9.23948 16.0748L8.53237 16.7819L9.21805 17.4676L9.92516 16.7605ZM12.6464 13.3321L9.21805 16.7605L9.92516 17.4676L13.3536 14.0392L12.6464 13.3321ZM16.7819 16.7605L13.3536 13.3321L12.6464 14.0392L16.0748 17.4676L16.7819 16.7605ZM16.7605 16.0748L16.0748 16.7605L16.7819 17.4676L17.4676 16.7819L16.7605 16.0748ZM13.3321 13.3535L16.7605 16.7819L17.4676 16.0748L14.0392 12.6464L13.3321 13.3535Z"
+            fill="#484F67"
+          />
+        </svg>
+      </span>
+      {children}
+    </div>
+  );
+}
+function DocumentUploadAttachmentContainer({
+  documentUploadArray,
+  setDocumentUploadArray,
+}: any) {
+  function removeADocument(index: number) {
+    const newDocumentUploadArray: any[] = [...documentUploadArray];
+    newDocumentUploadArray.splice(index, 1);
+    setDocumentUploadArray(newDocumentUploadArray);
+  }
+  function renderUploadedDocuments() {
+    return documentUploadArray?.map((docItem: any, docIndex: number) => {
+      return (
+        <HolderWithCross
+          key={docItem.name + docIndex}
+          onCloseFunction={removeADocument}
+        >
+          <div className="attachedDocumentWrapper">
+            {/* pdf icon */}
+            <span>
+              <svg
+                width="28"
+                height="36"
+                viewBox="0 0 28 36"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M24.7312 36C26.5376 36 28 34.5498 28 32.7583V8.23223H21.4194C20.9462 8.23223 20.6022 7.84834 20.6022 7.4218V0H3.22581C1.46237 0 0 1.40758 0 3.19905V32.8009C0 34.5498 1.41935 36 3.22581 36H24.7312ZM22.2365 1.27935V6.6111H27.0107L22.2365 1.27935Z"
+                  fill="#EF6060"
+                />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M5.23765 25.3398V22.1662H6.87829C7.95541 22.1662 8.7986 21.9115 9.40786 21.4022C10.0171 20.8928 10.3217 20.1968 10.3217 19.3142C10.3217 18.7327 10.1824 18.2141 9.90379 17.7584C9.62515 17.3026 9.22695 16.951 8.70918 16.7036C8.19142 16.4561 7.59152 16.3324 6.90948 16.3324H3.36621V25.3398H5.23765ZM6.90949 20.6629H5.23767V17.8357H6.95316C7.41478 17.8439 7.77659 17.9842 8.03859 18.2564C8.30059 18.5286 8.4316 18.8853 8.4316 19.3266C8.4316 19.7555 8.30163 20.0855 8.04171 20.3164C7.78179 20.5474 7.40438 20.6629 6.90949 20.6629ZM16.5599 24.7954C15.9278 25.1542 15.2145 25.3357 14.4202 25.3398H11.6068V16.3324H14.4015C15.2 16.3324 15.9143 16.5108 16.5443 16.8675C17.1744 17.2243 17.6661 17.7316 18.0196 18.3894C18.3731 19.0472 18.5499 19.7947 18.5499 20.632V21.0464C18.5499 21.8837 18.3762 22.6281 18.029 23.2797C17.6817 23.9314 17.192 24.4366 16.5599 24.7954ZM14.3828 23.8489H13.4783V17.8357H14.4015C15.1376 17.8357 15.697 18.0718 16.0796 18.544C16.4622 19.0163 16.6535 19.7102 16.6535 20.6258V21.1021C16.6452 21.9847 16.4476 22.6632 16.0608 23.1374C15.6741 23.6117 15.1147 23.8489 14.3828 23.8489ZM21.7812 21.6589V25.3398H19.9098V16.3324H25.8235V17.8357H21.7812V20.1618H25.3744V21.6589H21.7812Z"
+                  fill="white"
+                />
+              </svg>
+            </span>
+            <div className="attachedDocumentWrapper--attachmentBody">
+              <p className="attachedDocumentWrapper__attachmentBody--headingMain">
+                Event Document
+              </p>
+              <p className="attachedDocumentWrapper__attachmentBody--headingSub">
+                2 Pages 278 Kb PDF
+              </p>
+            </div>
+          </div>
+        </HolderWithCross>
+      );
+    });
+  }
+  return (
+    <div className="documentAttachmentContainer">
+      {renderUploadedDocuments()}
+    </div>
+  );
+}
+export default AttachmentsHolder;
