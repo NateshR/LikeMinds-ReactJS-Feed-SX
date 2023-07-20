@@ -52,8 +52,19 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
 
   async function postFeed() {
     try {
-      lmFeedClient.addPost(text);
-    } catch (error) {}
+      let response: any;
+      if (imageOrVideoUploadArray?.length) {
+        response = await lmFeedClient.addPostWithImageAttachments(
+          text,
+          imageOrVideoUploadArray
+        );
+      } else if (documentUploadArray?.length) {
+      } else {
+        lmFeedClient.addPost(text);
+      }
+    } catch (error) {
+      lmFeedClient.logError(error);
+    }
   }
   function closeDialogBox() {
     resetContext();

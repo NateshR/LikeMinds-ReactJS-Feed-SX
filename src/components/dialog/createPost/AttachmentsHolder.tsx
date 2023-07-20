@@ -192,31 +192,39 @@ const MaxTwoImage = () => {
 };
 
 const SingleImage = ({ imageOrVideoUploadArray }: any) => {
-  return (
-    <>
-      <div className="attachmentHolder__singleBlock">
-        <label>
-          <span className="attachmentHolder__addMoreButton">
-            <input type="file" />
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M0 8C0 8.2205 0.0791909 8.40999 0.237573 8.56847C0.395954 8.72007 0.581881 8.79587 0.795352 8.79587H7.20981V15.2145C7.20981 15.4281 7.28556 15.6107 7.43706 15.7623C7.59544 15.9208 7.78481 16 8.00517 16C8.21864 16 8.40112 15.9208 8.55262 15.7623C8.70411 15.6107 8.77986 15.4281 8.77986 15.2145V8.79587H15.215C15.4284 8.79587 15.6109 8.72007 15.7624 8.56847C15.9208 8.40999 16 8.2205 16 8C16 7.78639 15.9208 7.60379 15.7624 7.4522C15.6109 7.29371 15.4284 7.21447 15.215 7.21447H8.77986V0.78553C8.77986 0.578811 8.70411 0.39621 8.55262 0.237726C8.40112 0.079242 8.21864 0 8.00517 0C7.78481 0 7.59544 0.079242 7.43706 0.237726C7.28556 0.39621 7.20981 0.578811 7.20981 0.78553V7.21447H0.795352C0.581881 7.21447 0.395954 7.29371 0.237573 7.4522C0.0791909 7.60379 0 7.78639 0 8Z"
-                fill="#5046E5"
-              />
-            </svg>
-            Add More
-          </span>
-        </label>
-        <img src={phoneImageSample} alt="sampleImg" />
-      </div>
-    </>
-  );
+  function fetchImageUrl() {
+    console.log(imageOrVideoUploadArray);
+    return imageOrVideoUploadArray[0];
+  }
+  fetchImageUrl();
+  if (imageOrVideoUploadArray.length === 1)
+    return (
+      <>
+        <div className="attachmentHolder__singleBlock">
+          <label>
+            <span className="attachmentHolder__addMoreButton">
+              <input type="file" />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0 8C0 8.2205 0.0791909 8.40999 0.237573 8.56847C0.395954 8.72007 0.581881 8.79587 0.795352 8.79587H7.20981V15.2145C7.20981 15.4281 7.28556 15.6107 7.43706 15.7623C7.59544 15.9208 7.78481 16 8.00517 16C8.21864 16 8.40112 15.9208 8.55262 15.7623C8.70411 15.6107 8.77986 15.4281 8.77986 15.2145V8.79587H15.215C15.4284 8.79587 15.6109 8.72007 15.7624 8.56847C15.9208 8.40999 16 8.2205 16 8C16 7.78639 15.9208 7.60379 15.7624 7.4522C15.6109 7.29371 15.4284 7.21447 15.215 7.21447H8.77986V0.78553C8.77986 0.578811 8.70411 0.39621 8.55262 0.237726C8.40112 0.079242 8.21864 0 8.00517 0C7.78481 0 7.59544 0.079242 7.43706 0.237726C7.28556 0.39621 7.20981 0.578811 7.20981 0.78553V7.21447H0.795352C0.581881 7.21447 0.395954 7.29371 0.237573 7.4522C0.0791909 7.60379 0 7.78639 0 8Z"
+                  fill="#5046E5"
+                />
+              </svg>
+              Add More
+            </span>
+          </label>
+          <img src={URL.createObjectURL(fetchImageUrl())} alt="sampleImg" />
+        </div>
+      </>
+    );
+
+  return null;
 };
 
 const InitiateUploadView = ({

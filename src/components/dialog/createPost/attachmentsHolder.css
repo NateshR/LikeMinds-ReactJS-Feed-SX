@@ -20,8 +20,11 @@
     height: 194px;
     width: 100%;
     text-align: center;
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.5);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .attachmentHolder__singleBlock > img {
     

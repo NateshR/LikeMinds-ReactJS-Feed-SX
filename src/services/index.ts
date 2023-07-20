@@ -60,7 +60,17 @@ export class LMClient
       }
     } catch (error) {}
   }
-
+  async addPostWithImageAttachments(text: any, imgMediaArray: any[]) {
+    try {
+      let apiCallResponse = await this.client.addPost({
+        text: text,
+        attachments: {
+          attachment_type: 1,
+        },
+      });
+    } catch (error) {}
+  }
+  async addPostWithDocumentAttachments(text: any, docMediaArray: any[]) {}
   async fetchFeed() {
     try {
       let apiCallResponse = await this.client.getFeed({
