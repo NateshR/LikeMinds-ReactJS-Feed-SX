@@ -1,0 +1,124 @@
+.attachmentHolder{
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.attachmentHolder__imgBlock{
+    border-radius: 0.5rem;
+    flex-grow: 1;
+    text-align: center;
+    margin: 0.25rem;
+}
+.attachmentHolder__imgBlock > img {
+    margin: auto;
+    width: 100%;
+    
+}
+
+.attachmentHolder__singleBlock{
+    height: 194px;
+    width: 100%;
+    text-align: center;
+    background-color: black;
+    position: relative;
+}
+.attachmentHolder__singleBlock > img {
+    
+}
+
+.attachmentHolder__addMoreButton{
+    color: #5046E5;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #5046E5;
+    border-radius: 0.5rem;
+    background-color: white;
+    height: 40px;
+    width: 114px;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+}
+.attachmentHolder__addMoreButton > svg{
+    margin-right: 0.25rem;
+}
+
+input[type="file"]{
+    display: none;
+}
+
+.initiateMediaUploadBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    height: 194px;
+    width: 100%;
+    background-color:rgba(230, 235, 245,0.3);
+    border: 1px solid #E6EBF5;
+    cursor: pointer;
+    border-radius: 0.5rem;
+}
+.initiateMediaUploadBox--closeIcon{
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+.initiateMediaUploadBox--headingOne {
+    font-weight: 400;
+    line-height: 1.25rem;
+    font-size: 1rem;
+    color: #484F67;
+    margin: 0;
+}
+.initiateMediaUploadBox--headingTwo {
+    font-weight: 400;
+    line-height: 1rem;
+    font-size: 0.75rem;
+    color: rgba(72, 79, 103, 0.5);
+    margin: 0;
+}
+.initiateMediaUploadBox > input[type="file"]{
+    display: none;
+}
+
+.holderWithCrossContainer{
+    position: relative;
+    border: 1px solid #E6EBF5;
+    border-radius: 0.5rem;
+}
+.holderWithCrossContainer--closeIcon{
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+.documentAttachmentContainer{
+    max-height: 220px;
+    width: 100%;
+
+}
+
+.attachedDocumentWrapper{
+    height: 72px;
+    display: flex;
+    align-items: center;
+}
+.attachedDocumentWrapper > span {
+    padding: 1rem;
+
+}
+
+.attachedDocumentWrapper--attachmentBody{
+    flex-grow: 1;
+}
+
+.attachedDocumentWrapper__attachmentBody--headingMain{
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 20px;
+    color: #484F67;
+}
