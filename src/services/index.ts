@@ -1,5 +1,6 @@
 import LMFeedClient from '@likeminds.community/feed-js-beta';
 import { HelperFunctionsClass } from './helper';
+import { Attachment, FileModel, UploadMediaModel } from './models';
 interface LMFeedClientInterface {
   initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string): Promise<any>;
   logout(refreshToken: string): Promise<any>;
@@ -24,7 +25,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         isGuest: isGuestMember
       });
       return this.parseDataLayerResponse(apiCallResponse);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async logout(refreshToken: string) {
@@ -33,13 +36,16 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         refreshToken: refreshToken
       });
       return this.parseDataLayerResponse(apiCallResponse);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async addPost(text: string) {
     try {
       const validLinksArray: any[] = this.detectLinks(text);
       if (validLinksArray?.length) {
+        console.log('none');
       } else {
         const apiCallResponse = await this.client.addPost({
           text: text,
@@ -47,25 +53,63 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         });
         return this.parseDataLayerResponse(apiCallResponse);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
-  async addPostWithImageAttachments(text: any, imgMediaArray: any[]) {
+  async addPostWithImageAttachments(text: any, mediaArray: any[], uniqueUserId: any) {
     try {
-      let apiCallResponse = await this.client.addPost({
-        text: text,
-        attachments: {
+      const attachmentResponseArray: Attachment[] = [];
+      for (let index = 0; index < mediaArray.length; index++) {
+        const file: FileModel = mediaArray[index];
+        const resp: UploadMediaModel = await this.uploadMedia(file, uniqueUserId);
+        attachmentResponseArray.push({
           attachment_type: 1,
-        },
+          attachment_meta: {
+            url: resp.Location,
+            format: file?.name?.split('.').slice(-1).toString(),
+            size: file.size
+          }
+        });
+      }
+
+      const apiCallResponse: UploadMediaModel = await this.client.addPost({
+        text: text,
+        attachments: attachmentResponseArray
       });
-    } catch (error) {}
+      console.log(apiCallResponse);
+    } catch (error) {
+      console.log(error);
+    }
   }
-  async addPostWithDocumentAttachments(text: any, docMediaArray: any[]) {}
+  async addPostWithDocumentAttachments(text: any, mediaArray: any[], uniqueUserId: any) {
+    const attachmentResponseArray: Attachment[] = [];
+    for (let index = 0; index < mediaArray.length; index++) {
+      const file: FileModel = mediaArray[index];
+      const resp: UploadMediaModel = await this.uploadMedia(file, uniqueUserId);
+      attachmentResponseArray.push({
+        attachment_type: 3,
+        attachment_meta: {
+          url: resp.Location,
+          format: file?.name?.split('.').slice(-1).toString(),
+          size: file.size
+        }
+      });
+    }
+
+    const apiCallResponse: UploadMediaModel = await this.client.addPost({
+      text: text,
+      attachments: attachmentResponseArray
+    });
+  }
   async fetchFeed() {
     try {
       let apiCallResponse = await this.client.getFeed({
         page: 1,
         pageSize: 10
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

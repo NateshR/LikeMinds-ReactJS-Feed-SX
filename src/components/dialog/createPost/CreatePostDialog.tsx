@@ -6,6 +6,7 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
+  console.log(dialogBoxRef);
   const userContext = useContext(UserContext);
   function setUserImage() {
     const imageLink = userContext?.user?.image_url;
@@ -45,13 +46,19 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
 
   async function postFeed() {
     try {
-      let response: any;
+      closeDialogBox();
       if (imageOrVideoUploadArray?.length) {
-        response = await lmFeedClient.addPostWithImageAttachments(
+        await lmFeedClient.addPostWithImageAttachments(
           text,
-          imageOrVideoUploadArray
+          imageOrVideoUploadArray,
+          userContext?.user?.sdk_client_info.user_unique_id
         );
       } else if (documentUploadArray?.length) {
+        await lmFeedClient.addPostWithDocumentAttachments(
+          text,
+          documentUploadArray,
+          userContext?.user?.sdk_client_info.user_unique_id
+        );
       } else {
         lmFeedClient.addPost(text);
       }
@@ -72,15 +79,13 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
       <div className="create-post-feed-dialog-wrapper--container">
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
-          onClick={closeDialogBox}
-        >
+          onClick={closeDialogBox}>
           <svg
             width="16"
             height="16"
             viewBox="0 0 24 24"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+            xmlns="http://www.w3.org/2000/svg">
             <path
               d="M3.47755 20.5254C3.89943 20.9356 4.59084 20.9356 4.98927 20.5254L11.9971 13.5176L19.0049 20.5254C19.4151 20.9356 20.1065 20.9473 20.5166 20.5254C20.9268 20.1035 20.9385 19.4121 20.5283 19.002L13.5205 11.9942L20.5283 4.99806C20.9385 4.58791 20.9385 3.88478 20.5166 3.47462C20.0947 3.06447 19.4151 3.06447 19.0049 3.47462L11.9971 10.4824L4.98927 3.47462C4.59084 3.06447 3.88771 3.05275 3.47755 3.47462C3.0674 3.8965 3.0674 4.58791 3.47755 4.99806L10.4736 11.9942L3.47755 19.002C3.0674 19.4121 3.05568 20.1152 3.47755 20.5254Z"
               fill="#000000"
@@ -112,8 +117,7 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
           <AttachmentsHolder {...attachmentProps} />
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            onClick={postFeed}
-          >
+            onClick={postFeed}>
             Post
           </div>
         </div>
