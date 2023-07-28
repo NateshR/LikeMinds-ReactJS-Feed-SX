@@ -6,8 +6,11 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
-  console.log(dialogBoxRef);
+interface CreatePostDialogProps {
+  dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
+  closeCreatePostDialog: () => void;
+}
+const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
     const imageLink = userContext?.user?.image_url;
@@ -17,11 +20,11 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
       return <img src={defaultUserImage} alt={userContext.user?.image_url} />;
     }
   }
-  const [text, setText] = useState('');
+  const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
-  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | any[]>(null);
-  const [documentUploadArray, setDocumentUploadArray] = useState<null | any[]>(null);
+  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | File[]>(null);
+  const [documentUploadArray, setDocumentUploadArray] = useState<null | File[]>(null);
   const [attachmentType, setAttachmentType] = useState<null | number>(0);
   const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
   const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
