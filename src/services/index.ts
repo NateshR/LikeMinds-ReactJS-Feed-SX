@@ -1,6 +1,6 @@
 import LMFeedClient from '@likeminds.community/feed-js-beta';
 import { HelperFunctionsClass } from './helper';
-import { Attachment, FileModel, UploadMediaModel } from './models';
+import { Attachment, DecodeUrlModelSX, FileModel, UploadMediaModel } from './models';
 interface LMFeedClientInterface {
   initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string): Promise<any>;
   logout(refreshToken: string): Promise<any>;
@@ -43,16 +43,29 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
 
   async addPost(text: string) {
     try {
-      const validLinksArray: any[] = this.detectLinks(text);
-      if (validLinksArray?.length) {
-        console.log('none');
-      } else {
-        const apiCallResponse = await this.client.addPost({
-          text: text,
-          attachments: validLinksArray
-        });
-        return this.parseDataLayerResponse(apiCallResponse);
-      }
+      const apiCallResponse = await this.client.addPost({
+        text: text,
+        attachments: []
+      });
+      return this.parseDataLayerResponse(apiCallResponse);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async addPostWithOGTags(text: string, ogTags: any) {
+    try {
+      let attachmentArr: Attachment[] = [];
+      attachmentArr.push({
+        attachment_type: 4,
+        attachment_meta: {
+          og_tags: ogTags
+        }
+      });
+      const apiCallResponse = await this.client.addPost({
+        text: text,
+        attachments: attachmentArr
+      });
+      return this.parseDataLayerResponse(apiCallResponse);
     } catch (error) {
       console.log(error);
     }
@@ -110,6 +123,19 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       });
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async decodeUrl(url: string) {
+    try {
+      const apiCallResponse = await this.client.decodeUrl({
+        url: url
+      });
+      // change this in the data layer
+      return apiCallResponse?.data?.og_tags;
+    } catch (error: any) {
+      console.log(error);
+      return error;
     }
   }
 }

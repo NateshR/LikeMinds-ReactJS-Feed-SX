@@ -5,6 +5,7 @@ import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
+import { DecodeUrlModelSX } from '../../../services/models';
 const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
   console.log(dialogBoxRef);
   const userContext = useContext(UserContext);
@@ -22,6 +23,9 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
   const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | any[]>(null);
   const [documentUploadArray, setDocumentUploadArray] = useState<null | any[]>(null);
   const [attachmentType, setAttachmentType] = useState<null | number>(0);
+  const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
+  const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
+  const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -32,7 +36,13 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
     attachmentType,
     setAttachmentType,
     showInitiateUploadComponent,
-    setShowInitiateUploadComponent
+    setShowInitiateUploadComponent,
+    showOGTagPreview,
+    setShowOGTagPreview,
+    previewOGTagData,
+    setPreviewOGTagData,
+    hasPreviewClosedOnce,
+    setHasPreviewClosedOnce
   };
 
   function resetContext() {
@@ -59,11 +69,29 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
           documentUploadArray,
           userContext?.user?.sdk_client_info.user_unique_id
         );
+      } else if (previewOGTagData !== null) {
+        await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
       } else {
         lmFeedClient.addPost(text);
       }
     } catch (error) {
       lmFeedClient.logError(error);
+    }
+  }
+  async function checkForOGTags() {
+    try {
+      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
+      console.log(ogTagLinkArray);
+      if (ogTagLinkArray.length) {
+        const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
+        console.log('the og tag call is :', getOgTag);
+        setPreviewOGTagData(getOgTag);
+        if (!hasPreviewClosedOnce) {
+          setShowOGTagPreview(true);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
   function closeDialogBox() {
@@ -74,6 +102,15 @@ const CreatePostDialog = ({ dialogBoxRef, closeCreatePostDialog }: any) => {
   useEffect(() => {
     console.log(imageOrVideoUploadArray);
   }, [imageOrVideoUploadArray]);
+
+  useEffect(() => {
+    const timeOut = setTimeout(() => {
+      checkForOGTags();
+    }, 500);
+    return () => {
+      clearTimeout(timeOut);
+    };
+  }, [text]);
   return (
     <div className="create-post-feed-dialog-wrapper">
       <div className="create-post-feed-dialog-wrapper--container">

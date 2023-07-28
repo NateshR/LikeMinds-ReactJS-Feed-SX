@@ -39,3 +39,10 @@ export interface FileModel {
   type: string;
   webkitRelativePath: string;
 }
+
+export interface DecodeUrlModelSX {
+  description: string;
+  image: string;
+  title: string;
+  url: string;
+}
