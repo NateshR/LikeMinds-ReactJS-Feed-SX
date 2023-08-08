@@ -12,11 +12,7 @@ const FeedComponent: React.FC = () => {
   function setAppUserState(user: any) {
     switch (user) {
       case null:
-        return (
-          <DialogBox>
-            <CreatePostDialog />
-          </DialogBox>
-        );
+        return null;
       default:
         return (
           <div className="lmWrapper">
@@ -40,13 +36,11 @@ const FeedComponent: React.FC = () => {
 
   useEffect(() => {
     async function setUserState() {
-      try {
-        const userResponse = await lmFeedClient.initiateUser(
-          '28f7f107-5916-4cce-bbb7-4ee48b35e64d',
-          false
-        );
-        setUser(userResponse?.data?.user);
-      } catch (error) {}
+      const userResponse = await lmFeedClient.initiateUser(
+        '28f7f107-5916-4cce-bbb7-4ee48b35e64d',
+        false
+      );
+      setUser(userResponse?.data?.user);
     }
     setUserState();
   }, []);
@@ -56,8 +50,7 @@ const FeedComponent: React.FC = () => {
       value={{
         user,
         setUser
-      }}
-    >
+      }}>
       {setAppUserState(user)}
     </UserContext.Provider>
   );
