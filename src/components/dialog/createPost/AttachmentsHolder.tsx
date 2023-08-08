@@ -1,8 +1,27 @@
+import React, { ReactNode } from 'react';
 import './attachmentsHolder.css';
 import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
-import { FileModel } from '../../../services/models';
+import { DecodeUrlModelSX, FileModel } from '../../../services/models';
 import previewImage from './../../../assets/images/ogTagPreview.png';
+interface AttachmentsHolderProps {
+  showMediaUploadBar: boolean | null;
+  setShowMediaUploadBar: React.Dispatch<React.SetStateAction<boolean | null>>;
+  imageOrVideoUploadArray: File[] | null;
+  setImageOrVideoUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+  documentUploadArray: File[] | null;
+  setDocumentUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+  attachmentType: number | null;
+  setAttachmentType: React.Dispatch<React.SetStateAction<number | null>>;
+  showInitiateUploadComponent: boolean;
+  setShowInitiateUploadComponent: React.Dispatch<React.SetStateAction<boolean>>;
+  showOGTagPreview: boolean;
+  setShowOGTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  previewOGTagData: DecodeUrlModelSX | null; // Add the DecodeUrlModelSX type here (assuming it's imported)
+  setPreviewOGTagData: React.Dispatch<React.SetStateAction<DecodeUrlModelSX | null>>; // Add the DecodeUrlModelSX type here (assuming it's imported)
+  hasPreviewClosedOnce: boolean;
+  setHasPreviewClosedOnce: React.Dispatch<React.SetStateAction<boolean>>;
+}
 const AttachmentsHolder = ({
   showMediaUploadBar,
   setShowMediaUploadBar,
@@ -20,7 +39,7 @@ const AttachmentsHolder = ({
   setPreviewOGTagData,
   hasPreviewClosedOnce,
   setHasPreviewClosedOnce
-}: any) => {
+}: AttachmentsHolderProps) => {
   function setAttachmentTypeImage() {
     setShowMediaUploadBar(false);
     setShowInitiateUploadComponent(true);
@@ -133,15 +152,11 @@ const AttachmentsHolder = ({
     if (showInitiateUploadComponent) {
       return (
         <InitiateUploadView
-          showMediaUploadBar={showMediaUploadBar}
           setShowMediaUploadBar={setShowMediaUploadBar}
-          imageOrVideoUploadArray={imageOrVideoUploadArray}
           setImageOrVideoUploadArray={setImageOrVideoUploadArray}
-          documentUploadArray={documentUploadArray}
           setDocumentUploadArray={setDocumentUploadArray}
           attachmentType={attachmentType}
           setAttachmentType={setAttachmentType}
-          showInitiateUploadComponent={showInitiateUploadComponent}
           setShowInitiateUploadComponent={setShowInitiateUploadComponent}
         />
       );
@@ -151,7 +166,12 @@ const AttachmentsHolder = ({
   }
   function setUploadedView() {
     if (attachmentType === 1 && !showInitiateUploadComponent) {
-      return <ImageVideoAttachmentView imageOrVideoUploadArray={imageOrVideoUploadArray} />;
+      return (
+        <ImageVideoAttachmentView
+          imageOrVideoUploadArray={imageOrVideoUploadArray}
+          setImageOrVideoUploadArray={setImageOrVideoUploadArray}
+        />
+      );
     } else if (attachmentType === 2 && !showInitiateUploadComponent) {
       return (
         <DocumentUploadAttachmentContainer
@@ -167,7 +187,7 @@ const AttachmentsHolder = ({
     if (showOGTagPreview && attachmentType === 0) {
       return (
         <PreviewForOGTag
-          ogTagPreviewData={previewOGTagData}
+          ogTagPreviewData={previewOGTagData!}
           setOgTagPreview={setShowOGTagPreview}
         />
       );
@@ -187,9 +207,18 @@ const AttachmentsHolder = ({
     </>
   );
 };
-function DocumentUploadAttachmentContainer({ documentUploadArray, setDocumentUploadArray }: any) {
+
+type DocumentUploadAttachmentContainerProps = {
+  documentUploadArray: File[] | null;
+  setDocumentUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+};
+
+function DocumentUploadAttachmentContainer({
+  documentUploadArray,
+  setDocumentUploadArray
+}: DocumentUploadAttachmentContainerProps) {
   function removeADocument(index: number) {
-    const newDocumentUploadArray: any[] = [...documentUploadArray];
+    const newDocumentUploadArray: File[] = [...documentUploadArray!];
     newDocumentUploadArray.splice(index, 1);
     setDocumentUploadArray(newDocumentUploadArray);
   }
@@ -197,8 +226,8 @@ function DocumentUploadAttachmentContainer({ documentUploadArray, setDocumentUpl
     if (documentUploadArray === null) {
       return null;
     }
-    const docArray: FileModel[] = Array.from(documentUploadArray);
-    return docArray?.map((docItem: FileModel, docIndex: number) => {
+    const docArray: File[] = Array.from(documentUploadArray);
+    return docArray?.map((docItem: File, docIndex: number) => {
       function ad() {
         removeADocument(docIndex);
       }
@@ -240,7 +269,7 @@ function DocumentUploadAttachmentContainer({ documentUploadArray, setDocumentUpl
   }
   // eslint-disable-next-line no-undef
   function addMoreDocuments(event: ChangeEvent<HTMLInputElement>) {
-    const newDocumentUploadArray: FileModel[] = [...documentUploadArray].concat(
+    const newDocumentUploadArray: File[] = [...documentUploadArray!].concat(
       Array.from(event.target.files!)
     );
     setDocumentUploadArray(newDocumentUploadArray);
@@ -303,17 +332,28 @@ const MinThreeImage = () => {
     </>
   );
 };
+type SingleImageProps = {
+  imageOrVideoUploadArray: File[] | null;
+};
 
-const SingleImage = ({ imageOrVideoUploadArray }: any) => {
+const SingleImage = ({ imageOrVideoUploadArray }: SingleImageProps) => {
   function fetchImageUrl() {
-    console.log(imageOrVideoUploadArray);
-    return imageOrVideoUploadArray[0];
+    return imageOrVideoUploadArray![0];
   }
   fetchImageUrl();
-  if (imageOrVideoUploadArray.length === 1)
+  if (imageOrVideoUploadArray?.length === 1)
     return <img src={URL.createObjectURL(fetchImageUrl())} alt="sampleImg" />;
 
   return null;
+};
+
+type InitiateUploadViewProps = {
+  setShowMediaUploadBar: React.Dispatch<React.SetStateAction<boolean | null>>;
+  setShowInitiateUploadComponent: React.Dispatch<React.SetStateAction<boolean>>;
+  setImageOrVideoUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+  setDocumentUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+  attachmentType: number | null;
+  setAttachmentType: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 const InitiateUploadView = ({
@@ -327,13 +367,13 @@ const InitiateUploadView = ({
   setDocumentUploadArray,
   attachmentType,
   setAttachmentType
-}: any) => {
-  function handleImageMediaUpload(e: any) {
-    setImageOrVideoUploadArray(e.target.files);
+}: InitiateUploadViewProps) => {
+  function handleImageMediaUpload(e: ChangeEvent<HTMLInputElement>) {
+    setImageOrVideoUploadArray(Array.from(e.target.files!));
     setShowInitiateUploadComponent(false);
   }
-  function handleDocumentMediaUpload(e: any) {
-    setDocumentUploadArray(e.target.files);
+  function handleDocumentMediaUpload(e: ChangeEvent<HTMLInputElement>) {
+    setDocumentUploadArray(Array.from(e.target.files!));
     setShowInitiateUploadComponent(false);
   }
   function renderInputBox() {
@@ -397,7 +437,7 @@ const InitiateUploadView = ({
       );
     }
   }
-  function handleCloseIconInitiateMediaUploadBox(e: any) {
+  function handleCloseIconInitiateMediaUploadBox(e: React.MouseEvent<HTMLElement>) {
     e.stopPropagation();
     e.preventDefault();
     setAttachmentType(0);
@@ -436,8 +476,15 @@ const InitiateUploadView = ({
     </label>
   );
 };
+type ImageVideoAttachmentViewProps = {
+  imageOrVideoUploadArray: File[] | null;
+  setImageOrVideoUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
+};
 
-function ImageVideoAttachmentView({ imageOrVideoUploadArray, setImageOrVideoUploadArray }: any) {
+function ImageVideoAttachmentView({
+  imageOrVideoUploadArray,
+  setImageOrVideoUploadArray
+}: ImageVideoAttachmentViewProps) {
   let length = imageOrVideoUploadArray?.length;
   console.log('the image array: ', imageOrVideoUploadArray);
   function renderImages() {
@@ -458,10 +505,8 @@ function ImageVideoAttachmentView({ imageOrVideoUploadArray, setImageOrVideoUplo
   }
   // eslint-disable-next-line no-undef
   function addMoreImages(e: ChangeEvent<HTMLInputElement>) {
-    const newImageArray: FileModel[] = [...imageOrVideoUploadArray].concat(
-      Array.from(e.target.files!)
-    );
-    setImageOrVideoUploadArray(addMoreImages);
+    const newImageArray: File[] = [...imageOrVideoUploadArray!].concat(Array.from(e.target.files!));
+    setImageOrVideoUploadArray(newImageArray);
   }
   return (
     <div className="attachmentHolder__singleBlock">
@@ -487,7 +532,12 @@ function ImageVideoAttachmentView({ imageOrVideoUploadArray, setImageOrVideoUplo
   );
 }
 
-function HolderWithCross({ children, onCloseFunction }: any) {
+type HolderWithCrossProps = {
+  children: ReactNode;
+  onCloseFunction: () => void;
+};
+
+function HolderWithCross({ children, onCloseFunction }: HolderWithCrossProps) {
   return (
     <div className="holderWithCrossContainer">
       <span className="holderWithCrossContainer--closeIcon" onClick={onCloseFunction}>
@@ -514,7 +564,19 @@ function HolderWithCross({ children, onCloseFunction }: any) {
     </div>
   );
 }
-const PreviewForOGTag = ({ ogTagPreviewData, setOgTagPreview }: any) => {
+
+interface OgTags {
+  title?: string; // Link Title | nullable
+  image?: string; // Link Image URL | nullable
+  description?: string; // Link description | nullable
+  url?: string; // Link URL | nullable
+}
+type PreviewForOGTagProps = {
+  ogTagPreviewData: OgTags;
+  setOgTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const PreviewForOGTag = ({ setOgTagPreview }: PreviewForOGTagProps) => {
   function closePreviewBox() {
     setOgTagPreview(false);
   }

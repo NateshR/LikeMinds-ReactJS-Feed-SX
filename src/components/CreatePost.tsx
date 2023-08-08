@@ -24,7 +24,7 @@ const CreatePost: React.FC = () => {
         closeCreatePostDialog={closeCreatePostDialog}
         // children={<CreatePostDialog/>}
       >
-        <CreatePostDialog />
+        <CreatePostDialog closeCreatePostDialog={closeCreatePostDialog} />
       </DialogBox>
       <div className="lmWrapper__feed__creatPost">
         <div className="lmWrapper__feed__creatPost__write">
