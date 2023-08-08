@@ -1,18 +1,19 @@
-import LMFeedClient from '@likeminds.community/feed-js-beta';
+import LMFeedClient from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { Attachment, DecodeUrlModelSX, FileModel, UploadMediaModel } from './models';
 interface LMFeedClientInterface {
   initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string): Promise<any>;
-  logout(refreshToken: string): Promise<any>;
-  addPost(text: string, attachments: []): Promise<any>;
-  addPost(text: string): Promise<any>;
+  // logout(refreshToken: string): Promise<any>;
+  // addPost(text: string, attachments: []): Promise<any>;
+  // addPost(text: string): Promise<any>;
 }
 
 export class LMClient extends HelperFunctionsClass implements LMFeedClientInterface {
   client: LMFeedClient;
   public constructor() {
     super();
-    this.client = LMFeedClient.setApiKey(process.env.REACT_APP_API_KEY!)
+    this.client = LMFeedClient.Builder()
+      .setApiKey(process.env.REACT_APP_API_KEY!)
       .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
       .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
       .build();
