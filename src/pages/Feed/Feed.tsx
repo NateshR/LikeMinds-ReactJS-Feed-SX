@@ -42,6 +42,7 @@ const FeedComponent: React.FC = () => {
       );
       setUser(userResponse?.data?.user);
     }
+
     setUserState();
   }, []);
 

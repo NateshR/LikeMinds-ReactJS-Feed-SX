@@ -110,11 +110,11 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
       );
     }
   }
-  const [text, setText] = useState('');
+  const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
-  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | any[]>(null);
-  const [documentUploadArray, setDocumentUploadArray] = useState<null | any[]>(null);
+  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | File[]>(null);
+  const [documentUploadArray, setDocumentUploadArray] = useState<null | File[]>(null);
   const [attachmentType, setAttachmentType] = useState<null | number>(0);
   const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
   const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
