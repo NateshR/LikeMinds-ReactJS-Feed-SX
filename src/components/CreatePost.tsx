@@ -14,9 +14,7 @@ const CreatePost: React.FC = () => {
   function openCreatePostDialogBox() {
     setOpenCreatePostDialog(true);
   }
-  useEffect(() => {
-    lmFeedClient.fetchFeed();
-  });
+
   return (
     <>
       <DialogBox

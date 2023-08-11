@@ -57,46 +57,46 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     setShowInitiateUploadComponent(false);
   }
 
-  async function postFeed() {
-    try {
-      closeDialogBox();
-      if (imageOrVideoUploadArray?.length) {
-        await lmFeedClient.addPostWithImageAttachments(
-          text,
-          imageOrVideoUploadArray,
-          userContext?.user?.sdk_client_info.user_unique_id
-        );
-      } else if (documentUploadArray?.length) {
-        await lmFeedClient.addPostWithDocumentAttachments(
-          text,
-          documentUploadArray,
-          userContext?.user?.sdk_client_info.user_unique_id
-        );
-      } else if (previewOGTagData !== null) {
-        await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
-      } else {
-        lmFeedClient.addPost(text);
-      }
-    } catch (error) {
-      lmFeedClient.logError(error);
-    }
-  }
-  async function checkForOGTags() {
-    try {
-      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
-      console.log(ogTagLinkArray);
-      if (ogTagLinkArray.length) {
-        const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
-        console.log('the og tag call is :', getOgTag);
-        setPreviewOGTagData(getOgTag);
-        if (!hasPreviewClosedOnce) {
-          setShowOGTagPreview(true);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async function postFeed() {
+  //   try {
+  //     closeDialogBox();
+  //     if (imageOrVideoUploadArray?.length) {
+  //       await lmFeedClient.addPostWithImageAttachments(
+  //         text,
+  //         imageOrVideoUploadArray,
+  //         userContext?.user?.sdk_client_info.user_unique_id
+  //       );
+  //     } else if (documentUploadArray?.length) {
+  //       await lmFeedClient.addPostWithDocumentAttachments(
+  //         text,
+  //         documentUploadArray,
+  //         userContext?.user?.sdk_client_info.user_unique_id
+  //       );
+  //     } else if (previewOGTagData !== null) {
+  //       await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
+  //     } else {
+  //       lmFeedClient.addPost(text);
+  //     }
+  //   } catch (error) {
+  //     lmFeedClient.logError(error);
+  //   }
+  // }
+  // async function checkForOGTags() {
+  //   try {
+  //     const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
+  //     console.log(ogTagLinkArray);
+  //     if (ogTagLinkArray.length) {
+  //       const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
+  //       console.log('the og tag call is :', getOgTag);
+  //       setPreviewOGTagData(getOgTag);
+  //       if (!hasPreviewClosedOnce) {
+  //         setShowOGTagPreview(true);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   function closeDialogBox() {
     resetContext();
     closeCreatePostDialog();
@@ -108,7 +108,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      checkForOGTags();
+      // checkForOGTags();
     }, 500);
     return () => {
       clearTimeout(timeOut);
@@ -157,7 +157,8 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
           <AttachmentsHolder {...attachmentProps} />
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            onClick={postFeed}>
+            // onClick={postFeed}
+          >
             Post
           </div>
         </div>
