@@ -1,8 +1,15 @@
 import post from '../assets/images/post.jpg';
+import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import { Carousel } from 'react-responsive-carousel';
+import React, { ReactChild, useState } from 'react';
+import { Dialog, IconButton } from '@mui/material';
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import { Attachment } from 'likeminds-sdk';
 
-import React from 'react';
+import './../assets/css/post-body.css';
 interface PostBodyProps {
   answer: string;
+  attachments: Attachment[];
 }
 interface MatchPattern {
   type: number;
@@ -10,7 +17,7 @@ interface MatchPattern {
   routeId?: string;
   link?: string;
 }
-const PostBody: React.FC<PostBodyProps> = ({ answer }) => {
+const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
     const matches = text.match(regex) || [];
@@ -56,18 +63,77 @@ const PostBody: React.FC<PostBodyProps> = ({ answer }) => {
 
     return container;
   }
+  function renderAttachments(attachmentsArray: Attachment[]) {
+    return attachmentsArray
+      .filter(
+        (attachment: Attachment) =>
+          attachment.attachmentType === 1 ||
+          attachment.attachmentType === 2 ||
+          attachment.attachmentType === 3
+      )
+      .map((attachment: Attachment) => {
+        return renderMediaItem(attachment);
+      });
+  }
+  function renderMediaItem(attachment: Attachment) {
+    switch (attachment.attachmentType) {
+      case 1:
+        return (
+          <img
+            className="postMediaAttachment--image"
+            src={attachment.attachmentMeta.url}
+            alt="post"
+            key={attachment.attachmentMeta.url + Math.random().toString()}
+            loading="lazy"
+          />
+        );
+      case 2:
+        return (
+          <>
+            <video
+              className="postMediaAttachment--video"
+              src={attachment.attachmentMeta.url}
+              key={attachment.attachmentMeta.url + Math.random().toString()}
+              controls
+            />
+          </>
+        );
+      case 3:
+        return (
+          <object
+            data={attachment.attachmentMeta.url}
+            type="application/pdf"
+            width="100%"
+            height="100%">
+            <p>
+              Alternative text - include a link{' '}
+              <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
+            </p>
+          </object>
+        );
+      default:
+        return (
+          <img
+            src={attachment.attachmentMeta.url}
+            alt="post"
+            key={attachment.attachmentMeta.url + Math.random().toString()}
+          />
+        );
+    }
+  }
   return (
     <div className="lmWrapper__feed__post__body">
       <div
         className="lmWrapper__feed__post__body--content"
         dangerouslySetInnerHTML={{
-          __html: convertTextToHTML(
-            `<<Jai|route://member/sdfxgchvbjnmk>> hello 
-             everyone www.google.com hesndj`
-          ).innerHTML
+          __html: convertTextToHTML(answer).innerHTML
         }}></div>
       <div className="lmWrapper__feed__post__body--media">
-        <img src={post} alt="post" />
+        {/* <img src={post} alt="post" /> */}
+
+        <Carousel className="postMediaAttachment" showThumbs={false}>
+          {renderAttachments(attachments)}
+        </Carousel>
       </div>
     </div>
   );

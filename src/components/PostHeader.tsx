@@ -3,24 +3,28 @@ import { IMenuItem } from 'likeminds-sdk';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { lmFeedClient } from '..';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
   customTitle: string;
   createdAt: number;
   menuOptions: IMenuItem[];
+  postId: string;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
   customTitle,
   imgUrl,
   createdAt,
-  menuOptions
+  menuOptions,
+  postId
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
+  const [reportTags, setReportTags] = useState([]);
   function handleOpenMoreOptionsMenu(event: React.MouseEvent<HTMLElement>) {
     setMoreOptionsMenu(event.currentTarget);
   }
@@ -34,6 +38,33 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         return part.substring(0, 1).toUpperCase().concat(part.substring(1));
       })
       .join(' ');
+  }
+  async function pinPost() {
+    return await lmFeedClient.pinPost(postId);
+  }
+  async function unpinPost() {
+    return await lmFeedClient.pinPost(postId);
+  }
+  async function deletePost() {
+    return await lmFeedClient.deletePost(postId);
+  }
+  async function reportPost() {
+    const tags = await lmFeedClient.getReportTags();
+  }
+  useEffect(() => {
+    reportPost();
+  });
+  function editPost() {}
+  function onClickHandler(event: React.MouseEvent) {
+    switch (event.currentTarget.id) {
+      case '2':
+        return pinPost();
+      case '3':
+        return unpinPost();
+      case '1':
+        return deletePost();
+    }
+    handleCloseMoreOptionsMenu();
   }
   return (
     <div className="lmWrapper__feed__post__header">
@@ -66,7 +97,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           }}
           onClose={handleCloseMoreOptionsMenu}>
           {menuOptions?.map((menuItem: IMenuItem) => {
-            return <MenuItem key={menuItem.id}>{menuItem.title}</MenuItem>;
+            return (
+              <MenuItem onClick={onClickHandler} id={menuItem.id.toString()} key={menuItem.id}>
+                {menuItem.title}
+              </MenuItem>
+            );
           })}
         </Menu>
       </div>

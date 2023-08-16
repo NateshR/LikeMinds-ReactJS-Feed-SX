@@ -9,7 +9,7 @@
 .create-post-feed-dialog-wrapper--container {
   min-width: 460px;
   background-color: white;
-  opacity: 100;
+  /* opacity: 100; */
   border-radius: 1rem;
   position: relative;
   padding: 1rem 2rem;

@@ -17,6 +17,9 @@ interface PostProps {
 const pattern = /<<.*?>>/g;
 
 const Post: React.FC<PostProps> = ({ post, user }) => {
+  if (!user) {
+    console.log('the post is', post);
+  }
   return (
     <div>
       {/* Post */}
@@ -29,9 +32,10 @@ const Post: React.FC<PostProps> = ({ post, user }) => {
           customTitle={user.customTitle}
           createdAt={post.createdAt}
           menuOptions={post.menuItems}
+          postId={post.Id}
         />
         {/* post */}
-        <PostBody answer={post.text} />
+        <PostBody answer={post.text} attachments={post.attachments!} />
         {/* footer */}
         <PostFooter />
       </div>
