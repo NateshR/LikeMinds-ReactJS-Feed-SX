@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import './dialogBox.css';
-
 type DialogBoxType = {
   children: any;
   openCreatePostDialog: boolean;

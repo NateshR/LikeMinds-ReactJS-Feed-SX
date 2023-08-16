@@ -10,6 +10,7 @@ import './../assets/css/post-body.css';
 interface PostBodyProps {
   answer: string;
   attachments: Attachment[];
+  feedModerationHandler: (action: string, index: number, value: any) => void;
 }
 interface MatchPattern {
   type: number;

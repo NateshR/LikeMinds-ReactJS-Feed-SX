@@ -9,7 +9,10 @@ import LMFeedClient, {
   PinPostRequest,
   DeletePostRequest,
   GetReportTagsRequest,
-  PostReportRequest
+  PostReportRequest,
+  LikePostRequest,
+  SavePostRequest,
+  GetPostRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -26,7 +29,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   public constructor() {
     super();
     this.client = LMFeedClient.Builder()
-      .setApiKey(process.env.REACT_APP_API_KEY!)
+      // .setApiKey(process.env.REACT_APP_API_KEY!)
+      .setApiKey('69edd43f-4a5e-4077-9c50-2b7aa740acce')
       .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
       .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
       .build();
@@ -36,7 +40,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
-          .setUUID('1e9bc941-8817-4328-aa90-f1c90259b12c')
+          // .setUUID('1e9bc941-8817-4328-aa90-f1c90259b12c')
+          .setUUID('siddharth-1')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
           .build()
@@ -248,6 +253,41 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.getReportTags(
         GetReportTagsRequest.builder().settype(0).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async likePost(postId: string) {
+    try {
+      const apiCallResponse = await this.client.likePost(
+        LikePostRequest.builder().setpostId(postId).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async savePost(postId: string) {
+    try {
+      const apiCallResponse = await this.client.savePost(
+        SavePostRequest.builder().setpostId(postId).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async getPostDetails(postId: string) {
+    try {
+      const apiCallResponse = await this.client.getPost(
+        GetPostRequest.builder().setpostId(postId).setpage(1).setpageSize(10).build()
       );
       return apiCallResponse;
     } catch (error) {

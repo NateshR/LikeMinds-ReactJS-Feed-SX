@@ -14,6 +14,7 @@ interface PostHeaderProps {
   createdAt: number;
   menuOptions: IMenuItem[];
   postId: string;
+  feedModerationHandler: (action: string, index: number, value: any) => void;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
@@ -51,9 +52,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   async function reportPost() {
     const tags = await lmFeedClient.getReportTags();
   }
-  useEffect(() => {
-    reportPost();
-  });
+  // useEffect(() => {
+  //   reportPost();
+  // });
   function editPost() {}
   function onClickHandler(event: React.MouseEvent) {
     switch (event.currentTarget.id) {
