@@ -116,8 +116,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
       {/* Comments */}
       <div>{/* <input */}</div>
       {commentList.length
-        ? commentList.map((comment: IComment) => {
-            return <PostComents comment={comment} key={comment.id} />;
+        ? commentList.map((comment: IComment, index: number) => {
+            return <PostComents comment={comment} key={comment.Id!.toString()} />;
           })
         : null}
       {/* Comments */}

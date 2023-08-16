@@ -38,7 +38,10 @@ const PostComents: React.FC<CommentProps> = ({ comment }) => {
         <span className="like">
           <IconButton>{renderLikeButton()}</IconButton>
         </span>
-        |<span className="replies"></span>
+        |
+        <span className="replies">
+          Reply. <span>{}</span>
+        </span>
       </div>
     </div>
   );

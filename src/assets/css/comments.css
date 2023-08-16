@@ -11,3 +11,6 @@
 .commentWrapper--commentContent {
     font-size: 14px;
 }
+.commentWrapper--commentActions .replies{
+    font-size: 10px;
+}
