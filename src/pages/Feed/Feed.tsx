@@ -64,6 +64,7 @@ const FeedComponent: React.FC = () => {
         return null;
     }
   }
+
   function setAppUserState(user: any) {
     switch (user) {
       case null:
