@@ -307,7 +307,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
           text += extractTextFromNode(childNode);
         }
 
-        return text;
+        return text.trim();
       }
     } else {
       return '';
@@ -316,7 +316,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
   // function renamed to post comments
   async function postComment() {
     try {
-      let textContent = extractTextFromNode(contentEditableDiv.current);
+      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      if (textContent.length === 0) {
+        return;
+      }
       const response: any = await lmFeedClient.addComment(postId, textContent);
       const comment = response?.data?.comment;
       const user = response?.data?.users;

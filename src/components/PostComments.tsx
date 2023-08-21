@@ -181,7 +181,7 @@ const PostComents: React.FC<CommentProps> = ({
           text += extractTextFromNode(childNode);
         }
 
-        return text;
+        return text.trim();
       }
     } else {
       return '';
@@ -305,7 +305,10 @@ const PostComents: React.FC<CommentProps> = ({
   // function renamed to post comments
   async function postReply() {
     try {
-      let textContent = extractTextFromNode(contentEditableDiv.current);
+      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      if (textContent.length === 0) {
+        return;
+      }
       setOpenReplyBox(false);
       const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
       let newAddedComment: IComment = response.data.comment;
