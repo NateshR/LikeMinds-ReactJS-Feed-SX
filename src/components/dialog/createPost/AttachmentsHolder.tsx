@@ -4,6 +4,7 @@ import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
 import { DecodeUrlModelSX, FileModel } from '../../../services/models';
 import previewImage from './../../../assets/images/ogTagPreview.png';
+import { Attachment } from 'likeminds-sdk';
 interface AttachmentsHolderProps {
   showMediaUploadBar: boolean | null;
   setShowMediaUploadBar: React.Dispatch<React.SetStateAction<boolean | null>>;
@@ -312,14 +313,28 @@ function DocumentUploadAttachmentContainer({
   );
 }
 
-const MaxTwoImage = () => {
+const MaxTwoImage = ({ imageOrVideoUploadArray }: any) => {
   return (
     <>
       <div className="attachmentHolder__imgBlock">
-        <img src={phoneImageSample} alt="sampleImg" />
+        <img
+          style={{
+            height: '100%',
+            width: 'auto'
+          }}
+          src={URL.createObjectURL(imageOrVideoUploadArray[0])}
+          alt="sampleImg"
+        />
       </div>
       <div className="attachmentHolder__imgBlock">
-        <img src={phoneImageSample} alt="sampleImg" />
+        <img
+          style={{
+            height: '100%',
+            width: 'auto'
+          }}
+          src={URL.createObjectURL(imageOrVideoUploadArray[1])}
+          alt="sampleImg"
+        />
       </div>
     </>
   );
@@ -510,7 +525,7 @@ function ImageVideoAttachmentView({
         return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
       }
       case 2: {
-        return <MaxTwoImage />;
+        return <MaxTwoImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
       }
       default: {
         return <MinThreeImage />;

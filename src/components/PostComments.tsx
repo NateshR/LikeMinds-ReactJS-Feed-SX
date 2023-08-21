@@ -124,15 +124,20 @@ const PostComents: React.FC<CommentProps> = ({
       );
     } else {
       return (
-        <img
-          src={defaultUserImage}
-          alt={userContext.user?.imageUrl}
+        <span
           style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '50%'
-          }}
-        />
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: 'gray',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
       );
     }
   }
