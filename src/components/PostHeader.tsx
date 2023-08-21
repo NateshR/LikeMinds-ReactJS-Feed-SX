@@ -3,11 +3,12 @@ import { IMenuItem } from 'likeminds-sdk';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { lmFeedClient } from '..';
 import { DELETE_POST } from '../services/feedModerationActions';
+import UserContext from '../contexts/UserContext';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -72,11 +73,44 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
     handleCloseMoreOptionsMenu();
   }
+  const userContext = useContext(UserContext);
+
+  function setUserImage() {
+    const imageLink = userContext?.user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: 'gray',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
   return (
     <div className="lmWrapper__feed__post__header">
-      <div className="lmWrapper__feed__post__header--profile">
-        <img src={userImg} alt="user" />
-      </div>
+      <div className="lmWrapper__feed__post__header--profile">{setUserImage()}</div>
       <div className="lmWrapper__feed__post__header--info">
         <div className="title">
           {transformUsername(username)}
