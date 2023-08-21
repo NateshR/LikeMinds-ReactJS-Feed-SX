@@ -48,10 +48,14 @@ const CreatePost: React.FC = () => {
             width: '40px',
             height: '40px',
             borderRadius: '50%',
-            backgroundColor: 'gray',
             display: 'inline-flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
           }}>
           {userContext.user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
@@ -77,7 +81,7 @@ const CreatePost: React.FC = () => {
             <input
               ref={ref}
               type="text"
-              placeholder="Wtire something here..."
+              placeholder="Write something here..."
               onSelect={() => {
                 openCreatePostDialogBox();
                 // e.currentTarget.

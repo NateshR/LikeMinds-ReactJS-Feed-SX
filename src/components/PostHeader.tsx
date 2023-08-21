@@ -93,15 +93,19 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '48px',
+            height: '48px',
             borderRadius: '50%',
-            backgroundColor: 'gray',
             display: 'inline-flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {username?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>

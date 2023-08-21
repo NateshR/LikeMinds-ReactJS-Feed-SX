@@ -6,8 +6,10 @@
 .inputDiv{
     flex-grow: 1;
 }
-.profile{
+.lmProfile{
     margin-right: 1rem;
+    height: 24px;
+    width: 24px;
 }
 #editableDiv{
     /* height: 54px; */
