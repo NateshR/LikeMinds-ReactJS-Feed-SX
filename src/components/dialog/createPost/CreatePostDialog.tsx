@@ -83,12 +83,12 @@ function checkAtSymbol(str: string, index: number): number {
 const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
-    const imageLink = userContext?.user?.image_url;
+    const imageLink = userContext?.user?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.image_url}
+          alt={userContext.user?.imageUrl}
           style={{
             width: '100%',
             height: '100%',
@@ -100,7 +100,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
       return (
         <img
           src={defaultUserImage}
-          alt={userContext.user?.image_url}
+          alt={userContext.user?.imageUrl}
           style={{
             width: '100%',
             height: '100%',
@@ -188,49 +188,77 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     setShowInitiateUploadComponent(false);
   }
 
-  // async function postFeed() {
-  //   try {
-  //     closeDialogBox();
-  //     if (imageOrVideoUploadArray?.length) {
-  //       await lmFeedClient.addPostWithImageAttachments(
-  //         text,
-  //         imageOrVideoUploadArray,
-  //         userContext?.user?.sdk_client_info.user_unique_id
-  //       );
-  //     } else if (documentUploadArray?.length) {
-  //       await lmFeedClient.addPostWithDocumentAttachments(
-  //         text,
-  //         documentUploadArray,
-  //         userContext?.user?.sdk_client_info.user_unique_id
-  //       );
-  //     } else if (previewOGTagData !== null) {
-  //       await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
-  //     } else {
-  //       lmFeedClient.addPost(text);
-  //     }
-  //   } catch (error) {
-  //     lmFeedClient.logError(error);
-  //   }
-  // }
-  // async function checkForOGTags() {
-  //   try {
-  //     const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
-  //     // console.log (ogTagLinkArray);
-  //     if (ogTagLinkArray.length) {
-  //       const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
-  //       // console.log ('the og tag call is :', getOgTag);
-  //       setPreviewOGTagData(getOgTag);
-  //       if (!hasPreviewClosedOnce) {
-  //         setShowOGTagPreview(true);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     // console.log (error);
-  //   }
-  // }
+  async function postFeed() {
+    try {
+      let textContent = extractTextFromNode(contentEditableDiv.current);
+      console.log(textContent);
+      console.log(textContent.length);
+      closeDialogBox();
+      if (imageOrVideoUploadArray?.length) {
+        await lmFeedClient.addPostWithImageAttachments(
+          textContent,
+          imageOrVideoUploadArray,
+          userContext?.user?.sdkClientInfo.userUniqueId
+        );
+      } else if (documentUploadArray?.length) {
+        console.log(userContext.user);
+        await lmFeedClient.addPostWithDocumentAttachments(
+          textContent,
+          documentUploadArray,
+          userContext?.user?.sdkClientInfo.userUniqueId
+        );
+      } else if (previewOGTagData !== null) {
+        // await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
+      } else {
+        lmFeedClient.addPost(textContent);
+      }
+    } catch (error) {
+      lmFeedClient.logError(error);
+    }
+  }
+  async function checkForOGTags() {
+    try {
+      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
+      // console.log (ogTagLinkArray);
+      if (ogTagLinkArray.length) {
+        const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
+        // console.log ('the og tag call is :', getOgTag);
+        setPreviewOGTagData(getOgTag);
+        if (!hasPreviewClosedOnce) {
+          setShowOGTagPreview(true);
+        }
+      }
+    } catch (error) {
+      // console.log (error);
+    }
+  }
   function closeDialogBox() {
     resetContext();
     closeCreatePostDialog();
+  }
+
+  function extractTextFromNode(node: any) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.nodeName === 'A') {
+        let textContent: string = node.textContent;
+        textContent = textContent.substring(1);
+        const id = node.getAttribute('id');
+        return `<<${textContent}|route://user_profile/${id}>>`;
+      } else {
+        let text = '';
+        const childNodes = node.childNodes;
+
+        for (const childNode of childNodes) {
+          text += extractTextFromNode(childNode);
+        }
+
+        return text;
+      }
+    } else {
+      return '';
+    }
   }
 
   useEffect(() => {
@@ -271,7 +299,8 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     };
   }, [tagString]);
   return (
-    <div className="create-post-feed-dialog-wrapper">
+    // <div className="create-post-feed-dialog-wrapper">
+    <div>
       <div className="create-post-feed-dialog-wrapper--container">
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
@@ -394,15 +423,14 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                         if (!substr || substr.length === 0) {
                           return;
                         }
-
                         let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                         let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
                         let textNode1 = document.createTextNode(textNode1Text);
                         let anchorNode = document.createElement('a');
-                        anchorNode.id = '1234';
+                        anchorNode.id = item?.id;
                         anchorNode.href = '#';
-                        anchorNode.textContent = `@${substr.trim()}`;
+                        anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
                         let textNode2 = document.createTextNode(textNode2Text);
                         div!.replaceChild(textNode2, focusNode);
@@ -416,7 +444,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
               </div>
             ) : null}
           </div>
-          {/* <AttachmentsHolder {...attachmentProps} /> */}
+          <AttachmentsHolder {...attachmentProps} />
           <button
             onClick={() => {
               let focusNode = window.getSelection()!.focusNode;
@@ -459,8 +487,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
           </button>
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            // onClick={postFeed}
-          >
+            onClick={postFeed}>
             Post
           </div>
         </div>

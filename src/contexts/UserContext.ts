@@ -11,13 +11,13 @@ interface UserContextInterface {
 
 type User = {
   id: any;
-  image_url: any;
-  is_guest: boolean;
+  imageUrl: any;
+  isGuest: boolean;
   name: any;
-  organisation_name: any;
-  sdk_client_info: any;
-  updated_at: any;
-  user_unique_id: any;
+  organisationName: any;
+  sdkClientInfo: any;
+  updatedAt: any;
+  userUniqueId: any;
   uuid: any;
 };
 

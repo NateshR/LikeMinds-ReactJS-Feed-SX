@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import './dialogBox.css'; 
+import './dialogBox.css';
 
 type DialogBoxType = {
   children: any;
@@ -26,8 +26,7 @@ const DialogBox = ({ children, openCreatePostDialog, closeCreatePostDialog }: an
       className="lmWrapper-dialog"
       style={{
         display: openCreatePostDialog ? 'block' : 'none'
-      }}
-    >
+      }}>
       {passPropToChildren()}
     </div>
   );
