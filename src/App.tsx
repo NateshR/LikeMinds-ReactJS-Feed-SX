@@ -14,7 +14,7 @@ function App() {
         <div className="nav">
           <Nav />
         </div>
-        <div className="mxain">
+        <div className="main">
           <FeedComponent />
         </div>
       </section>

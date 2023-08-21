@@ -12,7 +12,14 @@ import LMFeedClient, {
   PostReportRequest,
   LikePostRequest,
   SavePostRequest,
-  GetPostRequest
+  GetPostRequest,
+  GetCommentRequest,
+  AddCommentRequest,
+  ReplyCommentRequest,
+  LikeCommentRequest,
+  DeleteCommentRequest,
+  GetNotificationFeedRequest,
+  MarkReadNotificationRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -32,7 +39,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       // .setApiKey(process.env.REACT_APP_API_KEY!)
       .setApiKey('69edd43f-4a5e-4077-9c50-2b7aa740acce')
       .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
-      .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
+      .setVersionCode(9999)
       .build();
   }
 
@@ -284,11 +291,128 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return error;
     }
   }
-  async getPostDetails(postId: string) {
+  async getPostDetails(postId: string, pageNo: number) {
     try {
       const apiCallResponse = await this.client.getPost(
-        GetPostRequest.builder().setpostId(postId).setpage(1).setpageSize(10).build()
+        GetPostRequest.builder().setpostId(postId).setpage(pageNo).setpageSize(10).build()
       );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getComments(postId: string, commentId: string, pageNo: number) {
+    try {
+      const apiCallResponse = await this.client.getComments(
+        postId,
+        GetCommentRequest.builder()
+          .setcommentId(commentId)
+          .setpage(pageNo)
+          .setpageSize(10)
+          .setpostId(postId)
+          .build(),
+        commentId,
+        pageNo
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async addComment(postId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.addComment(
+        AddCommentRequest.builder().setpostId(postId).settext(text).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async replyComment(postId: string, commentId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.replyComment(
+        ReplyCommentRequest.builder()
+          .setPostId(postId)
+          .setCommentId(commentId)
+          .setText(text)
+          .build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async likeComment(postId: string, commentId: string) {
+    try {
+      const apiCallResponse = await this.client.likeComment(
+        LikeCommentRequest.builder().setpostId(postId).setcommentId(commentId).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async deleteComment(postId: string, commentId: string) {
+    try {
+      const apiCallResponse = await this.client.deleteComment(
+        DeleteCommentRequest.builder()
+          .setcommentId(commentId)
+          .setpostId(postId)
+          .setreason('')
+          .build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getMemberState() {
+    try {
+      const apiCallResponse = await this.client.getMemberState();
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getNotificationFeed(pageNo: number) {
+    try {
+      const apiCallResponse = await this.client.getNotificationFeed(
+        GetNotificationFeedRequest.builder().setpage(pageNo).setpageSize(10).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async markReadNotification(activityId: string) {
+    try {
+      const apiCallResponse = await this.client.markReadNotification(
+        MarkReadNotificationRequest.builder().setactivityId(activityId).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getUnreadNotificationCount() {
+    try {
+      const apiCallResponse = await this.client.getUnreadNotificationCount();
       return apiCallResponse;
     } catch (error) {
       console.log(error);

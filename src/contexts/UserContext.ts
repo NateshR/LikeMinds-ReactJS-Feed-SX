@@ -1,12 +1,15 @@
+import { IMemberState } from 'likeminds-sdk';
 import React from 'react';
 const UserContext = React.createContext<UserContextInterface>({
   user: null,
-  setUser: null
+  setUser: null,
+  memberStateRights: null
 });
 
 interface UserContextInterface {
   user: null | User;
   setUser: null | any;
+  memberStateRights: null | IMemberState;
 }
 
 type User = {

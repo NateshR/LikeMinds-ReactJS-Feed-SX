@@ -36,6 +36,7 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
           menuOptions={post.menuItems}
           postId={post.Id}
           feedModerationHandler={feedModerationHandler}
+          index={index}
         />
         {/* post */}
         <PostBody

@@ -342,7 +342,16 @@ const SingleImage = ({ imageOrVideoUploadArray }: SingleImageProps) => {
   }
   fetchImageUrl();
   if (imageOrVideoUploadArray?.length === 1)
-    return <img src={URL.createObjectURL(fetchImageUrl())} alt="sampleImg" />;
+    return (
+      <img
+        src={URL.createObjectURL(fetchImageUrl())}
+        style={{
+          height: '100%',
+          width: 'auto'
+        }}
+        alt="sampleImg"
+      />
+    );
 
   return null;
 };
@@ -512,7 +521,7 @@ function ImageVideoAttachmentView({
     <div className="attachmentHolder__singleBlock">
       <label>
         <span className="attachmentHolder__addMoreButton">
-          <input type="file" />
+          <input type="file" onChange={addMoreImages} />
           <svg
             width="16"
             height="16"

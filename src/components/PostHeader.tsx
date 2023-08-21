@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { lmFeedClient } from '..';
+import { DELETE_POST } from '../services/feedModerationActions';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -14,6 +15,7 @@ interface PostHeaderProps {
   createdAt: number;
   menuOptions: IMenuItem[];
   postId: string;
+  index: number;
   feedModerationHandler: (action: string, index: number, value: any) => void;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
@@ -22,7 +24,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   imgUrl,
   createdAt,
   menuOptions,
-  postId
+  postId,
+  feedModerationHandler,
+  index
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [reportTags, setReportTags] = useState([]);
@@ -47,6 +51,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     return await lmFeedClient.pinPost(postId);
   }
   async function deletePost() {
+    feedModerationHandler(DELETE_POST, index, null);
     return await lmFeedClient.deletePost(postId);
   }
   async function reportPost() {

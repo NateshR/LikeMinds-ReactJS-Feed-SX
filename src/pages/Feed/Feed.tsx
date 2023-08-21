@@ -6,12 +6,14 @@ import UserContext from '../../contexts/UserContext';
 import { lmFeedClient } from '../..';
 import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
-import { IPost, IUser } from 'likeminds-sdk';
+import { IPost, IUser, IMemberState } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material';
-import { LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
+import { DELETE_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
+
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
+  const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
   const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
   const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
   const [hasMoreFeed, setHasMoreFeed] = useState<boolean>(true);
@@ -51,6 +53,11 @@ const FeedComponent: React.FC = () => {
       case SAVE_POST: {
         newFeedObject.isSaved = value;
         reNewFeedArray(index, newFeedObject);
+        break;
+      }
+      case DELETE_POST: {
+        newFeedArray.splice(index, 1);
+        setFeedPostsArray(newFeedArray);
         break;
       }
       default:
@@ -111,6 +118,8 @@ const FeedComponent: React.FC = () => {
         '28f7f107-5916-4cce-bbb7-4ee48b35e64d',
         false
       );
+      const memberStateResponse: any = await lmFeedClient.getMemberState();
+      setMemberStateRights(memberStateResponse.data);
       setUser(userResponse?.data?.user);
     }
 
@@ -141,7 +150,8 @@ const FeedComponent: React.FC = () => {
     <UserContext.Provider
       value={{
         user,
-        setUser
+        setUser,
+        memberStateRights
       }}>
       {setAppUserState(user)}
     </UserContext.Provider>
