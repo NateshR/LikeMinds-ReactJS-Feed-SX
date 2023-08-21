@@ -10,6 +10,7 @@ import { IPost, IUser, IMemberState } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material';
 import { DELETE_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
+import Header from '../../components/Header';
 
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
@@ -64,7 +65,18 @@ const FeedComponent: React.FC = () => {
         return null;
     }
   }
-
+  function setHeader() {
+    switch (user) {
+      case null:
+        return null;
+      default:
+        return (
+          <div className="header">
+            <Header />
+          </div>
+        );
+    }
+  }
   function setAppUserState(user: any) {
     switch (user) {
       case null:
@@ -89,7 +101,7 @@ const FeedComponent: React.FC = () => {
                 {/* Create Post */}
 
                 {/* Filter */}
-                <FeedFilter />
+                {/* <FeedFilter /> */}
                 {/* Filter */}
 
                 {/* Post */}
@@ -154,6 +166,7 @@ const FeedComponent: React.FC = () => {
         setUser,
         memberStateRights
       }}>
+      {setHeader()}
       {setAppUserState(user)}
     </UserContext.Provider>
   );

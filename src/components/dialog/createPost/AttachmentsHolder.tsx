@@ -54,7 +54,12 @@ const AttachmentsHolder = ({
   function setMediaUploadBar() {
     if (showMediaUploadBar) {
       return (
-        <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-attachment-wrapper">
+        <div
+          className="create-post-feed-dialog-wrapper_container_post-wrapper--post-attachment-wrapper"
+          style={{
+            width: '100%',
+            justifyContent: 'space-evenly'
+          }}>
           <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--add-post-text">
             Add to your post
           </span>
@@ -91,7 +96,7 @@ const AttachmentsHolder = ({
             </svg>
           </span>
           {/* q/a upload icon */}
-          <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
+          {/* <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
             <svg
               width="24"
               height="24"
@@ -111,9 +116,9 @@ const AttachmentsHolder = ({
                 fill="#F2994A"
               />
             </svg>
-          </span>
+          </span> */}
           {/* poll upload icon */}
-          <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
+          {/* <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
             <svg
               width="24"
               height="24"
@@ -125,7 +130,7 @@ const AttachmentsHolder = ({
                 fill="#F75266"
               />
             </svg>
-          </span>
+          </span> */}
           {/* document type uppload icon */}
           <span
             className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"

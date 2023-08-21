@@ -371,9 +371,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
           <div className="lm-cursor-pointer">
             <IconButton onClick={savePost}>{setSavePostButton()}</IconButton>
           </div>
-          <div className="lm-cursor-pointer">
-            <img src={share} alt="share" />
-          </div>
         </div>
       </div>
       {/* Comments */}
