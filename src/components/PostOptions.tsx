@@ -14,9 +14,9 @@ const PostOptions: React.FC = () => {
           <li>
             <img src={videoIcon} alt="Video" /> <span>Video</span>
           </li>
-          <li>
+          {/* <li>
             <img src={pollIcon} alt="Poll" /> <span>Poll</span>
-          </li>
+          </li> */}
         </ul>
       </div>
       <div className="lmWrapper__feed__creatPost__actionBtn">

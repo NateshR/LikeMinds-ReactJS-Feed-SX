@@ -1,0 +1,29 @@
+.commentInputBox{
+    display: flex;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+.inputDiv{
+    flex-grow: 1;
+}
+.profile{
+    margin-right: 1rem;
+}
+#editableDiv{
+    /* height: 54px; */
+    resize: none;
+    font-weight: 400;
+    font-size: 1rem;
+    font-family: Roboto;
+    overflow-y: auto;
+    border: 1px solid black;
+    border-radius: 24px;
+    padding: 12px 8px;
+}
+.postCommentButton{
+
+}
+.commentsWrapper{
+    max-height: 400px;
+    overflow-y: scroll;
+}

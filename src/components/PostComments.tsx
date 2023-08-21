@@ -1,47 +1,425 @@
 // src/Header/Header.tsx
 
-import React from 'react';
-import './../assets/css/comments.css';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import defaultUserImage from '../assets/images/defaultUserImage.png';
 import { IconButton } from '@mui/material';
-import { IComment } from 'likeminds-sdk/dist/shared/models/comment.model';
+import { IComment, IUser } from 'likeminds-sdk';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
+import { lmFeedClient } from '..';
+import SendIcon from '@mui/icons-material/Send';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import './../assets/css/post-footer.css';
+import './../assets/css/comments.css';
+// import './../assets/css/post-footer.css';
+import {
+  TagInfo,
+  checkAtSymbol,
+  findSpaceAfterIndex,
+  getCaretPosition
+} from './dialog/createPost/CreatePostDialog';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import UserContext from '../contexts/UserContext';
 interface CommentProps {
   comment: IComment;
+  postId: string;
+  commentArray: IComment[];
+  setCommentArray: React.Dispatch<IComment[]>;
+  index: number;
+  user?: IUser;
 }
-const PostComents: React.FC<CommentProps> = ({ comment }) => {
+const PostComents: React.FC<CommentProps> = ({
+  comment,
+  postId,
+  commentArray,
+  index,
+  setCommentArray,
+  user
+}) => {
+  const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
+  const [isLiked, setIsLiked] = useState<boolean>(comment.isLiked);
+  const [likesCount, setLikesCount] = useState<number>(comment.likesCount);
+  const [commentsCount, setCommentsCount] = useState<number>(comment.commentsCount);
+  const [pageCount, setPageCount] = useState<number>(1);
+  const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
+  const [loadMoreReplies, setLoadMoreReplies] = useState<boolean>(true);
+  const repliesDiv = useRef(null);
+  useEffect(() => {
+    setIsLiked(comment.isLiked);
+    setLikesCount(comment.likesCount);
+    setCommentsCount(comment.commentsCount);
+  }, [comment.isLiked, comment.likesCount, comment.commentsCount]);
+  function likeComment() {
+    setIsLiked(!isLiked);
+    likeAComment();
+    if (isLiked) {
+      setLikesCount(likesCount - 1);
+    } else {
+      setLikesCount(likesCount + 1);
+    }
+  }
   function renderLikeButton() {
-    if (comment.isLiked) {
+    if (isLiked) {
       return (
         <Favorite
           sx={{
             color: '#FB1609',
-            fontSize: '14px'
+            fontSize: '16px'
           }}
         />
       );
     } else {
-      return <FavoriteBorder sx={{ fontSize: '14px' }} />;
+      return <FavoriteBorder sx={{ fontSize: '16px' }} />;
     }
   }
+  async function getComments() {
+    try {
+      const req: any = await lmFeedClient.getComments(postId, comment.Id, pageCount);
+      const replyArray = req?.data?.comment?.replies;
+      const userMap = req?.data?.users;
+      setUsersMap({ ...usersMap, ...userMap });
+      setRepliesArray([...repliesArray].concat(replyArray));
+      if (replyArray?.length === 0) {
+        setLoadMoreReplies(false);
+      }
+      setPageCount(pageCount + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function likeAComment() {
+    try {
+      const req: any = await lmFeedClient.likeComment(postId, comment.Id);
+      // setRepliesArray(req.data.comment.replies);
+      // console.log(req);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function deleteComment() {
+    try {
+      const req: any = await lmFeedClient.deleteComment(postId, comment.Id);
+      const newArray = [...commentArray];
+      newArray.splice(index, 1);
+      setCommentArray(newArray);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const userContext = useContext(UserContext);
+
+  function setUserImage() {
+    const imageLink = userContext?.user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <img
+          src={defaultUserImage}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    }
+  }
+  // functions for input box
+  const [text, setText] = useState<string>('');
+  const [tagString, setTagString] = useState('');
+  const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
+  const [openReplyBox, setOpenReplyBox] = useState<boolean>(false);
+  const contentEditableDiv = useRef<HTMLDivElement>(null);
+
+  function findTag(str: string): TagInfo | undefined {
+    if (str.length === 0) {
+      return undefined;
+    }
+    const cursorPosition = getCaretPosition();
+    // // console.log ("the cursor position is: ", cursorPosition)
+    const leftLimit = checkAtSymbol(str, cursorPosition - 1);
+    if (leftLimit === -1) {
+      // setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
+      return undefined;
+    }
+    const rightLimit = findSpaceAfterIndex(str, cursorPosition - 1);
+    // // console.log ("the right limit is :", rightLimit)
+    const substr = str.substring(leftLimit, rightLimit + 1);
+
+    return {
+      tagString: substr,
+      limitLeft: leftLimit,
+      limitRight: rightLimit
+    };
+  }
+  function extractTextFromNode(node: any) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.nodeName === 'A') {
+        let textContent: string = node.textContent;
+        textContent = textContent.substring(1);
+        const id = node.getAttribute('id');
+        return `<<${textContent}|route://user_profile/${id}>>`;
+      } else {
+        let text = '';
+        const childNodes = node.childNodes;
+
+        for (const childNode of childNodes) {
+          text += extractTextFromNode(childNode);
+        }
+
+        return text.trim();
+      }
+    } else {
+      return '';
+    }
+  }
+
+  function showReplyBox() {
+    if (openReplyBox) {
+      return (
+        <div className="commentInputBox">
+          <div className="profile">{setUserImage()}</div>
+          <div className="inputDiv">
+            <div
+              ref={contentEditableDiv}
+              contentEditable={true}
+              suppressContentEditableWarning
+              tabIndex={0}
+              placeholder="hello world"
+              id="editableDiv"
+              onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
+                setText(event.currentTarget.textContent!);
+                const selection = window.getSelection();
+                if (selection === null) return;
+                let focusNode = selection.focusNode;
+                if (focusNode === null) {
+                  return;
+                }
+                let div = focusNode.parentElement;
+                if (div === null) {
+                  return;
+                }
+                let text = div.childNodes;
+                if (focusNode === null || text.length === 0) {
+                  return;
+                }
+                let textContentFocusNode = focusNode.textContent;
+
+                let tagOp = findTag(textContentFocusNode!);
+                if (
+                  tagOp?.tagString !== null &&
+                  tagOp?.tagString !== undefined &&
+                  tagOp?.tagString !== ''
+                ) {
+                  setTagString(tagOp?.tagString!);
+                }
+              }}></div>
+            {taggingMemberList && taggingMemberList?.length > 0 ? (
+              <div
+                style={{
+                  maxHeight: '100px',
+                  overflowY: 'auto'
+                }}>
+                {taggingMemberList?.map!((item: any) => {
+                  return (
+                    <button
+                      key={item?.id}
+                      style={{
+                        background: 'white',
+                        padding: '12px',
+                        display: 'block',
+                        border: 'none',
+                        width: '100%',
+                        textAlign: 'left'
+                      }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        let focusNode = window.getSelection()!.focusNode;
+                        if (focusNode === null) {
+                          return;
+                        }
+                        let div = focusNode.parentElement;
+                        let text = div!.childNodes;
+                        if (focusNode === null || text.length === 0) {
+                          return;
+                        }
+                        let textContentFocusNode = focusNode.textContent;
+                        if (textContentFocusNode === null) {
+                          return;
+                        }
+                        let tagOp = findTag(textContentFocusNode);
+                        // console.log ('the tag string is ', tagOp!.tagString);
+                        if (tagOp === undefined) return;
+                        let substr = tagOp?.tagString;
+                        const { limitLeft, limitRight } = tagOp;
+                        if (!substr || substr.length === 0) {
+                          return;
+                        }
+                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+
+                        let textNode1 = document.createTextNode(textNode1Text);
+                        let anchorNode = document.createElement('a');
+                        anchorNode.id = item?.id;
+                        anchorNode.href = '#';
+                        anchorNode.textContent = `@${item?.name.trim()}`;
+                        anchorNode.contentEditable = 'false';
+                        let textNode2 = document.createTextNode(textNode2Text);
+                        div!.replaceChild(textNode2, focusNode);
+                        div!.insertBefore(anchorNode, textNode2);
+                        div!.insertBefore(textNode1, anchorNode);
+                      }}>
+                      {item?.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+          <div className="postCommentButton">
+            <IconButton onClick={postReply}>
+              <SendIcon />
+            </IconButton>
+          </div>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+
+  // function renamed to post comments
+  async function postReply() {
+    try {
+      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      if (textContent.length === 0) {
+        return;
+      }
+      const childNodes = contentEditableDiv.current?.childNodes;
+      childNodes?.forEach((item: any) => {
+        contentEditableDiv.current?.removeChild(item);
+      });
+      setOpenReplyBox(false);
+      const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
+      let newAddedComment: IComment = response.data.comment;
+      if (repliesArray.length) {
+        let newRepliesArray = [];
+        newRepliesArray.push(newAddedComment);
+        newRepliesArray = newRepliesArray.concat([...repliesArray]);
+        setRepliesArray(newRepliesArray);
+      }
+      setCommentsCount(commentsCount + 1);
+      console.log(response);
+    } catch (error) {
+      lmFeedClient.logError(error);
+    }
+  }
+  useEffect(() => {
+    if (!tagString && !(tagString.length > 0)) {
+      return;
+    }
+    async function getTags() {
+      const tagListResponse = await lmFeedClient.getTaggingList(tagString);
+
+      const memberList = tagListResponse?.data?.members;
+      console.log(memberList);
+      if (memberList && memberList.length > 0) {
+        console.log('setting tag member list');
+        setTaggingMemberList(memberList);
+      } else {
+        console.log('setting tag member list  to null');
+        setTaggingMemberList(null);
+      }
+    }
+    const timeout = setTimeout(() => {
+      getTags();
+    }, 500);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [tagString]);
+  console.log(user);
   return (
     <div className="commentWrapper">
       <div className="commentWrapper--username">
-        <span className="displayName">Ronald Richard</span>
+        <span className="displayName">{user?.name || 'Ronald Richard'}</span>
         <span className="displayTitle"></span>
       </div>
       <div className="commentWrapper--commentContent">
-        Reliance Retail Ltd has signed a long-term franchise agreement with American fashion brand
-        Gap Inc to bring its products to India, a statement issued on July 6 read. The pact makes
-        Reliance Retail the official retailer for Gap across all channels in India... See more
+        <div className="commentWrapper__commentContent--content">{comment.text}</div>
+        <IconButton onClick={deleteComment}>
+          <MoreVertIcon
+            sx={{
+              fontSize: '14px'
+            }}
+          />
+        </IconButton>
       </div>
       <div className="commentWrapper--commentActions">
         <span className="like">
-          <IconButton>{renderLikeButton()}</IconButton>
+          <IconButton onClick={likeComment}>{renderLikeButton()}</IconButton>
         </span>
-        |
+        <span className="replies">{likesCount} Likes</span>
+        {' | '}
         <span className="replies">
-          Reply. <span>{}</span>
+          <span
+            style={{
+              cursor: 'pointer'
+            }}
+            onClick={() => setOpenReplyBox(!openReplyBox)}>
+            Reply.
+          </span>{' '}
+          <span
+            style={{
+              cursor: 'pointer'
+            }}
+            onClick={getComments}>
+            {commentsCount} replies
+          </span>
         </span>
+        {showReplyBox()}
+        <div
+          style={{
+            marginLeft: '4px',
+            maxHeight: '300px',
+            overflowY: 'auto'
+          }}
+          id={comment.Id}>
+          <InfiniteScroll
+            loader={null}
+            hasMore={loadMoreReplies}
+            next={getComments}
+            dataLength={repliesArray?.length}
+            scrollableTarget={comment.Id}>
+            {repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+              return (
+                <PostComents
+                  comment={comment}
+                  postId={postId}
+                  key={comment.Id}
+                  index={index}
+                  commentArray={commentArray}
+                  setCommentArray={setRepliesArray}
+                  user={usersMap[comment.uuid]}
+                />
+              );
+            })}
+          </InfiniteScroll>
+        </div>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ interface Limits {
   left: number;
   right: number;
 }
-interface TagInfo {
+export interface TagInfo {
   tagString: string;
   limitLeft: number;
   limitRight: number;
@@ -58,7 +58,7 @@ export function findSpaceAfterIndex(str: string, index: number): number {
   }
 }
 
-function checkAtSymbol(str: string, index: number): number {
+export function checkAtSymbol(str: string, index: number): number {
   if (index < 0 || index >= str.length) {
     throw new Error('Invalid index');
   }
@@ -330,14 +330,6 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             </div>
           </div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
-            {/* <textarea
-              rows={4}
-              placeholder="Write something here...."
-              value={text}
-              onChange={(e) => {
-                setText(e.target.value);
-              }}
-            /> */}
             <div
               ref={contentEditableDiv}
               contentEditable={true}
@@ -347,7 +339,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
               id="editableDiv"
               style={{
                 width: '100%',
-                height: '250px',
+                height: 'auto',
                 resize: 'none',
                 border: 'none',
                 fontWeight: '400',
@@ -386,18 +378,20 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
               <div
                 style={{
                   maxHeight: '100px',
+                  width: '250px',
                   overflowY: 'auto'
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
+                      className="taggingTile"
                       style={{
                         background: 'white',
                         padding: '12px',
                         display: 'block',
                         border: 'none',
-                        width: '100%',
+                        width: '250px',
                         textAlign: 'left'
                       }}
                       onClick={(e) => {
@@ -436,6 +430,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(textNode1, anchorNode);
+                        setTaggingMemberList([]);
                       }}>
                       {item?.name}
                     </button>
@@ -445,46 +440,6 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             ) : null}
           </div>
           <AttachmentsHolder {...attachmentProps} />
-          <button
-            onClick={() => {
-              let focusNode = window.getSelection()!.focusNode;
-              if (focusNode === null) {
-                return;
-              }
-              let div = focusNode.parentElement;
-              let text = div!.childNodes;
-              if (focusNode === null || text.length === 0) {
-                return;
-              }
-              let textContentFocusNode = focusNode.textContent;
-              if (textContentFocusNode === null) {
-                return;
-              }
-              let tagOp = findTag(textContentFocusNode);
-              // console.log ('the tag string is ', tagOp!.tagString);
-              if (tagOp === undefined) return;
-              let substr = tagOp?.tagString;
-              const { limitLeft, limitRight } = tagOp;
-              if (!substr || substr.length === 0) {
-                return;
-              }
-
-              let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-              let textNode2Text = textContentFocusNode.substring(limitRight + 1);
-
-              let textNode1 = document.createTextNode(textNode1Text);
-              let anchorNode = document.createElement('a');
-              anchorNode.id = '1234';
-              anchorNode.href = '#';
-              anchorNode.textContent = `@${substr.trim()}`;
-              anchorNode.contentEditable = 'false';
-              let textNode2 = document.createTextNode(textNode2Text);
-              div!.replaceChild(textNode2, focusNode);
-              div!.insertBefore(anchorNode, textNode2);
-              div!.insertBefore(textNode1, anchorNode);
-            }}>
-            PRESS
-          </button>
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
             onClick={postFeed}>

@@ -7,14 +7,14 @@ import Nav from './components/Nav';
 function App() {
   return (
     <div>
-      <div className="header">
+      {/* <div className="header">
         <Header />
-      </div>
+      </div> */}
       <section className="mainBlock">
         <div className="nav">
           <Nav />
         </div>
-        <div className="mxain">
+        <div className="main">
           <FeedComponent />
         </div>
       </section>
