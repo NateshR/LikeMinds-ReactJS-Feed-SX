@@ -88,7 +88,7 @@ const FeedComponent: React.FC = () => {
               {/* Create Post */}
               <InfiniteScroll
                 dataLength={feedPostsArray.length + 2}
-                scrollThreshold={1}
+                scrollThreshold={0.8}
                 hasMore={hasMoreFeed}
                 loader={(() => {
                   return <CircularProgress />;
