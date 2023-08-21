@@ -134,13 +134,17 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '24px',
+            height: '24px',
             borderRadius: '50%',
-            backgroundColor: 'gray',
             display: 'inline-flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
           }}>
           {userContext.user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
@@ -157,7 +161,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     if (isCommentingAllowed) {
       return (
         <>
-          <div className="profile">{setUserImage()}</div>
+          <div className="lmProfile">{setUserImage()}</div>
           <div className="inputDiv">
             <div
               ref={contentEditableDiv}
