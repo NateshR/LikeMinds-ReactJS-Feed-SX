@@ -1,0 +1,10 @@
+.headerWrapper{
+    display: flex;
+}
+.headerWrapper--notification{
+    text-align: right;
+}
+.headerWrapper--notification{
+    text-align: right;
+    flex-grow: 1;
+}

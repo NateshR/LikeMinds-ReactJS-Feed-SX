@@ -72,7 +72,7 @@ const FeedComponent: React.FC = () => {
       default:
         return (
           <div className="header">
-            <Header />
+            <Header user={user} />
           </div>
         );
     }

@@ -267,7 +267,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [text, setText] = useState<string>('');
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
-  const contentEditableDiv = useRef<HTMLDivElement>(null);
+  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
 
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
