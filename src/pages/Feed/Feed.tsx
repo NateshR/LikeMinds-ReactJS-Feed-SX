@@ -9,6 +9,7 @@ import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialo
 import { IPost, IUser } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress } from '@mui/material';
+import { LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
   const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
@@ -28,6 +29,34 @@ const FeedComponent: React.FC = () => {
     setUsersMap({ ...usersMap, ...feeds.users });
     // feeds?.posts.
   };
+  function feedModerationLocalHandler(action: string, index: number, value: any) {
+    function reNewFeedArray(index: number, newFeedObject: IPost) {
+      newFeedArray[index] = newFeedObject;
+      setFeedPostsArray(newFeedArray);
+    }
+    const newFeedArray = [...feedPostsArray];
+    const newFeedObject = { ...newFeedArray[index] };
+    switch (action) {
+      // For hadling likes/dislikes by user
+      case LIKE_POST: {
+        newFeedObject.isLiked = value;
+        if (value) {
+          newFeedObject.likesCount++;
+        } else {
+          newFeedObject.likesCount--;
+        }
+        reNewFeedArray(index, newFeedObject);
+        break;
+      }
+      case SAVE_POST: {
+        newFeedObject.isSaved = value;
+        reNewFeedArray(index, newFeedObject);
+        break;
+      }
+      default:
+        return null;
+    }
+  }
   function setAppUserState(user: any) {
     switch (user) {
       case null:
@@ -57,7 +86,15 @@ const FeedComponent: React.FC = () => {
 
                 {/* Post */}
                 {feedPostsArray.map((post: IPost, index: number) => {
-                  return <Post key={post.Id} post={post} user={usersMap[post.uuid]} />;
+                  return (
+                    <Post
+                      key={post.Id}
+                      post={post}
+                      user={usersMap[post.uuid]}
+                      feedModerationHandler={feedModerationLocalHandler}
+                      index={index}
+                    />
+                  );
                 })}
                 {/* <Post /> */}
                 {/* Post */}
@@ -92,7 +129,7 @@ const FeedComponent: React.FC = () => {
       if (feeds.posts.length < 10) {
         setHasMoreFeed(false);
       }
-
+      console.log(feeds);
       setFeedPostsArray(feeds?.posts!);
       setUsersMap(feeds.users);
       // feeds?.posts.

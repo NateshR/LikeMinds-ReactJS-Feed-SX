@@ -13,10 +13,12 @@ import { IPost, IUser } from 'likeminds-sdk';
 interface PostProps {
   post: IPost;
   user: IUser;
+  feedModerationHandler: (action: string, index: number, value: any) => void;
+  index: number;
 }
 const pattern = /<<.*?>>/g;
 
-const Post: React.FC<PostProps> = ({ post, user }) => {
+const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index }) => {
   if (!user) {
     console.log('the post is', post);
   }
@@ -33,11 +35,26 @@ const Post: React.FC<PostProps> = ({ post, user }) => {
           createdAt={post.createdAt}
           menuOptions={post.menuItems}
           postId={post.Id}
+          feedModerationHandler={feedModerationHandler}
         />
         {/* post */}
-        <PostBody answer={post.text} attachments={post.attachments!} />
+        <PostBody
+          answer={post.text}
+          attachments={post.attachments!}
+          feedModerationHandler={feedModerationHandler}
+        />
         {/* footer */}
-        <PostFooter />
+        <PostFooter
+          postId={post.Id}
+          isLiked={post.isLiked}
+          isPinned={post.isPinned}
+          isEdited={post.isEdited}
+          isSaved={post.isSaved}
+          likesCount={post.likesCount}
+          feedModerationHandler={feedModerationHandler}
+          index={index}
+          commentsCount={post.commentsCount}
+        />
       </div>
       {/* Post */}
     </div>

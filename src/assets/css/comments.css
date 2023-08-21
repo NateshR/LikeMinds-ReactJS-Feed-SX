@@ -1,0 +1,16 @@
+.commentWrapper {
+    margin: 0 0.25rem;
+}
+.commentWrapper--username{
+    margin-bottom: 0.25rem;
+}
+
+.commentWrapper--username .displayName {
+    font-size: 16px;
+}
+.commentWrapper--commentContent {
+    font-size: 14px;
+}
+.commentWrapper--commentActions .replies{
+    font-size: 10px;
+}
