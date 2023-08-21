@@ -150,7 +150,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   }
   function showCommentBox() {
-    console.log(userContext);
     const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
       (item: IMemberRight) => item.id === 10 && item.isSelected
     );

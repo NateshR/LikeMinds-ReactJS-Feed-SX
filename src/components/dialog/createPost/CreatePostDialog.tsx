@@ -272,7 +272,7 @@ const CreatePostDialog = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      // checkForOGTags();
+      checkForOGTags();
     }, 500);
     return () => {
       clearTimeout(timeOut);

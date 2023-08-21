@@ -605,10 +605,11 @@ type PreviewForOGTagProps = {
   setOgTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PreviewForOGTag = ({ setOgTagPreview }: PreviewForOGTagProps) => {
+const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagProps) => {
   function closePreviewBox() {
     setOgTagPreview(false);
   }
+  console.log(ogTagPreviewData);
   return (
     <div className="ogTagPreviewContainer">
       <HolderWithCross onCloseFunction={closePreviewBox}>
@@ -618,10 +619,10 @@ const PreviewForOGTag = ({ setOgTagPreview }: PreviewForOGTagProps) => {
           </div>
           <div className="ogTagPreviewContainer__wrapper--bodyWrapper">
             <p className="ogTagPreviewContainer__wrapper__bodyWrapper--title">
-              Twitter will soon le
+              {ogTagPreviewData.title}
             </p>
             <p className="ogTagPreviewContainer__wrapper__bodyWrapper--description">
-              The new feature has already been implemented in the U…
+              {ogTagPreviewData.description}
             </p>
           </div>
         </div>
