@@ -320,6 +320,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
       if (textContent.length === 0) {
         return;
       }
+      const childNodes = contentEditableDiv.current?.childNodes;
+      childNodes?.forEach((item: any) => {
+        contentEditableDiv.current?.removeChild(item);
+      });
       const response: any = await lmFeedClient.addComment(postId, textContent);
       const comment = response?.data?.comment;
       const user = response?.data?.users;

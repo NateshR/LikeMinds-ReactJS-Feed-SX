@@ -309,6 +309,10 @@ const PostComents: React.FC<CommentProps> = ({
       if (textContent.length === 0) {
         return;
       }
+      const childNodes = contentEditableDiv.current?.childNodes;
+      childNodes?.forEach((item: any) => {
+        contentEditableDiv.current?.removeChild(item);
+      });
       setOpenReplyBox(false);
       const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
       let newAddedComment: IComment = response.data.comment;
