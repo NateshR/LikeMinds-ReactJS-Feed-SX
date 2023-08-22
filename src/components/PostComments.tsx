@@ -124,15 +124,20 @@ const PostComents: React.FC<CommentProps> = ({
       );
     } else {
       return (
-        <img
-          src={defaultUserImage}
-          alt={userContext.user?.imageUrl}
+        <span
           style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '50%'
-          }}
-        />
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: 'gray',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
       );
     }
   }
@@ -186,6 +191,57 @@ const PostComents: React.FC<CommentProps> = ({
     } else {
       return '';
     }
+  }
+  interface MatchPattern {
+    type: number;
+    displayName?: string;
+    routeId?: string;
+    link?: string;
+  }
+  function convertTextToHTML(text: string) {
+    const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
+    const matches = text.match(regex) || [];
+    const splits = text.split(regex);
+
+    const container = document.createElement('div');
+
+    for (let i = 0; i < splits.length; i++) {
+      const splitNode = document.createTextNode(splits[i]);
+      container.appendChild(splitNode);
+
+      if (matches[i]) {
+        const text = matches[i];
+        const getInfoPattern = /<<([^|]+)\|([^>>]+)>>/;
+        const match = text.match(getInfoPattern);
+        const userObject: MatchPattern = {
+          type: 1
+        };
+        if (match) {
+          const userName = match[1];
+          const userId = match[2];
+          userObject.displayName = userName;
+          userObject.routeId = userId;
+        } else {
+          userObject.type = 2;
+          userObject.link = text;
+        }
+        if (userObject.type === 1) {
+          const matchText = matches[i].slice(2, -2); // Remove '<<' and '>>'
+          const linkNode = document.createElement('a');
+          linkNode.href = '#'; // You can set the appropriate URL here
+          linkNode.textContent = userObject.displayName!;
+          linkNode.id = userObject.routeId!;
+          container.appendChild(linkNode);
+        } else {
+          const linkNode = document.createElement('a');
+          linkNode.href = userObject.link!; // You can set the appropriate URL here
+          linkNode.textContent = userObject.link!;
+          container.appendChild(linkNode);
+        }
+      }
+    }
+
+    return container;
   }
 
   function showReplyBox() {
@@ -282,6 +338,7 @@ const PostComents: React.FC<CommentProps> = ({
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(textNode1, anchorNode);
+                        setTaggingMemberList([]);
                       }}>
                       {item?.name}
                     </button>
@@ -309,10 +366,9 @@ const PostComents: React.FC<CommentProps> = ({
       if (textContent.length === 0) {
         return;
       }
-      const childNodes = contentEditableDiv.current?.childNodes;
-      childNodes?.forEach((item: any) => {
-        contentEditableDiv.current?.removeChild(item);
-      });
+      while (contentEditableDiv.current?.firstChild) {
+        contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
+      }
       setOpenReplyBox(false);
       const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
       let newAddedComment: IComment = response.data.comment;
@@ -360,7 +416,11 @@ const PostComents: React.FC<CommentProps> = ({
         <span className="displayTitle"></span>
       </div>
       <div className="commentWrapper--commentContent">
-        <div className="commentWrapper__commentContent--content">{comment.text}</div>
+        <div
+          className="commentWrapper__commentContent--content"
+          dangerouslySetInnerHTML={{
+            __html: convertTextToHTML(comment.text).innerHTML
+          }}></div>
         <IconButton onClick={deleteComment}>
           <MoreVertIcon
             sx={{

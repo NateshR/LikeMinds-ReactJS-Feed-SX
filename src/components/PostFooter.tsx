@@ -132,27 +132,35 @@ const PostFooter: React.FC<PostFooterProps> = ({
       );
     } else {
       return (
-        <img
-          src={defaultUserImage}
-          alt={userContext.user?.imageUrl}
+        <span
           style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '50%'
-          }}
-        />
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
       );
     }
   }
   function showCommentBox() {
-    console.log(userContext);
     const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
       (item: IMemberRight) => item.id === 10 && item.isSelected
     );
     if (isCommentingAllowed) {
       return (
         <>
-          <div className="profile">{setUserImage()}</div>
+          <div className="lmProfile">{setUserImage()}</div>
           <div className="inputDiv">
             <div
               ref={contentEditableDiv}
@@ -199,7 +207,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     <button
                       key={item?.id}
                       style={{
-                        background: 'white',
+                        background: '#fff',
                         padding: '12px',
                         display: 'block',
                         border: 'none',
@@ -242,6 +250,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(textNode1, anchorNode);
+                        setTaggingMemberList([]);
                       }}>
                       {item?.name}
                     </button>
@@ -267,7 +276,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [text, setText] = useState<string>('');
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
-  const contentEditableDiv = useRef<HTMLDivElement>(null);
+  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
 
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
@@ -320,10 +329,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
       if (textContent.length === 0) {
         return;
       }
-      const childNodes = contentEditableDiv.current?.childNodes;
-      childNodes?.forEach((item: any) => {
-        contentEditableDiv.current?.removeChild(item);
-      });
+
+      while (contentEditableDiv.current?.firstChild) {
+        contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
+      }
       const response: any = await lmFeedClient.addComment(postId, textContent);
       const comment = response?.data?.comment;
       const user = response?.data?.users;

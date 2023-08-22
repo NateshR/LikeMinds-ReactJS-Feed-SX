@@ -19,7 +19,8 @@ import LMFeedClient, {
   LikeCommentRequest,
   DeleteCommentRequest,
   GetNotificationFeedRequest,
-  MarkReadNotificationRequest
+  MarkReadNotificationRequest,
+  EditPostRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -49,6 +50,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         InitiateUserRequest.builder()
           // .setUUID('1e9bc941-8817-4328-aa90-f1c90259b12c')
           .setUUID('siddharth-1')
+          // .setUUID('10003')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
           .build()
@@ -89,10 +91,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
           .setAttachmentMeta(AttachmentMeta.builder().setogTags(ogTags).build())
           .build()
       );
-      // const apiCallResponse = await this.client.addPost({
-      //   text: text,
-      //   attachments: attachmentArr
-      // });
+
       const apiCallResponse = await this.client.addPost(
         AddPostRequest.builder().setText(text).setAttachments(attachmentArr).build()
       );
@@ -150,7 +149,6 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
           .build()
       );
     }
-    console.log(attachmentResponseArray);
     const apiCallResponse: UploadMediaModel = await this.client.addPost(
       AddPostRequest.builder().setText(text).setAttachments(attachmentResponseArray).build()
     );
@@ -417,6 +415,39 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     } catch (error) {
       console.log(error);
       return error;
+    }
+  }
+
+  async editPost(postId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.editPost(
+        EditPostRequest.builder().setpostId(postId).settext(text).setattachments([]).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async editPostWithOGTags(postId: string, text: string, ogTags: any) {
+    try {
+      let attachmentArr: Attachment[] = [];
+      attachmentArr.push(
+        Attachment.builder()
+          .setAttachmentType(4)
+          .setAttachmentMeta(AttachmentMeta.builder().setogTags(ogTags).build())
+          .build()
+      );
+      const apiCallResponse = await this.client.editPost(
+        EditPostRequest.builder()
+          .setpostId(postId)
+          .settext(text)
+          .setattachments(attachmentArr)
+          .build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
     }
   }
 }

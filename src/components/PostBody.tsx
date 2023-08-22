@@ -124,11 +124,14 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
   }
   return (
     <div className="lmWrapper__feed__post__body">
-      <div
-        className="lmWrapper__feed__post__body--content"
-        dangerouslySetInnerHTML={{
-          __html: convertTextToHTML(answer).innerHTML
-        }}></div>
+      {answer && (
+        <div
+          className="lmWrapper__feed__post__body--content"
+          dangerouslySetInnerHTML={{
+            __html: convertTextToHTML(answer).innerHTML
+          }}></div>
+      )}
+
       <div className="lmWrapper__feed__post__body--media">
         {/* <img src={post} alt="post" /> */}
 

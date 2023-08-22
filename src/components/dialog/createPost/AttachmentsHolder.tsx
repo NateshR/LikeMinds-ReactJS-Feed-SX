@@ -1,9 +1,10 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import './attachmentsHolder.css';
 import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
 import { DecodeUrlModelSX, FileModel } from '../../../services/models';
 import previewImage from './../../../assets/images/ogTagPreview.png';
+import { Attachment } from 'likeminds-sdk';
 interface AttachmentsHolderProps {
   showMediaUploadBar: boolean | null;
   setShowMediaUploadBar: React.Dispatch<React.SetStateAction<boolean | null>>;
@@ -21,6 +22,8 @@ interface AttachmentsHolderProps {
   setPreviewOGTagData: React.Dispatch<React.SetStateAction<DecodeUrlModelSX | null>>; // Add the DecodeUrlModelSX type here (assuming it's imported)
   hasPreviewClosedOnce: boolean;
   setHasPreviewClosedOnce: React.Dispatch<React.SetStateAction<boolean>>;
+  showMediaAttachmentOnInitiation: boolean;
+  // setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const AttachmentsHolder = ({
   showMediaUploadBar,
@@ -38,7 +41,8 @@ const AttachmentsHolder = ({
   previewOGTagData,
   setPreviewOGTagData,
   hasPreviewClosedOnce,
-  setHasPreviewClosedOnce
+  setHasPreviewClosedOnce,
+  showMediaAttachmentOnInitiation
 }: AttachmentsHolderProps) => {
   function setAttachmentTypeImage() {
     setShowMediaUploadBar(false);
@@ -50,6 +54,12 @@ const AttachmentsHolder = ({
     setShowInitiateUploadComponent(true);
     setAttachmentType(2);
   }
+
+  useEffect(() => {
+    if (showMediaAttachmentOnInitiation) {
+      setAttachmentTypeImage();
+    }
+  }, []);
 
   function setMediaUploadBar() {
     if (showMediaUploadBar) {
@@ -202,7 +212,11 @@ const AttachmentsHolder = ({
 
   return (
     <>
-      <div className="attachmentHolder">
+      <div
+        className="attachmentHolder"
+        style={{
+          display: showOGTagPreview ? 'block' : 'flex'
+        }}>
         {/* <MaxTwoImage /> */}
         {setOGTagPreviewBlock()}
         {setInitiateUploadBlock()}
@@ -312,14 +326,28 @@ function DocumentUploadAttachmentContainer({
   );
 }
 
-const MaxTwoImage = () => {
+const MaxTwoImage = ({ imageOrVideoUploadArray }: any) => {
   return (
     <>
       <div className="attachmentHolder__imgBlock">
-        <img src={phoneImageSample} alt="sampleImg" />
+        <img
+          style={{
+            height: '100%',
+            width: 'auto'
+          }}
+          src={URL.createObjectURL(imageOrVideoUploadArray[0])}
+          alt="sampleImg"
+        />
       </div>
       <div className="attachmentHolder__imgBlock">
-        <img src={phoneImageSample} alt="sampleImg" />
+        <img
+          style={{
+            height: '100%',
+            width: 'auto'
+          }}
+          src={URL.createObjectURL(imageOrVideoUploadArray[1])}
+          alt="sampleImg"
+        />
       </div>
     </>
   );
@@ -510,7 +538,7 @@ function ImageVideoAttachmentView({
         return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
       }
       case 2: {
-        return <MaxTwoImage />;
+        return <MaxTwoImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
       }
       default: {
         return <MinThreeImage />;
@@ -590,23 +618,29 @@ type PreviewForOGTagProps = {
   setOgTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PreviewForOGTag = ({ setOgTagPreview }: PreviewForOGTagProps) => {
+const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagProps) => {
   function closePreviewBox() {
     setOgTagPreview(false);
   }
+  console.log(ogTagPreviewData);
   return (
     <div className="ogTagPreviewContainer">
       <HolderWithCross onCloseFunction={closePreviewBox}>
         <div className="ogTagPreviewContainer--wrapper">
           <div className="ogTagPreviewContainer__wrapper--imageWrapper">
-            <img src={previewImage} alt="preview" />
+            {
+              <img
+                src={ogTagPreviewData.image?.length === 0 ? previewImage : ogTagPreviewData.image}
+                alt="preview"
+              />
+            }
           </div>
           <div className="ogTagPreviewContainer__wrapper--bodyWrapper">
             <p className="ogTagPreviewContainer__wrapper__bodyWrapper--title">
-              Twitter will soon le
+              {ogTagPreviewData.title}
             </p>
             <p className="ogTagPreviewContainer__wrapper__bodyWrapper--description">
-              The new feature has already been implemented in the U…
+              {ogTagPreviewData.description}
             </p>
           </div>
         </div>

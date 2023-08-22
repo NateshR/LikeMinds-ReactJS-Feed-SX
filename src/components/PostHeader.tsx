@@ -1,13 +1,16 @@
 import userImg from '../assets/images/user.png';
-import { IMenuItem } from 'likeminds-sdk';
+
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
-import React, { useEffect, useState } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
+import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { lmFeedClient } from '..';
-import { DELETE_POST } from '../services/feedModerationActions';
+import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
+import UserContext from '../contexts/UserContext';
+import EditPost from './dialog/editPost/EditPost';
+import { IPost, IMenuItem } from 'likeminds-sdk';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -30,6 +33,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [reportTags, setReportTags] = useState([]);
+  const [openDialogBox, setOpenDialog] = useState(false);
   function handleOpenMoreOptionsMenu(event: React.MouseEvent<HTMLElement>) {
     setMoreOptionsMenu(event.currentTarget);
   }
@@ -57,10 +61,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   async function reportPost() {
     const tags = await lmFeedClient.getReportTags();
   }
-  // useEffect(() => {
-  //   reportPost();
-  // });
-  function editPost() {}
+
+  function closeEditPostDialog() {
+    setOpenDialog(false);
+  }
+  function editPost() {
+    feedModerationHandler(EDIT_POST, index, null);
+  }
   function onClickHandler(event: React.MouseEvent) {
     switch (event.currentTarget.id) {
       case '2':
@@ -69,14 +76,53 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         return unpinPost();
       case '1':
         return deletePost();
+      case '5':
+        return editPost();
     }
     handleCloseMoreOptionsMenu();
   }
+  const userContext = useContext(UserContext);
+
+  function setUserImage() {
+    const imageLink = userContext?.user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {username?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
   return (
     <div className="lmWrapper__feed__post__header">
-      <div className="lmWrapper__feed__post__header--profile">
-        <img src={userImg} alt="user" />
-      </div>
+      <div className="lmWrapper__feed__post__header--profile">{setUserImage()}</div>
       <div className="lmWrapper__feed__post__header--info">
         <div className="title">
           {transformUsername(username)}

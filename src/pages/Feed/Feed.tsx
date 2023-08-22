@@ -8,9 +8,10 @@ import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
 import { IPost, IUser, IMemberState } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { CircularProgress } from '@mui/material';
-import { DELETE_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
+import { CircularProgress, Dialog, Snackbar } from '@mui/material';
+import { DELETE_POST, EDIT_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
+import EditPost from '../../components/dialog/editPost/EditPost';
 
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
@@ -18,6 +19,10 @@ const FeedComponent: React.FC = () => {
   const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
   const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
   const [hasMoreFeed, setHasMoreFeed] = useState<boolean>(true);
+  const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
+  const [snackBarMessage, setSnackBarMessage] = useState<string>('');
+  const [openDialogBox, setOpenDialogBox] = useState(false);
+  const [tempPost, setTempPost] = useState<IPost | null>(null);
   const getFeeds = async (pgNo: number) => {
     let feeds = await lmFeedClient.fetchFeed(pgNo);
     if (!feeds) {
@@ -32,7 +37,12 @@ const FeedComponent: React.FC = () => {
     setUsersMap({ ...usersMap, ...feeds.users });
     // feeds?.posts.
   };
-  function feedModerationLocalHandler(action: string, index: number, value: any) {
+  function feedModerationLocalHandler(
+    action: string,
+    index: number,
+    value: any,
+    data?: { [key: string]: any }
+  ) {
     function reNewFeedArray(index: number, newFeedObject: IPost) {
       newFeedArray[index] = newFeedObject;
       setFeedPostsArray(newFeedArray);
@@ -49,16 +59,26 @@ const FeedComponent: React.FC = () => {
           newFeedObject.likesCount--;
         }
         reNewFeedArray(index, newFeedObject);
+        setOpenSnackBar(true);
+
         break;
       }
       case SAVE_POST: {
         newFeedObject.isSaved = value;
         reNewFeedArray(index, newFeedObject);
+
         break;
       }
       case DELETE_POST: {
         newFeedArray.splice(index, 1);
         setFeedPostsArray(newFeedArray);
+        setOpenSnackBar(true);
+        setSnackBarMessage('Deleted Post');
+        break;
+      }
+      case EDIT_POST: {
+        setOpenDialogBox(true);
+        setTempPost(feedPostsArray[index]);
         break;
       }
       default:
@@ -72,7 +92,7 @@ const FeedComponent: React.FC = () => {
       default:
         return (
           <div className="header">
-            <Header />
+            <Header user={user} />
           </div>
         );
     }
@@ -97,7 +117,7 @@ const FeedComponent: React.FC = () => {
                   let pg = feedPostsArray.length / 10;
                   getFeeds(pg + 1);
                 }}>
-                <CreatePost />
+                <CreatePost setFeedArray={setFeedPostsArray} feedArray={feedPostsArray} />
                 {/* Create Post */}
 
                 {/* Filter */}
@@ -168,6 +188,22 @@ const FeedComponent: React.FC = () => {
       }}>
       {setHeader()}
       {setAppUserState(user)}
+      <Snackbar
+        open={openSnackBar}
+        onClose={() => {
+          setOpenSnackBar(false);
+        }}
+        autoHideDuration={3000}
+        message={snackBarMessage}
+      />
+      <Dialog open={openDialogBox} onClose={() => setOpenDialogBox(false)}>
+        <EditPost
+          feedArray={feedPostsArray}
+          setFeedArray={setFeedPostsArray}
+          closeCreatePostDialog={() => setOpenDialogBox(false)}
+          post={tempPost}
+        />
+      </Dialog>
     </UserContext.Provider>
   );
 };

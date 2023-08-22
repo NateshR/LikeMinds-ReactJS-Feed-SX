@@ -1,29 +1,30 @@
-.commentInputBox{
-    display: flex;
-    margin-bottom: 1.5rem;
-    align-items: center;
+.commentInputBox {
+  display: flex;
+  margin-bottom: 1.5rem;
+  align-items: center;
 }
-.inputDiv{
-    flex-grow: 1;
+.inputDiv {
+  flex-grow: 1;
 }
-.profile{
-    margin-right: 1rem;
+.lmProfile {
+  margin-right: 1rem;
+  height: 24px;
+  width: 24px;
 }
-#editableDiv{
-    /* height: 54px; */
-    resize: none;
-    font-weight: 400;
-    font-size: 1rem;
-    font-family: Roboto;
-    overflow-y: auto;
-    border: 1px solid black;
-    border-radius: 24px;
-    padding: 12px 8px;
+#editableDiv {
+  resize: none;
+  font-weight: 400;
+  font-size: 14px;
+  overflow-y: auto;
+  border: 1px solid rgba(72, 79, 103, 0.2);
+  border-radius: 24px;
+  padding: 5px 10px;
+  margin-right: 5px;
+  color: #484f67;
 }
-.postCommentButton{
-
+.postCommentButton {
 }
-.commentsWrapper{
-    max-height: 400px;
-    overflow-y: scroll;
+.commentsWrapper {
+  max-height: 400px;
+  overflow-y: scroll;
 }
