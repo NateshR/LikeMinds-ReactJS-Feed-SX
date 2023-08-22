@@ -77,7 +77,20 @@ const PostComents: React.FC<CommentProps> = ({
       const replyArray = req?.data?.comment?.replies;
       const userMap = req?.data?.users;
       setUsersMap({ ...usersMap, ...userMap });
-      setRepliesArray([...repliesArray].concat(replyArray));
+      if (pageCount === 1) {
+        const tempArr: { [key: string]: number } = {};
+        repliesArray.forEach((item: IComment) => (tempArr[item.Id] = 1));
+        let newResponseReplies = replyArray.filter((item: IComment) => {
+          if (tempArr[item.Id] != 1) {
+            return item;
+          }
+        });
+
+        setRepliesArray([...repliesArray, ...newResponseReplies]);
+      } else {
+        setRepliesArray([...repliesArray].concat(replyArray));
+      }
+
       if (replyArray?.length === 0) {
         setLoadMoreReplies(false);
       }
@@ -157,6 +170,14 @@ const PostComents: React.FC<CommentProps> = ({
   const [openReplyBox, setOpenReplyBox] = useState<boolean>(false);
   const contentEditableDiv = useRef<HTMLDivElement>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
+  }, [text]);
   function openMenu(e: React.MouseEvent<HTMLButtonElement>) {
     setMenuAnchor(e.currentTarget);
   }
@@ -286,6 +307,21 @@ const PostComents: React.FC<CommentProps> = ({
               tabIndex={0}
               placeholder="hello world"
               id="editableDiv"
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim().length === 0) {
+                    // alert('hello');
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
@@ -316,22 +352,21 @@ const PostComents: React.FC<CommentProps> = ({
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div
                 style={{
-                  maxHeight: '150px',
-                  width: '250px',
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  boxShadow: '0px 1px 16px 0 #0000003D',
-                  borderRadius: '0px',
-                  zIndex: 9
+                  maxHeight: '100px',
+                  overflowY: 'auto'
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
-                      className="postTaggingTile"
+                      style={{
+                        background: 'white',
+                        padding: '12px',
+                        display: 'block',
+                        border: 'none',
+                        width: '100%',
+                        textAlign: 'left'
+                      }}
                       onClick={(e) => {
                         e.preventDefault();
                         let focusNode = window.getSelection()!.focusNode;
@@ -477,8 +512,11 @@ const PostComents: React.FC<CommentProps> = ({
             style={{
               cursor: 'pointer'
             }}
-            onClick={getComments}>
-            {commentsCount} replies
+            onClick={() => {
+              getComments();
+              setOpenCommentsSection(true);
+            }}>
+            <span>{commentsCount} replies</span>
           </span>
         </span>
         {showReplyBox()}
@@ -495,19 +533,21 @@ const PostComents: React.FC<CommentProps> = ({
             next={getComments}
             dataLength={repliesArray?.length}
             scrollableTarget={comment.Id}>
-            {repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
-              return (
-                <PostComents
-                  comment={comment}
-                  postId={postId}
-                  key={comment.Id}
-                  index={index}
-                  commentArray={commentArray}
-                  setCommentArray={setRepliesArray}
-                  user={usersMap[comment.uuid]}
-                />
-              );
-            })}
+            {repliesArray.length && openCommentsSection
+              ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                  return (
+                    <PostComents
+                      comment={comment}
+                      postId={postId}
+                      key={comment.Id}
+                      index={index}
+                      commentArray={commentArray}
+                      setCommentArray={setRepliesArray}
+                      user={usersMap[comment?.uuid]}
+                    />
+                  );
+                })
+              : null}
           </InfiniteScroll>
         </div>
       </div>

@@ -18,6 +18,7 @@ interface MatchPattern {
   routeId?: string;
   link?: string;
 }
+
 const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
@@ -82,6 +83,7 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         return renderMediaItem(attachment);
       });
   }
+
   function renderMediaItem(attachment: Attachment) {
     switch (attachment.attachmentType) {
       case 1:

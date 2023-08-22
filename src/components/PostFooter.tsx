@@ -86,11 +86,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
     if (pageCount === 1) {
       const tempArr: { [key: string]: number } = {};
       commentList.forEach((item: IComment) => (tempArr[item.Id] = 1));
-      let newResponseReplies = commentArray.map((item: IComment) => {
+      let newResponseReplies = commentArray.filter((item: IComment) => {
         if (tempArr[item.Id] != 1) {
           return item;
         }
       });
+      console.log(newResponseReplies);
       setCommentList([...commentList, ...newResponseReplies]);
     } else {
       setCommentList([...commentList, ...commentArray]);
@@ -166,6 +167,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       );
     }
   }
+
   function showCommentBox() {
     const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
       (item: IMemberRight) => item.id === 10 && item.isSelected
@@ -182,6 +184,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
               tabIndex={0}
               placeholder="hello world"
               id="editableDiv"
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  console.log('the trimmed Length os', text.trim().length);
+                  if (text.trim().length === 0) {
+                    // alert('hello');
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
@@ -291,7 +309,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
-
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
+  }, [text]);
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
       return undefined;
@@ -391,7 +415,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <span>{postLikesCount}</span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
-            <IconButton onClick={getPostComments}>
+            <IconButton
+              onClick={() => {
+                getPostComments();
+                setOpenCommentsSection(true);
+              }}>
               <img src={comment} alt="comment" />
             </IconButton>{' '}
             <span
@@ -400,6 +428,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               }}
               onClick={() => {
                 setOpenCommentsSection(true);
+                getPostComments();
               }}>
               {postCommentsCount}
             </span>
@@ -430,7 +459,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   commentArray={commentArray}
                   setCommentArray={setCommentList}
                   index={index}
-                  user={postUsersMap[comment.uuid]}
+                  user={postUsersMap[comment?.uuid]}
                 />
               );
             })}
