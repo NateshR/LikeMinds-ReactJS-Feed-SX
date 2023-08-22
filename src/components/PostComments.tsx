@@ -139,13 +139,17 @@ const PostComents: React.FC<CommentProps> = ({
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '24px',
+            height: '24px',
             borderRadius: '50%',
-            backgroundColor: 'gray',
             display: 'inline-flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
           }}>
           {userContext.user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
@@ -298,7 +302,7 @@ const PostComents: React.FC<CommentProps> = ({
     if (openReplyBox) {
       return (
         <div className="commentInputBox">
-          <div className="profile">{setUserImage()}</div>
+          <div className="lmProfile">{setUserImage()}</div>
           <div className="inputDiv">
             <div
               ref={contentEditableDiv}
@@ -418,11 +422,11 @@ const PostComents: React.FC<CommentProps> = ({
               </div>
             ) : null}
           </div>
-          <div className="postCommentButton">
+          {/* <div className="postCommentButton">
             <IconButton onClick={postReply}>
               <SendIcon />
             </IconButton>
-          </div>
+          </div> */}
         </div>
       );
     } else {
@@ -505,7 +509,8 @@ const PostComents: React.FC<CommentProps> = ({
           <IconButton onClick={likeComment}>{renderLikeButton()}</IconButton>
         </span>
         <span className="replies">{likesCount} Likes</span>
-        {' | '}
+        <span className="replies">| </span>
+
         <span className="replies">
           <span
             style={{
