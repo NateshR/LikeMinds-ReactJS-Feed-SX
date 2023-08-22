@@ -55,7 +55,13 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           container.appendChild(linkNode);
         } else {
           const linkNode = document.createElement('a');
-          linkNode.href = userObject.link!; // You can set the appropriate URL here
+          linkNode.target = '_blank';
+          let url = userObject.link;
+          if (!url?.startsWith('http://') && !url?.startsWith('https://')) {
+            url = 'http://' + url;
+          }
+
+          linkNode.href = url!; // You can set the appropriate URL here
           linkNode.textContent = userObject.link!;
           container.appendChild(linkNode);
         }

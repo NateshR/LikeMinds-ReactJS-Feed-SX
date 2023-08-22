@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
-import { IconButton } from '@mui/material';
-import { IComment, IUser } from 'likeminds-sdk';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { IComment, IMenuItem, IUser } from 'likeminds-sdk';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';
@@ -141,13 +141,42 @@ const PostComents: React.FC<CommentProps> = ({
       );
     }
   }
+
+  function handleMenuClick(e: React.MouseEvent) {
+    const clickedElementid = e.currentTarget.id;
+    console.log(e.target);
+    switch (clickedElementid) {
+      case '6':
+        return deleteComment();
+    }
+  }
   // functions for input box
   const [text, setText] = useState<string>('');
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const [openReplyBox, setOpenReplyBox] = useState<boolean>(false);
   const contentEditableDiv = useRef<HTMLDivElement>(null);
-
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  function openMenu(e: React.MouseEvent<HTMLButtonElement>) {
+    setMenuAnchor(e.currentTarget);
+  }
+  function closeMenu() {
+    setMenuAnchor(null);
+  }
+  function renderMenu() {
+    return (
+      <Menu open={Boolean(menuAnchor)} anchorEl={menuAnchor} onClose={closeMenu}>
+        {comment.menuItems.map((item: IMenuItem) => {
+          if (item.id === 8) return null;
+          return (
+            <MenuItem id={item.id.toString()} key={item.id.toString()} onClick={handleMenuClick}>
+              {item.title}
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    );
+  }
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
       return undefined;
@@ -408,7 +437,6 @@ const PostComents: React.FC<CommentProps> = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
-  console.log(user);
   return (
     <div className="commentWrapper">
       <div className="commentWrapper--username">
@@ -421,13 +449,14 @@ const PostComents: React.FC<CommentProps> = ({
           dangerouslySetInnerHTML={{
             __html: convertTextToHTML(comment.text).innerHTML
           }}></div>
-        <IconButton onClick={deleteComment}>
+        <IconButton onClick={openMenu}>
           <MoreVertIcon
             sx={{
               fontSize: '14px'
             }}
           />
         </IconButton>
+        {renderMenu()}
       </div>
       <div className="commentWrapper--commentActions">
         <span className="like">
