@@ -54,6 +54,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [postUsersMap, setPostUsersMap] = useState<{ [key: string]: IUser }>({});
   const [pageCount, setPageCount] = useState<number>(1);
   const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
+  const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
   useEffect(() => {
     setIsPostLiked(isLiked);
     setIsPostSaved(isSaved);
@@ -82,7 +83,20 @@ const PostFooter: React.FC<PostFooterProps> = ({
     let commentArray = response?.data?.post?.replies;
 
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
-    setCommentList([...commentList, ...commentArray]);
+    if (pageCount === 1) {
+      const tempArr: { [key: string]: number } = {};
+      commentList.forEach((item: IComment) => (tempArr[item.Id] = 1));
+      let newResponseReplies = commentArray.filter((item: IComment) => {
+        if (tempArr[item.Id] != 1) {
+          return item;
+        }
+      });
+      console.log(newResponseReplies);
+      setCommentList([...commentList, ...newResponseReplies]);
+    } else {
+      setCommentList([...commentList, ...commentArray]);
+    }
+
     if (commentArray?.length === 0) {
       setHasMoreComments(false);
     }
@@ -153,6 +167,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       );
     }
   }
+
   function showCommentBox() {
     const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
       (item: IMemberRight) => item.id === 10 && item.isSelected
@@ -169,6 +184,28 @@ const PostFooter: React.FC<PostFooterProps> = ({
               tabIndex={0}
               placeholder="hello world"
               id="editableDiv"
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  console.log('the trimmed Length os', text.trim().length);
+                  if (text.trim().length === 0) {
+                    // alert('hello');
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  postComment();
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
@@ -199,21 +236,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div
                 style={{
-                  maxHeight: '100px',
-                  overflowY: 'auto'
+                  maxHeight: '150px',
+                  width: '250px',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  boxShadow: '0px 1px 16px 0 #0000003D',
+                  borderRadius: '0px',
+                  zIndex: 9
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
-                      style={{
-                        background: '#fff',
-                        padding: '12px',
-                        display: 'block',
-                        border: 'none',
-                        width: '100%',
-                        textAlign: 'left'
-                      }}
+                      className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
                         let focusNode = window.getSelection()!.focusNode;
@@ -277,7 +315,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
-
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
+  }, [text]);
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
       return undefined;
@@ -377,10 +421,23 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <span>{postLikesCount}</span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
-            <IconButton onClick={getPostComments}>
+            <IconButton
+              onClick={() => {
+                getPostComments();
+                setOpenCommentsSection(true);
+              }}>
               <img src={comment} alt="comment" />
             </IconButton>{' '}
-            <span>{postCommentsCount}</span>
+            <span
+              style={{
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                setOpenCommentsSection(true);
+                getPostComments();
+              }}>
+              {postCommentsCount}
+            </span>
           </div>
         </div>
         <div className="lmWrapper__feed__post__footer__actions__right">
@@ -392,7 +449,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       {/* Comments */}
       <div className="commentInputBox">{showCommentBox()}</div>
       <div className="commentsWrapper" id="wrapperComment">
-        {commentList.length ? (
+        {commentList.length && openCommentsSection ? (
           <InfiniteScroll
             dataLength={commentList.length}
             loader={null}
@@ -408,7 +465,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   commentArray={commentArray}
                   setCommentArray={setCommentList}
                   index={index}
-                  user={postUsersMap[comment.uuid]}
+                  user={postUsersMap[comment?.uuid]}
                 />
               );
             })}

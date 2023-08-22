@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
-import { IconButton } from '@mui/material';
-import { IComment, IUser } from 'likeminds-sdk';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { IComment, IMenuItem, IUser } from 'likeminds-sdk';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';
@@ -77,7 +77,20 @@ const PostComents: React.FC<CommentProps> = ({
       const replyArray = req?.data?.comment?.replies;
       const userMap = req?.data?.users;
       setUsersMap({ ...usersMap, ...userMap });
-      setRepliesArray([...repliesArray].concat(replyArray));
+      if (pageCount === 1) {
+        const tempArr: { [key: string]: number } = {};
+        repliesArray.forEach((item: IComment) => (tempArr[item.Id] = 1));
+        let newResponseReplies = replyArray.filter((item: IComment) => {
+          if (tempArr[item.Id] != 1) {
+            return item;
+          }
+        });
+
+        setRepliesArray([...repliesArray, ...newResponseReplies]);
+      } else {
+        setRepliesArray([...repliesArray].concat(replyArray));
+      }
+
       if (replyArray?.length === 0) {
         setLoadMoreReplies(false);
       }
@@ -141,13 +154,50 @@ const PostComents: React.FC<CommentProps> = ({
       );
     }
   }
+
+  function handleMenuClick(e: React.MouseEvent) {
+    const clickedElementid = e.currentTarget.id;
+    console.log(e.target);
+    switch (clickedElementid) {
+      case '6':
+        return deleteComment();
+    }
+  }
   // functions for input box
   const [text, setText] = useState<string>('');
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const [openReplyBox, setOpenReplyBox] = useState<boolean>(false);
   const contentEditableDiv = useRef<HTMLDivElement>(null);
-
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
+  }, [text]);
+  function openMenu(e: React.MouseEvent<HTMLButtonElement>) {
+    setMenuAnchor(e.currentTarget);
+  }
+  function closeMenu() {
+    setMenuAnchor(null);
+  }
+  function renderMenu() {
+    return (
+      <Menu open={Boolean(menuAnchor)} anchorEl={menuAnchor} onClose={closeMenu}>
+        {comment.menuItems.map((item: IMenuItem) => {
+          if (item.id === 8) return null;
+          return (
+            <MenuItem id={item.id.toString()} key={item.id.toString()} onClick={handleMenuClick}>
+              {item.title}
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    );
+  }
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
       return undefined;
@@ -257,6 +307,27 @@ const PostComents: React.FC<CommentProps> = ({
               tabIndex={0}
               placeholder="hello world"
               id="editableDiv"
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim().length === 0) {
+                    // alert('hello');
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  postReply();
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
@@ -408,7 +479,6 @@ const PostComents: React.FC<CommentProps> = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
-  console.log(user);
   return (
     <div className="commentWrapper">
       <div className="commentWrapper--username">
@@ -421,13 +491,14 @@ const PostComents: React.FC<CommentProps> = ({
           dangerouslySetInnerHTML={{
             __html: convertTextToHTML(comment.text).innerHTML
           }}></div>
-        <IconButton onClick={deleteComment}>
+        <IconButton onClick={openMenu}>
           <MoreVertIcon
             sx={{
               fontSize: '14px'
             }}
           />
         </IconButton>
+        {renderMenu()}
       </div>
       <div className="commentWrapper--commentActions">
         <span className="like">
@@ -447,8 +518,11 @@ const PostComents: React.FC<CommentProps> = ({
             style={{
               cursor: 'pointer'
             }}
-            onClick={getComments}>
-            {commentsCount} replies
+            onClick={() => {
+              getComments();
+              setOpenCommentsSection(true);
+            }}>
+            <span>{commentsCount} replies</span>
           </span>
         </span>
         {showReplyBox()}
@@ -465,19 +539,21 @@ const PostComents: React.FC<CommentProps> = ({
             next={getComments}
             dataLength={repliesArray?.length}
             scrollableTarget={comment.Id}>
-            {repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
-              return (
-                <PostComents
-                  comment={comment}
-                  postId={postId}
-                  key={comment.Id}
-                  index={index}
-                  commentArray={commentArray}
-                  setCommentArray={setRepliesArray}
-                  user={usersMap[comment.uuid]}
-                />
-              );
-            })}
+            {repliesArray.length && openCommentsSection
+              ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                  return (
+                    <PostComents
+                      comment={comment}
+                      postId={postId}
+                      key={comment.Id}
+                      index={index}
+                      commentArray={commentArray}
+                      setCommentArray={setRepliesArray}
+                      user={usersMap[comment?.uuid]}
+                    />
+                  );
+                })
+              : null}
           </InfiniteScroll>
         </div>
       </div>

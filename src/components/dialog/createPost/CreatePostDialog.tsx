@@ -111,13 +111,17 @@ const CreatePostDialog = ({
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '48px',
+            height: '48px',
             borderRadius: '50%',
-            backgroundColor: 'gray',
             display: 'inline-flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
           }}>
           {userContext.user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
@@ -141,8 +145,9 @@ const CreatePostDialog = ({
   });
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
-  const contentEditableDiv = useRef<HTMLDivElement>(null);
+  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => console.log(text));
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -291,11 +296,15 @@ const CreatePostDialog = ({
     const timeOut = setTimeout(() => {
       checkForOGTags();
     }, 500);
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
     return () => {
       clearTimeout(timeOut);
     };
   }, [text]);
-
   useEffect(() => {
     if (!tagString && !(tagString.length > 0)) {
       return;
@@ -320,6 +329,12 @@ const CreatePostDialog = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
+  const [stopInput, setStopInput] = useState(false);
+  // useEffect(() => {
+  //   if (contentEditableDiv && contentEditableDiv.current) {
+  //     contentEditableDiv.current.focus();
+  //   }
+  // }, []);
   return (
     // <div className="create-post-feed-dialog-wrapper">
     <div>
@@ -357,7 +372,6 @@ const CreatePostDialog = ({
               contentEditable={true}
               suppressContentEditableWarning
               tabIndex={0}
-              placeholder="hello world"
               id="editableDiv"
               style={{
                 width: '100%',
@@ -368,6 +382,28 @@ const CreatePostDialog = ({
                 fontSize: '1rem',
                 fontFamily: 'Roboto',
                 overflowY: 'auto'
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+                // setStopInput(true);
+              }}
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  console.log('the trimmed Length os', text.trim().length);
+                  if (text.trim().length === 0) {
+                    // alert('hello');
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
               }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
@@ -399,23 +435,22 @@ const CreatePostDialog = ({
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div
                 style={{
-                  maxHeight: '100px',
+                  maxHeight: '150px',
                   width: '250px',
-                  overflowY: 'auto'
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  boxShadow: '0px 1px 16px 0 #0000003D',
+                  borderRadius: '0px',
+                  zIndex: 9
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
                       className="taggingTile"
-                      style={{
-                        background: 'white',
-                        padding: '12px',
-                        display: 'block',
-                        border: 'none',
-                        width: '250px',
-                        textAlign: 'left'
-                      }}
                       onClick={(e) => {
                         e.preventDefault();
                         let focusNode = window.getSelection()!.focusNode;
