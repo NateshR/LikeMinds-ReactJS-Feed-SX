@@ -174,7 +174,7 @@ const Header: React.FC<HeaderProps> = () => {
               <div className="title">Notification</div>
               {activityArray.map((activity: IActivity) => {
                 return (
-                  <MenuItem key={activity.id} className="customMenuItem">
+                  <MenuItem key={activity.Id} className="customMenuItem">
                     <div className="notificationIist">
                       <div className="notiImg">{setUserImage(userMap[activity.actionOn])}</div>
                       <div

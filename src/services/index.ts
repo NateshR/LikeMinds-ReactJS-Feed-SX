@@ -100,6 +100,26 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       console.log(error);
     }
   }
+
+  read(file: any) {
+    const reader = new FileReader();
+    let duration: number | string = 0;
+    reader.onload = function (event: any) {
+      const blob = new Blob([event?.target?.result]);
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = function () {
+        URL.revokeObjectURL(video.src); // Clean up the object URL
+        duration = video.duration.toFixed(2);
+      };
+
+      video.src = URL.createObjectURL(blob);
+      return duration;
+    };
+    reader.readAsArrayBuffer(file as unknown as File);
+  }
+
   async addPostWithImageAttachments(text: any, mediaArray: any[], uniqueUserId: any) {
     try {
       const attachmentResponseArray: Attachment[] = [];
@@ -122,36 +142,20 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
               .build()
           );
         } else {
-          const reader = new FileReader();
-          let duration: number | string = 0;
-          reader.onload = function (event: any) {
-            const blob = new Blob([event?.target?.result]);
-            const video = document.createElement('video');
-            video.preload = 'metadata';
-
-            video.onloadedmetadata = function () {
-              URL.revokeObjectURL(video.src); // Clean up the object URL
-              duration = video.duration.toFixed(2);
-              attachmentResponseArray.push(
-                Attachment.builder()
-                  .setAttachmentType(2)
-                  .setAttachmentMeta(
-                    AttachmentMeta.builder()
-                      .seturl(resp.Location)
-                      .setformat(file?.name?.split('.').slice(-1).toString())
-                      .setsize(file.size)
-                      .setname(file.name)
-                      .setduration(parseInt(duration.toString()))
-                      .build()
-                  )
+          attachmentResponseArray.push(
+            Attachment.builder()
+              .setAttachmentType(2)
+              .setAttachmentMeta(
+                AttachmentMeta.builder()
+                  .seturl(resp.Location)
+                  .setformat(file?.name?.split('.').slice(-1).toString())
+                  .setsize(file.size)
+                  .setname(file.name)
+                  .setduration(10)
                   .build()
-              );
-            };
-
-            video.src = URL.createObjectURL(blob);
-          };
-
-          reader.readAsArrayBuffer(file as unknown as File);
+              )
+              .build()
+          );
         }
       }
 

@@ -257,6 +257,7 @@ const CreatePostDialog = ({
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
+        console.log('the image Array is', imageOrVideoUploadArray);
         response = await lmFeedClient.addPostWithImageAttachments(
           textContent,
           imageOrVideoUploadArray,
@@ -302,6 +303,7 @@ const CreatePostDialog = ({
   }
 
   function extractTextFromNode(node: any) {
+    node.focus();
     if (node.nodeType === Node.TEXT_NODE) {
       return node.textContent;
     } else if (node.nodeType === Node.ELEMENT_NODE) {

@@ -468,6 +468,14 @@ const PostFooter: React.FC<PostFooterProps> = ({
       </div>
       {/* Comments */}
       <div className="commentInputBox">{showCommentBox()}</div>
+      <div className="commentCountDiv">
+        <span
+          style={{
+            fontWeight: 400
+          }}>
+          {postCommentsCount} Comments
+        </span>
+      </div>
       <div className="commentsWrapper" id="wrapperComment">
         {commentList.length && openCommentsSection ? (
           <InfiniteScroll
