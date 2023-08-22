@@ -106,19 +106,53 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       for (let index = 0; index < mediaArray.length; index++) {
         const file: FileModel = mediaArray[index];
         const resp: UploadMediaModel = await this.uploadMedia(file, uniqueUserId);
-        attachmentResponseArray.push(
-          Attachment.builder()
-            .setAttachmentType(1)
-            .setAttachmentMeta(
-              AttachmentMeta.builder()
-                .seturl(resp.Location)
-                .setformat(file?.name?.split('.').slice(-1).toString())
-                .setsize(file.size)
-                .setname(file.name)
-                .build()
-            )
-            .build()
-        );
+        const type = file.type.split('/')[0] === 'image' ? 1 : 2;
+        if (type === 1) {
+          attachmentResponseArray.push(
+            Attachment.builder()
+              .setAttachmentType(1)
+              .setAttachmentMeta(
+                AttachmentMeta.builder()
+                  .seturl(resp.Location)
+                  .setformat(file?.name?.split('.').slice(-1).toString())
+                  .setsize(file.size)
+                  .setname(file.name)
+                  .build()
+              )
+              .build()
+          );
+        } else {
+          const reader = new FileReader();
+          let duration: number | string = 0;
+          reader.onload = function (event: any) {
+            const blob = new Blob([event?.target?.result]);
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+
+            video.onloadedmetadata = function () {
+              URL.revokeObjectURL(video.src); // Clean up the object URL
+              duration = video.duration.toFixed(2);
+              attachmentResponseArray.push(
+                Attachment.builder()
+                  .setAttachmentType(2)
+                  .setAttachmentMeta(
+                    AttachmentMeta.builder()
+                      .seturl(resp.Location)
+                      .setformat(file?.name?.split('.').slice(-1).toString())
+                      .setsize(file.size)
+                      .setname(file.name)
+                      .setduration(parseInt(duration.toString()))
+                      .build()
+                  )
+                  .build()
+              );
+            };
+
+            video.src = URL.createObjectURL(blob);
+          };
+
+          reader.readAsArrayBuffer(file as unknown as File);
+        }
       }
 
       const apiCallResponse: UploadMediaModel = await this.client.addPost(
