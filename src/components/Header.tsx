@@ -7,6 +7,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { lmFeedClient } from '..';
 import { IActivity, IUser } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import noNotification from '../assets/images/default.svg';
+
 interface HeaderProps {
   // user: any;
 }
@@ -153,6 +155,7 @@ const Header: React.FC<HeaderProps> = () => {
       console.log(error);
     }
   }
+
   function renderNotification() {
     return (
       <Menu
@@ -167,22 +170,29 @@ const Header: React.FC<HeaderProps> = () => {
             next={getNotifications}
             loader={null}
             scrollableTarget="activityHolder">
-            {activityArray.map((activity: IActivity) => {
-              return (
-                <MenuItem key={activity.Id}>
-                  <div>
-                    <div>{setUserImage(userMap[activity.actionOn])}</div>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: convertTextToHTML(activity.activityText).innerHTML
-                      }}></div>
-                  </div>
-                </MenuItem>
-              );
-            })}
+            <div className="lmNotification">
+              <div className="title">Notification</div>
+              {activityArray.map((activity: IActivity) => {
+                return (
+                  <MenuItem key={activity.id} className="customMenuItem">
+                    <div className="notificationIist">
+                      <div className="notiImg">{setUserImage(userMap[activity.actionOn])}</div>
+                      <div
+                        className="lmNoti"
+                        dangerouslySetInnerHTML={{
+                          __html: convertTextToHTML(activity.activityText).innerHTML
+                        }}></div>
+                    </div>
+                  </MenuItem>
+                );
+              })}
+            </div>
           </InfiniteScroll>
         ) : (
-          <>Sanjay pls add css and required designs to this</>
+          <div className="lmNoNotification">
+            <img src={noNotification} alt="default image" />
+            Oops! You do not have any no notifications yet.
+          </div>
         )}
       </Menu>
     );

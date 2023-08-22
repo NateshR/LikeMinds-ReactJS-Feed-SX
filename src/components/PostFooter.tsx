@@ -297,11 +297,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
               </div>
             ) : null}
           </div>
-          <div className="postCommentButton">
+          {/* Post comment send icon */}
+          {/* <div className="postCommentButton">
             <IconButton onClick={postComment}>
               <SendIcon />
             </IconButton>
-          </div>
+          </div> */}
         </>
       );
     } else {
@@ -417,11 +418,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
         <div className="lmWrapper__feed__post__footer__actions__left">
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
             {' '}
-            <IconButton onClick={likePost}>{setLikeButton()}</IconButton>{' '}
-            <span>{postLikesCount}</span>
+            <IconButton
+              style={{
+                margin: '0',
+                padding: '0'
+              }}
+              onClick={likePost}>
+              {setLikeButton()}
+            </IconButton>{' '}
+            <span>{postLikesCount} Likes</span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
             <IconButton
+              style={{
+                margin: '0',
+                padding: '0'
+              }}
               onClick={() => {
                 getPostComments();
                 setOpenCommentsSection(true);
@@ -436,13 +448,21 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 setOpenCommentsSection(true);
                 getPostComments();
               }}>
-              {postCommentsCount}
+              {postCommentsCount} Comments
             </span>
           </div>
         </div>
         <div className="lmWrapper__feed__post__footer__actions__right">
           <div className="lm-cursor-pointer">
-            <IconButton onClick={savePost}>{setSavePostButton()}</IconButton>
+            <IconButton
+              title="Save"
+              style={{
+                margin: '0',
+                padding: '0'
+              }}
+              onClick={savePost}>
+              {setSavePostButton()}
+            </IconButton>
           </div>
         </div>
       </div>
