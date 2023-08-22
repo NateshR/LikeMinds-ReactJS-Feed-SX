@@ -6,7 +6,7 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost } from 'likeminds-sdk';
+import { IPost, IUser } from 'likeminds-sdk';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -94,6 +94,43 @@ const CreatePostDialog = ({
 }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
+    const imageLink = userContext?.user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
+  function setTagUserImage(user: any) {
     const imageLink = userContext?.user?.imageUrl;
     if (imageLink !== '') {
       return (
@@ -447,6 +484,7 @@ const CreatePostDialog = ({
                   zIndex: 9
                 }}>
                 {taggingMemberList?.map!((item: any) => {
+                  console.log(item);
                   return (
                     <button
                       key={item?.id}
@@ -489,7 +527,8 @@ const CreatePostDialog = ({
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
-                      {item?.name}
+                      {setTagUserImage(item)}
+                      <span>{item?.name}</span>
                     </button>
                   );
                 })}
