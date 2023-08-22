@@ -1,8 +1,7 @@
 .attachmentHolder {
-  margin: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 0 20px 0;
+  display: flex; 
+  width: 100%;
 }
 .attachmentHolder__imgBlock {
   border-radius: 0.5rem;
@@ -65,10 +64,10 @@ input[type='file'] {
   position: relative;
   height: 194px;
   width: 100%;
-  background-color: rgba(230, 235, 245, 0.3);
+  background-color: #f7f9fc;
   border: 1px solid #e6ebf5;
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: 8px;
 }
 .initiateMediaUploadBox--closeIcon {
   position: absolute;
@@ -80,7 +79,7 @@ input[type='file'] {
   line-height: 1.25rem;
   font-size: 1rem;
   color: #484f67;
-  margin: 0;
+  margin: 10px 0 0 0;
 }
 .initiateMediaUploadBox--headingTwo {
   font-weight: 400;
@@ -165,7 +164,7 @@ border-radius: 0.5rem;
 .ogTagPreviewContainer__wrapper--imageWrapper{
   height: 216px;
   display: flex;
-  justify-content: center;
+  justify-content:center;
   align-items: center;
 }
 
