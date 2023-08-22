@@ -207,7 +207,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     <button
                       key={item?.id}
                       style={{
-                        background: 'white',
+                        background: '#fff',
                         padding: '12px',
                         display: 'block',
                         border: 'none',

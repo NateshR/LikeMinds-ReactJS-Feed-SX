@@ -268,11 +268,14 @@
   flex-direction: column;
 }
 .lmWrapper__feed__post__body--content {
-  padding: 10px 20px 20px 20px;
+  padding: 10px 20px 10px 20px;
   font-size: 1rem;
   line-height: 20px;
   font-weight: 400;
   color: #484f67;
+}
+.lmWrapper__feed__post__body--content a {
+  text-decoration: none;
 }
 .lmWrapper__feed__post__footer {
   border-radius: 0 0 8px 8px;
