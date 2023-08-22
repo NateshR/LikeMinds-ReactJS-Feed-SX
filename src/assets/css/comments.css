@@ -18,8 +18,12 @@
   line-height: 20px;
   display: flex;
 }
-.commentWrapper--commentActions .commentInputBox{ 
+.commentWrapper--commentActions .commentInputBox {
   margin: 0 0 0 40px;
+}
+.commentWrapper--commentActions .commentWrapper {
+  margin: 0 0 0 40px;
+  border: none;
 }
 .commentWrapper--commentActions .replies {
   color: rgba(15, 30, 61, 0.4);
