@@ -54,6 +54,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [postUsersMap, setPostUsersMap] = useState<{ [key: string]: IUser }>({});
   const [pageCount, setPageCount] = useState<number>(1);
   const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
+  const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
   useEffect(() => {
     setIsPostLiked(isLiked);
     setIsPostSaved(isSaved);
@@ -82,7 +83,19 @@ const PostFooter: React.FC<PostFooterProps> = ({
     let commentArray = response?.data?.post?.replies;
 
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
-    setCommentList([...commentList, ...commentArray]);
+    if (pageCount === 1) {
+      const tempArr: { [key: string]: number } = {};
+      commentList.forEach((item: IComment) => (tempArr[item.Id] = 1));
+      let newResponseReplies = commentArray.map((item: IComment) => {
+        if (tempArr[item.Id] != 1) {
+          return item;
+        }
+      });
+      setCommentList([...commentList, ...newResponseReplies]);
+    } else {
+      setCommentList([...commentList, ...commentArray]);
+    }
+
     if (commentArray?.length === 0) {
       setHasMoreComments(false);
     }
@@ -380,7 +393,15 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <IconButton onClick={getPostComments}>
               <img src={comment} alt="comment" />
             </IconButton>{' '}
-            <span>{postCommentsCount}</span>
+            <span
+              style={{
+                cursor: 'pointer'
+              }}
+              onClick={() => {
+                setOpenCommentsSection(true);
+              }}>
+              {postCommentsCount}
+            </span>
           </div>
         </div>
         <div className="lmWrapper__feed__post__footer__actions__right">
@@ -392,7 +413,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       {/* Comments */}
       <div className="commentInputBox">{showCommentBox()}</div>
       <div className="commentsWrapper" id="wrapperComment">
-        {commentList.length ? (
+        {commentList.length && openCommentsSection ? (
           <InfiniteScroll
             dataLength={commentList.length}
             loader={null}
