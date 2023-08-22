@@ -7,13 +7,20 @@ import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 import { lmFeedClient } from '..';
 import { Dialog } from '@mui/material';
 import UserContext from '../contexts/UserContext';
-
-const CreatePost: React.FC = () => {
+import { IPost } from 'likeminds-sdk';
+interface CreateFeedProps {
+  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
+  feedArray: IPost[];
+}
+const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
   const ref = useRef<HTMLInputElement | null>(null);
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
+  const [showMediaAttachmentOnInitiation, setShowMediaAttachmentOnInitiation] =
+    useState<boolean>(false);
   function closeCreatePostDialog() {
     console.log('handles');
     setOpenCreatePostDialog(false);
+    setShowMediaAttachmentOnInitiation(false);
   }
   function openCreatePostDialogBox() {
     setOpenCreatePostDialog(true);
@@ -72,7 +79,13 @@ const CreatePost: React.FC = () => {
           closeCreatePostDialog();
           e.preventDefault();
         }}>
-        <CreatePostDialog closeCreatePostDialog={closeCreatePostDialog} />
+        <CreatePostDialog
+          closeCreatePostDialog={closeCreatePostDialog}
+          showMediaAttachmentOnInitiation={showMediaAttachmentOnInitiation}
+          setShowMediaAttachmentOnInitiation={setShowMediaAttachmentOnInitiation}
+          setFeedArray={setFeedArray}
+          feedArray={feedArray}
+        />
       </Dialog>
       <div className="lmWrapper__feed__creatPost">
         <div className="lmWrapper__feed__creatPost__write">
@@ -90,7 +103,10 @@ const CreatePost: React.FC = () => {
             />
           </div>
         </div>
-        <PostOptions />
+        <PostOptions
+          setMediaAttachmentOnInitiation={setShowMediaAttachmentOnInitiation}
+          openCreatePostDialogBox={openCreatePostDialogBox}
+        />
       </div>
     </>
   );

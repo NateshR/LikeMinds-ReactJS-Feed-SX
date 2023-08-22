@@ -250,6 +250,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(textNode1, anchorNode);
+                        setTaggingMemberList([]);
                       }}>
                       {item?.name}
                     </button>
@@ -328,10 +329,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
       if (textContent.length === 0) {
         return;
       }
-      const childNodes = contentEditableDiv.current?.childNodes;
-      childNodes?.forEach((item: any) => {
-        contentEditableDiv.current?.removeChild(item);
-      });
+
+      while (contentEditableDiv.current?.firstChild) {
+        contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
+      }
       const response: any = await lmFeedClient.addComment(postId, textContent);
       const comment = response?.data?.comment;
       const user = response?.data?.users;

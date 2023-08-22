@@ -1,14 +1,16 @@
 import userImg from '../assets/images/user.png';
-import { IMenuItem } from 'likeminds-sdk';
+
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import React, { useContext, useEffect, useState } from 'react';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { lmFeedClient } from '..';
-import { DELETE_POST } from '../services/feedModerationActions';
+import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
 import UserContext from '../contexts/UserContext';
+import EditPost from './dialog/editPost/EditPost';
+import { IPost, IMenuItem } from 'likeminds-sdk';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -31,6 +33,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [reportTags, setReportTags] = useState([]);
+  const [openDialogBox, setOpenDialog] = useState(false);
   function handleOpenMoreOptionsMenu(event: React.MouseEvent<HTMLElement>) {
     setMoreOptionsMenu(event.currentTarget);
   }
@@ -58,10 +61,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   async function reportPost() {
     const tags = await lmFeedClient.getReportTags();
   }
-  // useEffect(() => {
-  //   reportPost();
-  // });
-  function editPost() {}
+
+  function closeEditPostDialog() {
+    setOpenDialog(false);
+  }
+  function editPost() {
+    feedModerationHandler(EDIT_POST, index, null);
+  }
   function onClickHandler(event: React.MouseEvent) {
     switch (event.currentTarget.id) {
       case '2':
@@ -70,6 +76,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         return unpinPost();
       case '1':
         return deletePost();
+      case '5':
+        return editPost();
     }
     handleCloseMoreOptionsMenu();
   }

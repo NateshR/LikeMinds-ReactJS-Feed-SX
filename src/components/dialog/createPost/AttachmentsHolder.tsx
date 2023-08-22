@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import './attachmentsHolder.css';
 import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
@@ -22,6 +22,8 @@ interface AttachmentsHolderProps {
   setPreviewOGTagData: React.Dispatch<React.SetStateAction<DecodeUrlModelSX | null>>; // Add the DecodeUrlModelSX type here (assuming it's imported)
   hasPreviewClosedOnce: boolean;
   setHasPreviewClosedOnce: React.Dispatch<React.SetStateAction<boolean>>;
+  showMediaAttachmentOnInitiation: boolean;
+  // setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const AttachmentsHolder = ({
   showMediaUploadBar,
@@ -39,7 +41,8 @@ const AttachmentsHolder = ({
   previewOGTagData,
   setPreviewOGTagData,
   hasPreviewClosedOnce,
-  setHasPreviewClosedOnce
+  setHasPreviewClosedOnce,
+  showMediaAttachmentOnInitiation
 }: AttachmentsHolderProps) => {
   function setAttachmentTypeImage() {
     setShowMediaUploadBar(false);
@@ -51,6 +54,12 @@ const AttachmentsHolder = ({
     setShowInitiateUploadComponent(true);
     setAttachmentType(2);
   }
+
+  useEffect(() => {
+    if (showMediaAttachmentOnInitiation) {
+      setAttachmentTypeImage();
+    }
+  }, []);
 
   function setMediaUploadBar() {
     if (showMediaUploadBar) {
@@ -203,7 +212,11 @@ const AttachmentsHolder = ({
 
   return (
     <>
-      <div className="attachmentHolder">
+      <div
+        className="attachmentHolder"
+        style={{
+          display: showOGTagPreview ? 'block' : 'flex'
+        }}>
         {/* <MaxTwoImage /> */}
         {setOGTagPreviewBlock()}
         {setInitiateUploadBlock()}
@@ -615,7 +628,12 @@ const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagP
       <HolderWithCross onCloseFunction={closePreviewBox}>
         <div className="ogTagPreviewContainer--wrapper">
           <div className="ogTagPreviewContainer__wrapper--imageWrapper">
-            <img src={previewImage} alt="preview" />
+            {
+              <img
+                src={ogTagPreviewData.image?.length === 0 ? previewImage : ogTagPreviewData.image}
+                alt="preview"
+              />
+            }
           </div>
           <div className="ogTagPreviewContainer__wrapper--bodyWrapper">
             <p className="ogTagPreviewContainer__wrapper__bodyWrapper--title">

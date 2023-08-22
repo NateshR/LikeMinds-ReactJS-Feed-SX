@@ -19,7 +19,8 @@ import LMFeedClient, {
   LikeCommentRequest,
   DeleteCommentRequest,
   GetNotificationFeedRequest,
-  MarkReadNotificationRequest
+  MarkReadNotificationRequest,
+  EditPostRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -90,10 +91,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
           .setAttachmentMeta(AttachmentMeta.builder().setogTags(ogTags).build())
           .build()
       );
-      // const apiCallResponse = await this.client.addPost({
-      //   text: text,
-      //   attachments: attachmentArr
-      // });
+
       const apiCallResponse = await this.client.addPost(
         AddPostRequest.builder().setText(text).setAttachments(attachmentArr).build()
       );
@@ -417,6 +415,39 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     } catch (error) {
       console.log(error);
       return error;
+    }
+  }
+
+  async editPost(postId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.editPost(
+        EditPostRequest.builder().setpostId(postId).settext(text).setattachments([]).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+  async editPostWithOGTags(postId: string, text: string, ogTags: any) {
+    try {
+      let attachmentArr: Attachment[] = [];
+      attachmentArr.push(
+        Attachment.builder()
+          .setAttachmentType(4)
+          .setAttachmentMeta(AttachmentMeta.builder().setogTags(ogTags).build())
+          .build()
+      );
+      const apiCallResponse = await this.client.editPost(
+        EditPostRequest.builder()
+          .setpostId(postId)
+          .settext(text)
+          .setattachments(attachmentArr)
+          .build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
     }
   }
 }

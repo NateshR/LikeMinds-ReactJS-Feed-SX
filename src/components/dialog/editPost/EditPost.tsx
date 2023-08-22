@@ -1,20 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
-import './createPostDialog.css';
-import defaultUserImage from '../../../assets/images/defaultUserImage.png';
+import '../createPost/createPostDialog.css';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
-import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
 import { IPost } from 'likeminds-sdk';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
   closeCreatePostDialog: () => void;
-  showMediaAttachmentOnInitiation: boolean;
-  setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
+  //   showMediaAttachmentOnInitiation: boolean;
+  //   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
   feedArray: IPost[];
+  post: IPost | null;
 }
 interface Limits {
   left: number;
@@ -85,12 +84,12 @@ export function checkAtSymbol(str: string, index: number): number {
   }
 }
 
-const CreatePostDialog = ({
+const EditPost = ({
   closeCreatePostDialog,
-  showMediaAttachmentOnInitiation,
-  setShowMediaAttachmentOnInitiation,
+
   setFeedArray,
-  feedArray
+  feedArray,
+  post
 }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
@@ -141,8 +140,63 @@ const CreatePostDialog = ({
   });
   const [tagString, setTagString] = useState('');
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
-  const contentEditableDiv = useRef<HTMLDivElement>(null);
+  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (contentEditableDiv.current) {
+      contentEditableDiv.current.innerHTML = convertTextToHTML(post?.text!).innerHTML;
+    }
+  }, []);
+  interface MatchPattern {
+    type: number;
+    displayName?: string;
+    routeId?: string;
+    link?: string;
+  }
+  function convertTextToHTML(text: string) {
+    const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
+    const matches = text.match(regex) || [];
+    const splits = text.split(regex);
 
+    const container = document.createElement('div');
+
+    for (let i = 0; i < splits.length; i++) {
+      const splitNode = document.createTextNode(splits[i]);
+      container.appendChild(splitNode);
+
+      if (matches[i]) {
+        const text = matches[i];
+        const getInfoPattern = /<<([^|]+)\|([^>>]+)>>/;
+        const match = text.match(getInfoPattern);
+        const userObject: MatchPattern = {
+          type: 1
+        };
+        if (match) {
+          const userName = match[1];
+          const userId = match[2];
+          userObject.displayName = userName;
+          userObject.routeId = userId;
+        } else {
+          userObject.type = 2;
+          userObject.link = text;
+        }
+        if (userObject.type === 1) {
+          const matchText = matches[i].slice(2, -2); // Remove '<<' and '>>'
+          const linkNode = document.createElement('a');
+          linkNode.href = '#'; // You can set the appropriate URL here
+          linkNode.textContent = userObject.displayName!;
+          linkNode.id = userObject.routeId!;
+          container.appendChild(linkNode);
+        } else {
+          const linkNode = document.createElement('a');
+          linkNode.href = userObject.link!; // You can set the appropriate URL here
+          linkNode.textContent = userObject.link!;
+          container.appendChild(linkNode);
+        }
+      }
+    }
+
+    return container;
+  }
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -159,8 +213,8 @@ const CreatePostDialog = ({
     previewOGTagData,
     setPreviewOGTagData,
     hasPreviewClosedOnce,
-    setHasPreviewClosedOnce,
-    showMediaAttachmentOnInitiation
+    setHasPreviewClosedOnce
+    // showMediaAttachmentOnInitiation
   };
 
   const setCloseDialog = () => {};
@@ -204,7 +258,7 @@ const CreatePostDialog = ({
     setText('');
     setAttachmentType(null);
     setShowInitiateUploadComponent(false);
-    setShowMediaAttachmentOnInitiation(false);
+    // setShowMediaAttachmentOnInitiation(false);
   }
 
   async function postFeed() {
@@ -214,26 +268,17 @@ const CreatePostDialog = ({
       console.log(textContent.length);
       closeDialogBox();
       let response: any;
-      if (imageOrVideoUploadArray?.length) {
-        response = await lmFeedClient.addPostWithImageAttachments(
-          textContent,
-          imageOrVideoUploadArray,
-          userContext?.user?.sdkClientInfo.userUniqueId
-        );
-      } else if (documentUploadArray?.length) {
-        console.log(userContext.user);
-        response = await lmFeedClient.addPostWithDocumentAttachments(
-          textContent,
-          documentUploadArray,
-          userContext?.user?.sdkClientInfo.userUniqueId
-        );
-      } else if (previewOGTagData !== null) {
+      if (previewOGTagData !== null) {
         response = await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
       } else {
-        response = await lmFeedClient.addPost(textContent);
+        response = await lmFeedClient.editPost(post?.Id!, textContent);
       }
-      const post: IPost = response?.data?.post;
-      setFeedArray([{ ...post }].concat([...feedArray]));
+      const newpost: IPost = response?.data?.post;
+      const newFeedArray = [...feedArray];
+      const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
+      newFeedArray[thisFeedIndex] = { ...newpost };
+      setFeedArray(newFeedArray);
+      //   setFeedArray([{ ...newpost }].concat([...feedArray]));
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -341,7 +386,7 @@ const CreatePostDialog = ({
         </span>
         <div className="create-post-feed-dialog-wrapper_container--post-wrapper">
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
-            <span>Create Post</span>
+            <span>Edit Post</span>
           </div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
@@ -461,11 +506,10 @@ const CreatePostDialog = ({
               </div>
             ) : null}
           </div>
-          <AttachmentsHolder {...attachmentProps} />
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
             onClick={postFeed}>
-            Post
+            Edit Post
           </div>
         </div>
       </div>
@@ -473,4 +517,4 @@ const CreatePostDialog = ({
   );
 };
 
-export default CreatePostDialog;
+export default EditPost;
