@@ -403,23 +403,22 @@ const CreatePostDialog = ({
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div
                 style={{
-                  maxHeight: '100px',
+                  maxHeight: '150px',
                   width: '250px',
-                  overflowY: 'auto'
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  boxShadow: '0px 1px 16px 0 #0000003D',
+                  borderRadius: '0px',
+                  zIndex: 9
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
                       className="taggingTile"
-                      style={{
-                        background: 'white',
-                        padding: '12px',
-                        display: 'block',
-                        border: 'none',
-                        width: '250px',
-                        textAlign: 'left'
-                      }}
                       onClick={(e) => {
                         e.preventDefault();
                         let focusNode = window.getSelection()!.focusNode;
