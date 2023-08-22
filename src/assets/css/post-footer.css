@@ -5,6 +5,7 @@
 }
 .inputDiv {
   flex-grow: 1;
+  position: relative;
 }
 .lmProfile {
   margin-right: 1rem;
@@ -27,4 +28,25 @@
 .commentsWrapper {
   max-height: 400px;
   overflow-y: scroll;
+}
+
+
+.postTaggingTile{
+  background: #fff;
+  padding: 10px 15px;
+  display: block;
+  border: none;
+  border-bottom: 1px solid #eceff3;
+  width: 250px;
+  text-align: left;
+  color: #333;
+  font-size: 14px;
+  text-transform: capitalize;
+  
+}
+.postTaggingTile:hover{
+  cursor: pointer;
+  transition: 0.3s all ease-in-out;
+  background-color: #5046e5;
+  color: #fff;
 }
