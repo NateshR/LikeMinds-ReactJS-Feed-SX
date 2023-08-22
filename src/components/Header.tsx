@@ -8,7 +8,7 @@ import { lmFeedClient } from '..';
 import { IActivity, IUser } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 interface HeaderProps {
-  user: any;
+  // user: any;
 }
 interface MatchPattern {
   type: number;
@@ -16,13 +16,14 @@ interface MatchPattern {
   routeId?: string;
   link?: string;
 }
-const Header: React.FC<HeaderProps> = ({ user }) => {
+const Header: React.FC<HeaderProps> = () => {
   const [notificationsCount, setNotificationsCount] = useState<string | number>(0);
   const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null);
   const [activityArray, setActivityArray] = useState<IActivity[]>([]);
   const [hasMoreUnreadActivities, setHasMoreUnreadActivities] = useState<boolean>(true);
   const [userMap, setUserMap] = useState<{ [key: string]: IUser }>({});
   const [pageCount, setPageCount] = useState(1);
+  const [user, setUser] = useState<null | IUser>();
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
     const matches = text.match(regex) || [];
@@ -75,6 +76,15 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
     return container;
   }
   useEffect(() => {
+    document.addEventListener('USER_INITIATED', (e: any) => {
+      setUser(e.detail);
+    });
+    return () =>
+      document.removeEventListener('USER_INITIATED', (e: any) => {
+        setUser(e.detail);
+      });
+  });
+  useEffect(() => {
     async function getNotificationsCount() {
       try {
         const response: any = await lmFeedClient.getUnreadNotificationCount();
@@ -88,6 +98,9 @@ const Header: React.FC<HeaderProps> = ({ user }) => {
     getNotificationsCount();
   }, [user]);
   function setUserImage(user: any) {
+    if (!user) {
+      return null;
+    }
     const imageLink = user?.imageUrl;
     if (imageLink !== '') {
       return (

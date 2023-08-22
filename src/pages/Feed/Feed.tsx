@@ -85,18 +85,18 @@ const FeedComponent: React.FC = () => {
         return null;
     }
   }
-  function setHeader() {
-    switch (user) {
-      case null:
-        return null;
-      default:
-        return (
-          <div className="header">
-            <Header user={user} />
-          </div>
-        );
-    }
-  }
+  // function setHeader() {
+  //   switch (user) {
+  //     case null:
+  //       return null;
+  //     default:
+  //       return (
+  //         <div className="header">
+  //           <Header user={user} />
+  //         </div>
+  //       );
+  //   }
+  // }
   function setAppUserState(user: any) {
     switch (user) {
       case null:
@@ -154,6 +154,10 @@ const FeedComponent: React.FC = () => {
       const memberStateResponse: any = await lmFeedClient.getMemberState();
       setMemberStateRights(memberStateResponse.data);
       setUser(userResponse?.data?.user);
+      const event = new CustomEvent('USER_INITIATED', {
+        detail: userResponse?.data?.user
+      });
+      document.dispatchEvent(event);
     }
 
     setUserState();
@@ -186,7 +190,7 @@ const FeedComponent: React.FC = () => {
         setUser,
         memberStateRights
       }}>
-      {setHeader()}
+      {/* {setHeader()} */}
       {setAppUserState(user)}
       <Snackbar
         open={openSnackBar}

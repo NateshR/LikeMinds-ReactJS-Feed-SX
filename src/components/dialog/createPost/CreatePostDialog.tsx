@@ -147,46 +147,6 @@ const CreatePostDialog = ({
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
 
-  // useEffect(() => {
-  //   contentEditableDiv.current?.addEventListener('blur', () => {
-  //     if (contentEditableDiv && contentEditableDiv.current) {
-  //       console.log('the trimmed Length os', text.trim().length);
-  //       if (text.trim().length === 0) {
-  //         alert('hello');
-  //         contentEditableDiv.current.textContent = `Enter the text`;
-  //       }
-  //     }
-  //   });
-  //   return () => {
-  //     contentEditableDiv.current?.removeEventListener('blur', () => {
-  //       if (contentEditableDiv && contentEditableDiv.current) {
-  //         console.log('the trimmed Length os', text.trim().length);
-  //         if (text.trim().length === 0) {
-  //           alert('hello');
-  //           contentEditableDiv.current.textContent = `Enter the text`;
-  //         }
-  //       }
-  //     });
-  //   };
-  // });
-  // useEffect(() => {
-  //   contentEditableDiv.current?.addEventListener('focus', () => {
-  //     if (contentEditableDiv && contentEditableDiv.current) {
-  //       if (text.trim() === '') {
-  //         contentEditableDiv.current.textContent = ``;
-  //       }
-  //     }
-  //   });
-  //   return () => {
-  //     contentEditableDiv.current?.removeEventListener('focus', () => {
-  //       if (contentEditableDiv && contentEditableDiv.current) {
-  //         if (text.trim() === '') {
-  //           contentEditableDiv.current.textContent = ``;
-  //         }
-  //       }
-  //     });
-  //   };
-  // });
   useEffect(() => console.log(text));
   const attachmentProps = {
     showMediaUploadBar,
@@ -369,6 +329,7 @@ const CreatePostDialog = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
+  const [stopInput, setStopInput] = useState(false);
   // useEffect(() => {
   //   if (contentEditableDiv && contentEditableDiv.current) {
   //     contentEditableDiv.current.focus();
@@ -421,6 +382,12 @@ const CreatePostDialog = ({
                 fontSize: '1rem',
                 fontFamily: 'Roboto',
                 overflowY: 'auto'
+              }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+                // setStopInput(true);
               }}
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {

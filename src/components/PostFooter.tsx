@@ -200,6 +200,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   }
                 }
               }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  postComment();
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();

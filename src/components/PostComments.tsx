@@ -322,6 +322,12 @@ const PostComents: React.FC<CommentProps> = ({
                   }
                 }
               }}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  postReply();
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
