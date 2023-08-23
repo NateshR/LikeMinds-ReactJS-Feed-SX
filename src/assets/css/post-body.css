@@ -23,3 +23,23 @@
 .lmWrapper__feed__post__body--content{
   word-wrap: break-word;
 }
+.carousel {
+  height: 300px;
+}
+.slider-wrapper.axis-horizontal{
+  height: 100%;
+}
+.slider-wrapper.axis-horizontal > ul {
+  height: 100%;
+}
+.slider-wrapper.axis-horizontal > ul > li{
+  height: 100%;
+}
+.slider-wrapper.axis-horizontal > ul > li > img{
+  height: 100%;
+  width: auto;
+}
+.slider-wrapper.axis-horizontal > ul > li > video{
+  height: 100%;
+  width: auto;
+}
