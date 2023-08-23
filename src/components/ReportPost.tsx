@@ -9,8 +9,10 @@ type ReportConversationDialogBoxType = {
   closeBox: any;
   reportedPostId: any;
   uuid: any;
+  entity?: any;
 };
 const ReportPostDialogBox = ({
+  entity,
   closeBox,
   reportedPostId,
   uuid
@@ -77,7 +79,13 @@ const ReportPostDialogBox = ({
           <button
             disabled={!(selectedId > 0)}
             onClick={() => {
-              lmFeedClient.reportPost(reportedPostId, uuid, 5, 11, otherReasonsText);
+              lmFeedClient.reportPost(
+                reportedPostId,
+                uuid,
+                entity ? entity : 5,
+                11,
+                otherReasonsText
+              );
               closeBox();
             }}>
             Report

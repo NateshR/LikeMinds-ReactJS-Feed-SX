@@ -82,15 +82,20 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   function onClickHandler(event: React.MouseEvent) {
     switch (event.currentTarget.id) {
       case '2':
-        return pinPost();
+        pinPost();
+        break;
       case '3':
-        return unpinPost();
+        unpinPost();
+        break;
       case '1':
-        return deletePost();
+        deletePost();
+        break;
       case '5':
-        return editPost();
+        editPost();
+        break;
       case '4':
-        return openReport();
+        openReport();
+        break;
     }
     handleCloseMoreOptionsMenu();
   }
