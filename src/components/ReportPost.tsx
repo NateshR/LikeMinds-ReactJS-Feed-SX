@@ -61,6 +61,8 @@ const ReportPostDialogBox = ({
             ))}
           </div>
         </div>
+      </div>
+      <div className="lmReport-footer">
         <div
           style={{
             display: openOtherReasonsInputBox ? 'block' : 'none'

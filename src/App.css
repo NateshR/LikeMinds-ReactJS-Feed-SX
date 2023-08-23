@@ -349,6 +349,7 @@
 .lmReport .lmReport-body {
   width: 100%;
   padding: 0 30px;
+  float: left;
 }
 
 .lmReport .lmReport-body p {
@@ -371,4 +372,29 @@
   font-weight: 400;
   float: left;
   margin: 0 12px 12px 0;
+  cursor: pointer;
+}
+
+.lmReport .lmReport-footer {
+  display: flex;
+  padding: 0 30px 20px;
+  flex-direction: column;
+}
+
+.lmReport .lmReport-footer input {
+  width: 94%;
+  margin: 10px 0 20px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(72, 79, 103, 0.5);
+}
+.lmReport .lmReport-footer button {
+  width: 100%;
+  border: none;
+  color: #fff;
+  background-color: #5046e5;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 12px 15px;
 }
