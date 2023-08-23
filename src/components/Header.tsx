@@ -8,7 +8,10 @@ import { lmFeedClient } from '..';
 import { IActivity, IUser } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import noNotification from '../assets/images/default.svg';
-
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+dayjs.extend(relativeTime);
 interface HeaderProps {
   // user: any;
 }
@@ -26,6 +29,7 @@ const Header: React.FC<HeaderProps> = () => {
   const [userMap, setUserMap] = useState<{ [key: string]: IUser }>({});
   const [pageCount, setPageCount] = useState(1);
   const [user, setUser] = useState<null | IUser>();
+  const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
     const matches = text.match(regex) || [];
@@ -120,8 +124,8 @@ const Header: React.FC<HeaderProps> = () => {
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '48px',
+            height: '48px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -155,7 +159,18 @@ const Header: React.FC<HeaderProps> = () => {
       console.log(error);
     }
   }
-
+  function handleNotification(activity: IActivity) {
+    lmFeedClient.markReadNotification(activity.Id);
+    switch (activity.action) {
+      case 10: {
+        document.dispatchEvent(
+          new CustomEvent('NOTIFICATION', {
+            detail: activity.activityEntityData.Id
+          })
+        );
+      }
+    }
+  }
   function renderNotification() {
     return (
       <Menu
@@ -174,16 +189,44 @@ const Header: React.FC<HeaderProps> = () => {
               <div className="title">Notification</div>
               {activityArray.map((activity: IActivity) => {
                 return (
-                  <MenuItem key={activity.id} className="customMenuItem">
+                  <div
+                    key={activity.Id}
+                    className="customMenuItem"
+                    onClick={() => handleNotification(activity)}
+                    style={{
+                      background: activity.isRead ? 'none' : 'gray'
+                    }}>
                     <div className="notificationIist">
-                      <div className="notiImg">{setUserImage(userMap[activity.actionOn])}</div>
-                      <div
-                        className="lmNoti"
-                        dangerouslySetInnerHTML={{
-                          __html: convertTextToHTML(activity.activityText).innerHTML
-                        }}></div>
+                      <div className="notiImg">
+                        {setUserImage(userMap[activity.actionBy[activity.actionBy.length - 1]])}
+                      </div>
+                      <div>
+                        <div
+                          className="lmNoti"
+                          dangerouslySetInnerHTML={{
+                            __html: convertTextToHTML(activity.activityText).innerHTML
+                          }}></div>
+                        <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
+                      </div>
+                      <div>
+                        <IconButton
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                            setMenuAnchor(e.currentTarget)
+                          }>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </div>
+
+                      <Menu
+                        open={Boolean(menuAnchor)}
+                        onClose={() => setMenuAnchor(null)}
+                        anchorEl={menuAnchor}
+                        className="menu-block">
+                        <div className="menu-block-item">Remove this notification</div>
+                        <div className="menu-block-item">Mute this notification</div>
+                      </Menu>
                     </div>
-                  </MenuItem>
+                  </div>
                 );
               })}
             </div>

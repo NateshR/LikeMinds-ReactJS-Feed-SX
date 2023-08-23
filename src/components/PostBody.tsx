@@ -110,7 +110,8 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
       case 3:
         return (
           <object
-            data={attachment.attachmentMeta.url}
+            key={attachment?.attachmentMeta?.url}
+            data={attachment?.attachmentMeta?.url}
             type="application/pdf"
             width="100%"
             height="100%">
@@ -143,7 +144,7 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
       <div className="lmWrapper__feed__post__body--media">
         {/* <img src={post} alt="post" /> */}
 
-        <Carousel className="postMediaAttachment" showThumbs={false}>
+        <Carousel className="postMediaAttachment" showThumbs={false} showStatus={false}>
           {renderAttachments(attachments)}
         </Carousel>
       </div>

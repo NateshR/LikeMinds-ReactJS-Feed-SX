@@ -1,0 +1,30 @@
+.allMembers__header{
+padding: 1.5rem 1rem;
+border-top: 1px solid #d0d8e2;
+border-bottom: 1px solid #d0d8e2;
+font-weight: 500;
+font-size: 1rem;
+}
+.memberTile{
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.memberTile:hover{
+    background-color:  #E6EBF5;
+}
+.memberTile__image{
+    height: 48px;
+    width: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.memberTile__profile{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+}

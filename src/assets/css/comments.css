@@ -1,9 +1,10 @@
 .commentWrapper {
-  padding: 1rem 0;
+  padding: 1rem;
   border-bottom: 1px solid #dde3ed;
+  padding-bottom: 0px;
 }
 .commentWrapper--username {
-  margin-bottom: 5px;
+ 
 }
 
 .commentWrapper--username .displayName {
@@ -17,9 +18,10 @@
   font-size: 14px;
   line-height: 20px;
   display: flex;
+  align-items: center;
 }
 .commentWrapper--commentActions .commentInputBox {
-  margin: 0 0 0 40px;
+  
 }
 .commentWrapper--commentActions .commentWrapper {
   margin: 0 0 0 40px;

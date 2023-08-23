@@ -12,6 +12,8 @@ import { CircularProgress, Dialog, Snackbar } from '@mui/material';
 import { DELETE_POST, EDIT_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
+import AllMembers from '../../components/AllMembers';
+import LMFeedClient from '@likeminds.community/feed-js-beta';
 
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
@@ -60,13 +62,14 @@ const FeedComponent: React.FC = () => {
         }
         reNewFeedArray(index, newFeedObject);
         setOpenSnackBar(true);
-
+        setSnackBarMessage('Post Liked');
         break;
       }
       case SAVE_POST: {
         newFeedObject.isSaved = value;
         reNewFeedArray(index, newFeedObject);
-
+        setOpenSnackBar(true);
+        setSnackBarMessage('Post Saved');
         break;
       }
       case DELETE_POST: {
@@ -140,6 +143,9 @@ const FeedComponent: React.FC = () => {
                 {/* Post */}
               </InfiniteScroll>
             </div>
+            <div className="lmWrapper__allMembers">
+              <AllMembers />
+            </div>
           </div>
         );
     }
@@ -175,7 +181,6 @@ const FeedComponent: React.FC = () => {
       if (feeds.posts.length < 10) {
         setHasMoreFeed(false);
       }
-      console.log(feeds);
       setFeedPostsArray(feeds?.posts!);
       setUsersMap(feeds.users);
       // feeds?.posts.
@@ -183,6 +188,25 @@ const FeedComponent: React.FC = () => {
 
     getFeeds();
   }, [user]);
+  useEffect(() => {
+    document.addEventListener('NOTIFICATION', handleNotificationAction);
+
+    return () => document.removeEventListener('NOTIFICATION', handleNotificationAction);
+  });
+  async function handleNotificationAction(e: any) {
+    let postId = e.detail;
+    try {
+      const resp: any = await lmFeedClient.getPostDetails(postId, 1);
+      const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
+      if (doesPostExistInArray) {
+        return;
+      }
+      setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
+      setUsersMap({ ...usersMap, ...resp.data.users });
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <UserContext.Provider
       value={{

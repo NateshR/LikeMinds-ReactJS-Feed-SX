@@ -6,7 +6,8 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost } from 'likeminds-sdk';
+import { IPost, IUser } from 'likeminds-sdk';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -65,7 +66,7 @@ export function findSpaceAfterIndex(str: string, index: number): number {
 
 export function checkAtSymbol(str: string, index: number): number {
   if (index < 0 || index >= str.length) {
-    throw new Error('Invalid index');
+    return -1;
   }
   let pos = -1;
   for (let i = index; i >= 0; i--) {
@@ -130,6 +131,43 @@ const CreatePostDialog = ({
       );
     }
   }
+  function setTagUserImage(user: any) {
+    const imageLink = userContext?.user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {userContext.user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
   const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
@@ -144,9 +182,10 @@ const CreatePostDialog = ({
     right: 0
   });
   const [tagString, setTagString] = useState('');
-  const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
+  const [taggingMemberList, setTaggingMemberList] = useState<any[]>([]);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
-
+  const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
+  const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
   useEffect(() => console.log(text));
   const attachmentProps = {
     showMediaUploadBar,
@@ -187,7 +226,7 @@ const CreatePostDialog = ({
       left: leftLimit,
       right: rightLimit
     });
-
+    setTaggingPageCount(1);
     return {
       tagString: substr,
       limitLeft: leftLimit,
@@ -215,8 +254,6 @@ const CreatePostDialog = ({
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
-      console.log(textContent);
-      console.log(textContent.length);
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
@@ -226,7 +263,6 @@ const CreatePostDialog = ({
           userContext?.user?.sdkClientInfo.userUniqueId
         );
       } else if (documentUploadArray?.length) {
-        console.log(userContext.user);
         response = await lmFeedClient.addPostWithDocumentAttachments(
           textContent,
           documentUploadArray,
@@ -305,29 +341,30 @@ const CreatePostDialog = ({
       clearTimeout(timeOut);
     };
   }, [text]);
+  async function getTags() {
+    const tagListResponse = await lmFeedClient.getTaggingList(tagString, taggingPageCount);
+    const memberList = tagListResponse?.data?.members;
+    if (memberList && memberList.length > 0) {
+      setTaggingMemberList([...taggingMemberList].concat([...memberList]));
+      setTaggingPageCount(taggingPageCount + 1);
+    }
+  }
   useEffect(() => {
     if (!tagString && !(tagString.length > 0)) {
       return;
     }
-    async function getTags() {
-      const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
-      const memberList = tagListResponse?.data?.members;
-      console.log(memberList);
-      if (memberList && memberList.length > 0) {
-        console.log('setting tag member list');
-        setTaggingMemberList(memberList);
-      } else {
-        console.log('setting tag member list  to null');
-        setTaggingMemberList(null);
-      }
-    }
     const timeout = setTimeout(() => {
       getTags();
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
+  }, [tagString]);
+  useEffect(() => {
+    if (!tagString || tagString.length === 0) {
+      setTaggingMemberList([]);
+    }
   }, [tagString]);
   const [stopInput, setStopInput] = useState(false);
   // useEffect(() => {
@@ -391,9 +428,7 @@ const CreatePostDialog = ({
               }}
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  console.log('the trimmed Length os', text.trim().length);
                   if (text.trim().length === 0) {
-                    // alert('hello');
                     contentEditableDiv.current.textContent = `Write something here...`;
                   }
                 }
@@ -424,11 +459,7 @@ const CreatePostDialog = ({
                 let textContentFocusNode = focusNode.textContent;
 
                 let tagOp = findTag(textContentFocusNode!);
-                if (
-                  tagOp?.tagString !== null &&
-                  tagOp?.tagString !== undefined &&
-                  tagOp?.tagString !== ''
-                ) {
+                if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
               }}></div>
@@ -445,54 +476,68 @@ const CreatePostDialog = ({
                   boxShadow: '0px 1px 16px 0 #0000003D',
                   borderRadius: '0px',
                   zIndex: 9
-                }}>
-                {taggingMemberList?.map!((item: any) => {
-                  return (
-                    <button
-                      key={item?.id}
-                      className="taggingTile"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
-                        if (focusNode === null) {
-                          return;
-                        }
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
-                        if (focusNode === null || text.length === 0) {
-                          return;
-                        }
-                        let textContentFocusNode = focusNode.textContent;
-                        if (textContentFocusNode === null) {
-                          return;
-                        }
-                        let tagOp = findTag(textContentFocusNode);
-                        // console.log ('the tag string is ', tagOp!.tagString);
-                        if (tagOp === undefined) return;
-                        let substr = tagOp?.tagString;
-                        const { limitLeft, limitRight } = tagOp;
-                        if (!substr || substr.length === 0) {
-                          return;
-                        }
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                }}
+                id="scrollableTaggingContainer">
+                <InfiniteScroll
+                  loader={null}
+                  hasMore={loadMoreTaggingUsers}
+                  next={getTags}
+                  dataLength={taggingMemberList.length}
+                  scrollableTarget="scrollableTaggingContainer">
+                  {taggingMemberList?.map!((item: any) => {
+                    return (
+                      <button
+                        key={item?.id.toString() + Math.random().toString()}
+                        className="taggingTile"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          let focusNode = window.getSelection()!.focusNode;
+                          if (focusNode === null) {
+                            return;
+                          }
+                          let div = focusNode.parentElement;
+                          let text = div!.childNodes;
+                          if (focusNode === null || text.length === 0) {
+                            return;
+                          }
+                          let textContentFocusNode = focusNode.textContent;
+                          if (textContentFocusNode === null) {
+                            return;
+                          }
+                          let tagOp = findTag(textContentFocusNode);
+                          // console.log ('the tag string is ', tagOp!.tagString);
+                          if (tagOp === undefined) return;
+                          let substr = tagOp?.tagString;
+                          const { limitLeft, limitRight } = tagOp;
+                          if (!substr || substr.length === 0) {
+                            return;
+                          }
+                          let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                          let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
-                        anchorNode.id = item?.id;
-                        anchorNode.href = '#';
-                        anchorNode.textContent = `@${item?.name.trim()}`;
-                        anchorNode.contentEditable = 'false';
-                        let textNode2 = document.createTextNode(textNode2Text);
-                        div!.replaceChild(textNode2, focusNode);
-                        div!.insertBefore(anchorNode, textNode2);
-                        div!.insertBefore(textNode1, anchorNode);
-                        setTaggingMemberList([]);
-                      }}>
-                      {item?.name}
-                    </button>
-                  );
-                })}
+                          let textNode1 = document.createTextNode(textNode1Text);
+                          let anchorNode = document.createElement('a');
+                          anchorNode.id = item?.id;
+                          anchorNode.href = '#';
+                          anchorNode.textContent = `@${item?.name.trim()}`;
+                          anchorNode.contentEditable = 'false';
+                          let textNode2 = document.createTextNode(textNode2Text);
+                          div!.replaceChild(textNode2, focusNode);
+                          div!.insertBefore(anchorNode, textNode2);
+                          div!.insertBefore(textNode1, anchorNode);
+                          setTaggingMemberList([]);
+                        }}>
+                        {setTagUserImage(item)}
+                        <span
+                          style={{
+                            padding: '0px 0.5rem'
+                          }}>
+                          {item?.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </InfiniteScroll>
               </div>
             ) : null}
           </div>

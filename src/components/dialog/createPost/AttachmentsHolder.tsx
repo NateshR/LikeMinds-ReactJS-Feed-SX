@@ -4,6 +4,8 @@ import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
 import { DecodeUrlModelSX } from '../../../services/models';
 import previewImage from './../../../assets/images/ogTagPreview.png';
+import { Carousel } from 'react-responsive-carousel';
+import { Attachment } from 'likeminds-sdk';
 interface AttachmentsHolderProps {
   showMediaUploadBar: boolean | null;
   setShowMediaUploadBar: React.Dispatch<React.SetStateAction<boolean | null>>;
@@ -518,28 +520,84 @@ type ImageVideoAttachmentViewProps = {
   imageOrVideoUploadArray: File[] | null;
   setImageOrVideoUploadArray: React.Dispatch<React.SetStateAction<File[] | null>>;
 };
-
+function renderAttachments(attachmentsArray: File[]) {
+  return attachmentsArray.map((attachment: File) => {
+    return renderMediaItem(attachment);
+  });
+}
+function renderMediaItem(attachment: File) {
+  switch (attachment.type.split('/')[0]) {
+    case 'image':
+      return (
+        <img
+          className="postMediaAttachment--image"
+          src={URL.createObjectURL(attachment)}
+          alt="post"
+          key={attachment.name + Math.random().toString()}
+          loading="lazy"
+        />
+      );
+    case 'video':
+      return (
+        <>
+          <video
+            className="postMediaAttachment--video"
+            src={URL.createObjectURL(attachment)}
+            key={attachment.name + Math.random().toString()}
+            controls
+          />
+        </>
+      );
+    default:
+      return (
+        <object
+          data={URL.createObjectURL(attachment)}
+          type="application/pdf"
+          width="100%"
+          height="100%">
+          <p>
+            Alternative text - include a link{' '}
+            <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
+          </p>
+        </object>
+      );
+    // default:
+    //   return (
+    //     <img
+    //       src={attachment.attachmentMeta.url}
+    //       alt="post"
+    //       key={attachment.attachmentMeta.url + Math.random().toString()}
+    //     />
+    //   );
+  }
+}
 function ImageVideoAttachmentView({
   imageOrVideoUploadArray,
   setImageOrVideoUploadArray
 }: ImageVideoAttachmentViewProps) {
   let length = imageOrVideoUploadArray?.length;
-  console.log('the image array: ', imageOrVideoUploadArray);
   function renderImages() {
-    switch (length) {
-      case undefined || 0 || null: {
-        return null;
-      }
-      case 1: {
-        return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
-      }
-      case 2: {
-        return <MaxTwoImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
-      }
-      default: {
-        return <MinThreeImage />;
-      }
-    }
+    // switch (length) {
+    //   case undefined || 0 || null: {
+    //     return null;
+    //   }
+    //   case 1: {
+    //     return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
+    //   }
+    //   case 2: {
+    //     return <MaxTwoImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
+    //   }
+    //   default: {
+    //     return <MinThreeImage />;
+    //   }
+    // }
+    return (
+      <>
+        <Carousel className="postMediaAttachment" showThumbs={false}>
+          {renderAttachments(imageOrVideoUploadArray!)}
+        </Carousel>
+      </>
+    );
   }
   // eslint-disable-next-line no-undef
   function addMoreImages(e: ChangeEvent<HTMLInputElement>) {
@@ -549,7 +607,11 @@ function ImageVideoAttachmentView({
   return (
     <div className="attachmentHolder__singleBlock">
       <label>
-        <span className="attachmentHolder__addMoreButton">
+        <span
+          className="attachmentHolder__addMoreButton"
+          style={{
+            zIndex: 1
+          }}>
           <input type="file" onChange={addMoreImages} />
           <svg
             width="16"
@@ -618,7 +680,7 @@ const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagP
   function closePreviewBox() {
     setOgTagPreview(false);
   }
-  console.log(ogTagPreviewData);
+
   return (
     <div className="ogTagPreviewContainer">
       <HolderWithCross onCloseFunction={closePreviewBox}>

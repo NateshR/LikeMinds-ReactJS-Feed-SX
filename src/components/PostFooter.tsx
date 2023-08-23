@@ -91,7 +91,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
           return item;
         }
       });
-      console.log(newResponseReplies);
       setCommentList([...commentList, ...newResponseReplies]);
     } else {
       setCommentList([...commentList, ...commentArray]);
@@ -148,8 +147,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return (
         <span
           style={{
-            width: '24px',
-            height: '24px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -186,7 +185,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
               id="editableDiv"
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  console.log('the trimmed Length os', text.trim().length);
                   if (text.trim().length === 0) {
                     // alert('hello');
                     contentEditableDiv.current.textContent = `Write something here...`;
@@ -268,7 +266,6 @@ const PostFooter: React.FC<PostFooterProps> = ({
                           return;
                         }
                         let tagOp = findTag(textContentFocusNode);
-                        // console.log ('the tag string is ', tagOp!.tagString);
                         if (tagOp === undefined) return;
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
@@ -328,14 +325,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return undefined;
     }
     const cursorPosition = getCaretPosition();
-    // // console.log ("the cursor position is: ", cursorPosition)
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
     if (leftLimit === -1) {
       // setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
     }
     const rightLimit = findSpaceAfterIndex(str, cursorPosition - 1);
-    // // console.log ("the right limit is :", rightLimit)
+
     const substr = str.substring(leftLimit, rightLimit + 1);
 
     return {
@@ -396,12 +392,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
       const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
       const memberList = tagListResponse?.data?.members;
-      console.log(memberList);
       if (memberList && memberList.length > 0) {
-        console.log('setting tag member list');
         setTaggingMemberList(memberList);
       } else {
-        console.log('setting tag member list  to null');
         setTaggingMemberList(null);
       }
     }
@@ -442,7 +435,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
             </IconButton>{' '}
             <span
               style={{
-                cursor: 'pointer'
+                cursor: 'pointer',
+                color:
+                  openCommentsSection && commentList && commentList.length
+                    ? '#5046E5'
+                    : 'rgba(72, 79, 103, 0.7)'
               }}
               onClick={() => {
                 setOpenCommentsSection(true);
@@ -468,6 +465,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
       </div>
       {/* Comments */}
       <div className="commentInputBox">{showCommentBox()}</div>
+      <div
+        className="commentCountDiv"
+        style={{
+          display: openCommentsSection && commentList && commentList.length ? 'block' : 'none'
+        }}>
+        <span
+          style={{
+            fontWeight: 400
+          }}>
+          {postCommentsCount} Comments
+        </span>
+      </div>
       <div className="commentsWrapper" id="wrapperComment">
         {commentList.length && openCommentsSection ? (
           <InfiniteScroll

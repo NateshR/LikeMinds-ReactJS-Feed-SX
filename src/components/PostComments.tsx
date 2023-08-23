@@ -102,8 +102,6 @@ const PostComents: React.FC<CommentProps> = ({
   async function likeAComment() {
     try {
       const req: any = await lmFeedClient.likeComment(postId, comment.Id);
-      // setRepliesArray(req.data.comment.replies);
-      // console.log(req);
     } catch (error) {
       console.log(error);
     }
@@ -139,8 +137,8 @@ const PostComents: React.FC<CommentProps> = ({
       return (
         <span
           style={{
-            width: '24px',
-            height: '24px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -161,7 +159,6 @@ const PostComents: React.FC<CommentProps> = ({
 
   function handleMenuClick(e: React.MouseEvent) {
     const clickedElementid = e.currentTarget.id;
-    console.log(e.target);
     switch (clickedElementid) {
       case '6':
         return deleteComment();
@@ -207,14 +204,14 @@ const PostComents: React.FC<CommentProps> = ({
       return undefined;
     }
     const cursorPosition = getCaretPosition();
-    // // console.log ("the cursor position is: ", cursorPosition)
+
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
     if (leftLimit === -1) {
       // setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
     }
     const rightLimit = findSpaceAfterIndex(str, cursorPosition - 1);
-    // // console.log ("the right limit is :", rightLimit)
+
     const substr = str.substring(leftLimit, rightLimit + 1);
 
     return {
@@ -393,7 +390,6 @@ const PostComents: React.FC<CommentProps> = ({
                           return;
                         }
                         let tagOp = findTag(textContentFocusNode);
-                        // console.log ('the tag string is ', tagOp!.tagString);
                         if (tagOp === undefined) return;
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
@@ -454,7 +450,6 @@ const PostComents: React.FC<CommentProps> = ({
         setRepliesArray(newRepliesArray);
       }
       setCommentsCount(commentsCount + 1);
-      console.log(response);
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -467,12 +462,10 @@ const PostComents: React.FC<CommentProps> = ({
       const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
       const memberList = tagListResponse?.data?.members;
-      console.log(memberList);
+
       if (memberList && memberList.length > 0) {
-        console.log('setting tag member list');
         setTaggingMemberList(memberList);
       } else {
-        console.log('setting tag member list  to null');
         setTaggingMemberList(null);
       }
     }
@@ -494,7 +487,9 @@ const PostComents: React.FC<CommentProps> = ({
           className="commentWrapper__commentContent--content"
           dangerouslySetInnerHTML={{
             __html: convertTextToHTML(comment.text).innerHTML
-          }}></div>
+          }}>
+          {/* {} */}
+        </div>
         <IconButton onClick={openMenu}>
           <MoreVertIcon
             sx={{
@@ -531,36 +526,36 @@ const PostComents: React.FC<CommentProps> = ({
           </span>
         </span>
         {showReplyBox()}
-        <div
-          style={{
-            marginLeft: '4px',
-            maxHeight: '300px',
-            overflowY: 'auto'
-          }}
-          id={comment.Id}>
-          <InfiniteScroll
-            loader={null}
-            hasMore={loadMoreReplies}
-            next={getComments}
-            dataLength={repliesArray?.length}
-            scrollableTarget={comment.Id}>
-            {repliesArray.length && openCommentsSection
-              ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
-                  return (
-                    <PostComents
-                      comment={comment}
-                      postId={postId}
-                      key={comment.Id}
-                      index={index}
-                      commentArray={commentArray}
-                      setCommentArray={setRepliesArray}
-                      user={usersMap[comment?.uuid]}
-                    />
-                  );
-                })
-              : null}
-          </InfiniteScroll>
-        </div>
+      </div>
+      <div
+        style={{
+          paddingLeft: '2rem',
+          maxHeight: '300px',
+          overflowY: 'auto'
+        }}
+        id={comment.Id}>
+        <InfiniteScroll
+          loader={null}
+          hasMore={loadMoreReplies}
+          next={getComments}
+          dataLength={repliesArray?.length}
+          scrollableTarget={comment.Id}>
+          {repliesArray.length && openCommentsSection
+            ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                return (
+                  <PostComents
+                    comment={comment}
+                    postId={postId}
+                    key={comment.Id}
+                    index={index}
+                    commentArray={commentArray}
+                    setCommentArray={setRepliesArray}
+                    user={usersMap[comment?.uuid]}
+                  />
+                );
+              })
+            : null}
+        </InfiniteScroll>
       </div>
     </div>
   );

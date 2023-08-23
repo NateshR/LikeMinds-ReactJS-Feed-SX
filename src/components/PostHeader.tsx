@@ -11,6 +11,7 @@ import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
 import UserContext from '../contexts/UserContext';
 import EditPost from './dialog/editPost/EditPost';
 import { IPost, IMenuItem } from 'likeminds-sdk';
+import ReportPostDialogBox from './ReportPost';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -20,6 +21,7 @@ interface PostHeaderProps {
   postId: string;
   index: number;
   feedModerationHandler: (action: string, index: number, value: any) => void;
+  uuid: any;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
@@ -29,7 +31,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   menuOptions,
   postId,
   feedModerationHandler,
-  index
+  index,
+  uuid
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [reportTags, setReportTags] = useState([]);
@@ -58,15 +61,23 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     feedModerationHandler(DELETE_POST, index, null);
     return await lmFeedClient.deletePost(postId);
   }
-  async function reportPost() {
-    const tags = await lmFeedClient.getReportTags();
-  }
+  // async function reportPost() {
+  //   try {
+  //     const tags = await lmFeedClient.getReportTags();
+  //     setReportTags(tags.data.reportTags);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   function closeEditPostDialog() {
     setOpenDialog(false);
   }
   function editPost() {
     feedModerationHandler(EDIT_POST, index, null);
+  }
+  function openReport() {
+    setOpenDialog(true);
   }
   function onClickHandler(event: React.MouseEvent) {
     switch (event.currentTarget.id) {
@@ -78,6 +89,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         return deletePost();
       case '5':
         return editPost();
+      case '4':
+        return openReport();
     }
     handleCloseMoreOptionsMenu();
   }
@@ -156,6 +169,19 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             );
           })}
         </Menu>
+        <Dialog
+          open={openDialogBox}
+          onClose={() => {
+            setOpenDialog(false);
+          }}>
+          <ReportPostDialogBox
+            uuid={uuid}
+            closeBox={() => {
+              setOpenDialog(false);
+            }}
+            reportedPostId={postId}
+          />
+        </Dialog>
       </div>
     </div>
   );

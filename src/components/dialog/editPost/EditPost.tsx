@@ -264,8 +264,6 @@ const EditPost = ({
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
-      console.log(textContent);
-      console.log(textContent.length);
       closeDialogBox();
       let response: any;
       if (previewOGTagData !== null) {
@@ -329,10 +327,6 @@ const EditPost = ({
   }
 
   useEffect(() => {
-    // console.log (imageOrVideoUploadArray);
-  }, [imageOrVideoUploadArray]);
-
-  useEffect(() => {
     const timeOut = setTimeout(() => {
       checkForOGTags();
     }, 500);
@@ -349,12 +343,9 @@ const EditPost = ({
       const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
       const memberList = tagListResponse?.data?.members;
-      console.log(memberList);
       if (memberList && memberList.length > 0) {
-        console.log('setting tag member list');
         setTaggingMemberList(memberList);
       } else {
-        console.log('setting tag member list  to null');
         setTaggingMemberList(null);
       }
     }
@@ -477,7 +468,6 @@ const EditPost = ({
                           return;
                         }
                         let tagOp = findTag(textContentFocusNode);
-                        // console.log ('the tag string is ', tagOp!.tagString);
                         if (tagOp === undefined) return;
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
