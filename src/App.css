@@ -80,7 +80,7 @@
   padding: 0px;
   box-sizing: border-box;
   background-color: #e6ebf5;
-  display: flex; 
+  display: flex;
   position: relative;
 }
 .lmWrapper__feed {
@@ -95,7 +95,6 @@
   border-radius: 8px;
   width: 100%;
   margin: 20px 0;
-
 }
 .lmWrapper__feed__creatPost__write {
   display: flex;
@@ -279,7 +278,7 @@
   text-decoration: none;
 }
 .lmWrapper__feed__post__footer {
-  border-radius: 0 0 8px 8px; 
+  border-radius: 0 0 8px 8px;
 }
 .lmWrapper__feed__post__footer__actions {
   display: flex;
@@ -309,9 +308,9 @@
   margin: 0 0px 0 20px;
 }
 /* LM-Feed */
-.lmWrapper__allMembers{
+.lmWrapper__allMembers {
   min-width: 300px;
-  background-color: #fff; 
+  background-color: #fff;
   height: 100vh;
   position: sticky;
   overflow-y: auto;
@@ -319,7 +318,57 @@
   right: 0;
   border: none;
 }
-#allMembersScrollWrapper{
+#allMembersScrollWrapper {
   height: 500px;
   overflow-y: auto;
+}
+
+.lmReport {
+  background-color: #fff;
+  padding: '16px';
+  width: '400px';
+}
+
+.lmReport .lmReport-header {
+  position: relative;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 24px;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 30px 0;
+  color: #484f67;
+}
+
+.lmReport .lmReport-header .close {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+}
+
+.lmReport .lmReport-body {
+  width: 100%;
+  padding: 0 30px;
+}
+
+.lmReport .lmReport-body p {
+  margin: 0 0 5px 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #484f67;
+}
+
+.lmReport .lmReport-body p.lm-title {
+  font-weight: 500;
+}
+.lmReportTag {
+  border-radius: 18px;
+  border: 1px solid rgba(72, 79, 103, 0.5);
+  padding: 12px 24px;
+  color: rgba(72, 79, 103, 0.5);
+  font-size: 1rem;
+  font-weight: 400;
+  float: left;
+  margin: 0 12px 12px 0;
 }
