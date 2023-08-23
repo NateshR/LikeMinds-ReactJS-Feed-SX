@@ -209,12 +209,12 @@ const Header: React.FC<HeaderProps> = () => {
                         <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
                       </div>
                       <div>
-                        <IconButton
+                        {/* <IconButton
                           onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                             setMenuAnchor(e.currentTarget)
                           }>
                           <MoreVertIcon />
-                        </IconButton>
+                        </IconButton> */}
                       </div>
 
                       <Menu
