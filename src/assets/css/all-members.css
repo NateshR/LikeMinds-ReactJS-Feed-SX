@@ -1,19 +1,24 @@
+.allMembers{
+    height: 100%;
+}
 .allMembers__header{
-padding: 1.5rem 1rem;
-border-top: 1px solid #d0d8e2;
-border-bottom: 1px solid #d0d8e2;
+padding: 1.5rem 1rem; 
+border-bottom: 1px solid rgba(218, 225, 238, 1);
 font-weight: 500;
 font-size: 1rem;
+color: #484f67;
 }
 .memberTile{
+    color: #484f67;
+    font-weight: 400;
     padding: 0.5rem 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.memberTile:hover{
+/* .memberTile:hover{
     background-color:  #E6EBF5;
-}
+} */
 .memberTile__image{
     height: 48px;
     width: 48px;
