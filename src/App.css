@@ -83,6 +83,12 @@
   display: flex;
   position: relative;
 }
+.lmWrapper a:visited {
+  color: #5046e5;
+}
+.lmWrapper :focus {
+  outline: none;
+}
 .lmWrapper__feed {
   background-color: transparent;
   max-width: 576px;
@@ -280,9 +286,14 @@
   line-height: 20px;
   font-weight: 400;
   color: #484f67;
+  word-wrap: break-word;
 }
 .lmWrapper__feed__post__body--content a {
   text-decoration: none;
+}
+.lmWrapper__feed__post__body--media {
+  width: 100%;
+  max-height: 200px;
 }
 .lmWrapper__feed__post__footer {
   border-radius: 0 0 8px 8px;
