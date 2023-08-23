@@ -94,10 +94,16 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
               ref={ref}
               type="text"
               placeholder="Write something here..."
-              onSelect={() => {
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+              onSelect={(e) => {
+                e.currentTarget.blur();
+                e.preventDefault();
                 openCreatePostDialogBox();
                 // e.currentTarget.
               }}
+              readOnly
               autoFocus={false}
             />
           </div>

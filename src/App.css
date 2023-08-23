@@ -130,7 +130,14 @@
   box-sizing: border-box;
   line-height: 30px;
   border: 0 none;
+  /* cursor: none; */
 }
+.lmWrapper__feed__creatPost__write--inputBox input:active {
+  outline: none;
+  border: none;
+  cursor: none;
+}
+
 .lmWrapper__feed__creatPost__options {
   border-top: 1px solid #eceff3;
   background-color: #f6f7f9;
