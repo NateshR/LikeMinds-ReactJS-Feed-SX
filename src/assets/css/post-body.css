@@ -2,11 +2,11 @@
   object-position: center;
   object-fit: cover;
   width: 100%;
-  height: 196px;
+  /* height: 196px; */
+  height: auto;
   background-position: 50%;
   background-size: cover;
   color: #000;
-
 }
 .carousel .slider-wrapper.axis-horizontal .slider {
   align-items: center;
