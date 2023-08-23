@@ -38,6 +38,7 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
           postId={post.Id}
           feedModerationHandler={feedModerationHandler}
           index={index}
+          uuid={post.uuid}
         />
         {/* post */}
         <PostBody
