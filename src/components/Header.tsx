@@ -124,8 +124,8 @@ const Header: React.FC<HeaderProps> = () => {
       return (
         <span
           style={{
-            width: '40px',
-            height: '40px',
+            width: '48px',
+            height: '48px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -200,26 +200,32 @@ const Header: React.FC<HeaderProps> = () => {
                       <div className="notiImg">
                         {setUserImage(userMap[activity.actionBy[activity.actionBy.length - 1]])}
                       </div>
-                      <div
-                        className="lmNoti"
-                        dangerouslySetInnerHTML={{
-                          __html: convertTextToHTML(activity.activityText).innerHTML
-                        }}></div>
-                      <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
+                      <div>
+                        <div
+                          className="lmNoti"
+                          dangerouslySetInnerHTML={{
+                            __html: convertTextToHTML(activity.activityText).innerHTML
+                          }}></div>
+                        <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
+                      </div>
+                      <div>
+                        <IconButton
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                            setMenuAnchor(e.currentTarget)
+                          }>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </div>
+
+                      <Menu
+                        open={Boolean(menuAnchor)}
+                        onClose={() => setMenuAnchor(null)}
+                        anchorEl={menuAnchor}
+                        className="menu-block">
+                        <div className="menu-block-item">Remove this notification</div>
+                        <div className="menu-block-item">Mute this notification</div>
+                      </Menu>
                     </div>
-                    <IconButton
-                      onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                        setMenuAnchor(e.currentTarget)
-                      }>
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      open={Boolean(menuAnchor)}
-                      onClose={() => setMenuAnchor(null)}
-                      anchorEl={menuAnchor}>
-                      <div>REMOVE THIS NOTIFICATION</div>
-                      <div>MUTE THIS NOTIFICATION</div>
-                    </Menu>
                   </div>
                 );
               })}
