@@ -3,6 +3,9 @@
   border-bottom: 1px solid #dde3ed;
   padding-bottom: 0px;
 }
+.commentWrapper a{
+  text-decoration: none;
+}
 .commentWrapper--username {
  
 }

@@ -186,8 +186,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
                   if (text.trim().length === 0) {
-                    // alert('hello');
-                    contentEditableDiv.current.textContent = `Write something here...`;
+                    contentEditableDiv.current.textContent = `Write your comment`;
                   }
                 }
               }}
@@ -316,7 +315,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   useEffect(() => {
     if (contentEditableDiv && contentEditableDiv.current) {
       if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
-        contentEditableDiv.current.textContent = 'Write something here...';
+        contentEditableDiv.current.textContent = 'Write your comment';
       }
     }
   }, [text]);
@@ -470,12 +469,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         style={{
           display: openCommentsSection && commentList && commentList.length ? 'block' : 'none'
         }}>
-        <span
-          style={{
-            fontWeight: 400
-          }}>
-          {postCommentsCount} Comments
-        </span>
+        <span>{postCommentsCount} Comments</span>
       </div>
       <div className="commentsWrapper" id="wrapperComment">
         {commentList.length && openCommentsSection ? (
