@@ -110,7 +110,8 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
       case 3:
         return (
           <object
-            data={attachment.attachmentMeta.url}
+            key={attachment?.attachmentMeta?.url}
+            data={attachment?.attachmentMeta?.url}
             type="application/pdf"
             width="100%"
             height="100%">

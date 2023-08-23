@@ -218,11 +218,11 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     }
   }
 
-  async getTaggingList(tagSearchString: string) {
+  async getTaggingList(tagSearchString: string, pageNo?: number) {
     try {
       const apiCallResponse = await this.client.getTaggingList(
         GetTaggingListRequest.builder()
-          .setpage(1)
+          .setpage(pageNo ? pageNo : 1)
           .setpageSize(10)
           .setsearchName(tagSearchString)
           .build()
