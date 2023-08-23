@@ -80,6 +80,7 @@
   padding: 20px;
   box-sizing: border-box;
   background-color: #e6ebf5;
+  display: flex;
   /* height: 100vh;
   overflow: auto; */
 }
@@ -310,3 +311,14 @@
   margin: 0 0px 0 20px;
 }
 /* LM-Feed */
+.lmWrapper__allMembers{
+  min-width: 300px;
+  background-color: white;
+  border-radius: 0.5rem;
+  height: 600px;
+  overflow-y: auto;
+}
+#allMembersScrollWrapper{
+  height: 500px;
+  overflow-y: auto;
+}

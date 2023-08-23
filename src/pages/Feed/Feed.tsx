@@ -12,6 +12,7 @@ import { CircularProgress, Dialog, Snackbar } from '@mui/material';
 import { DELETE_POST, EDIT_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
+import AllMembers from '../../components/AllMembers';
 
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
@@ -139,6 +140,9 @@ const FeedComponent: React.FC = () => {
                 {/* <Post /> */}
                 {/* Post */}
               </InfiniteScroll>
+            </div>
+            <div className="lmWrapper__allMembers">
+              <AllMembers />
             </div>
           </div>
         );

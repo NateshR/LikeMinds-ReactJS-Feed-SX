@@ -148,8 +148,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return (
         <span
           style={{
-            width: '24px',
-            height: '24px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',

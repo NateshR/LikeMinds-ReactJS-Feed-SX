@@ -139,8 +139,8 @@ const PostComents: React.FC<CommentProps> = ({
       return (
         <span
           style={{
-            width: '24px',
-            height: '24px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -494,7 +494,9 @@ const PostComents: React.FC<CommentProps> = ({
           className="commentWrapper__commentContent--content"
           dangerouslySetInnerHTML={{
             __html: convertTextToHTML(comment.text).innerHTML
-          }}></div>
+          }}>
+          {/* {} */}
+        </div>
         <IconButton onClick={openMenu}>
           <MoreVertIcon
             sx={{
@@ -531,36 +533,36 @@ const PostComents: React.FC<CommentProps> = ({
           </span>
         </span>
         {showReplyBox()}
-        <div
-          style={{
-            marginLeft: '4px',
-            maxHeight: '300px',
-            overflowY: 'auto'
-          }}
-          id={comment.Id}>
-          <InfiniteScroll
-            loader={null}
-            hasMore={loadMoreReplies}
-            next={getComments}
-            dataLength={repliesArray?.length}
-            scrollableTarget={comment.Id}>
-            {repliesArray.length && openCommentsSection
-              ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
-                  return (
-                    <PostComents
-                      comment={comment}
-                      postId={postId}
-                      key={comment.Id}
-                      index={index}
-                      commentArray={commentArray}
-                      setCommentArray={setRepliesArray}
-                      user={usersMap[comment?.uuid]}
-                    />
-                  );
-                })
-              : null}
-          </InfiniteScroll>
-        </div>
+      </div>
+      <div
+        style={{
+          paddingLeft: '2rem',
+          maxHeight: '300px',
+          overflowY: 'auto'
+        }}
+        id={comment.Id}>
+        <InfiniteScroll
+          loader={null}
+          hasMore={loadMoreReplies}
+          next={getComments}
+          dataLength={repliesArray?.length}
+          scrollableTarget={comment.Id}>
+          {repliesArray.length && openCommentsSection
+            ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                return (
+                  <PostComents
+                    comment={comment}
+                    postId={postId}
+                    key={comment.Id}
+                    index={index}
+                    commentArray={commentArray}
+                    setCommentArray={setRepliesArray}
+                    user={usersMap[comment?.uuid]}
+                  />
+                );
+              })
+            : null}
+        </InfiniteScroll>
       </div>
     </div>
   );

@@ -20,7 +20,8 @@ import LMFeedClient, {
   DeleteCommentRequest,
   GetNotificationFeedRequest,
   MarkReadNotificationRequest,
-  EditPostRequest
+  EditPostRequest,
+  GetAllMembersRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -486,6 +487,17 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return apiCallResponse;
     } catch (error) {
       console.log(error);
+    }
+  }
+  async getAllMembers(pageNo: number) {
+    try {
+      const apiCallResponse = await this.client.getAllMembers(
+        GetAllMembersRequest.builder().setpage(pageNo).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
     }
   }
 }
