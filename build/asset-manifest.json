@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a63fc50e.css",
+    "main.js": "/static/js/main.a145e741.js",
+    "static/js/787.e20835cf.chunk.js": "/static/js/787.e20835cf.chunk.js",
+    "static/media/ogTagPreview.png": "/static/media/ogTagPreview.eaa3cd647c63702b394e.png",
+    "static/media/default.svg": "/static/media/default.37399867f07af6ecc332971251f87f24.svg",
+    "static/media/phoneImgaeSample.png": "/static/media/phoneImgaeSample.6fe821161e1a15ae90fb.png",
+    "static/media/video.svg": "/static/media/video.7161332aa50e00112208b6e699064d2b.svg",
+    "static/media/photo.svg": "/static/media/photo.6ce6c081a42cf0b47bba0347b6a4d5b5.svg",
+    "static/media/liked.svg": "/static/media/liked.1ad9256a83623e4e2ac37683032bc123.svg",
+    "static/media/comment.svg": "/static/media/comment.d621903189feea1138c103214dcdae46.svg",
+    "index.html": "/index.html",
+    "static/media/bookmark.svg": "/static/media/bookmark.97d1e8fd5ffae0764f5374201a72aaf1.svg",
+    "static/media/share.svg": "/static/media/share.1e9983eb42d69c5b4fb3af437afaf95b.svg",
+    "main.a63fc50e.css.map": "/static/css/main.a63fc50e.css.map",
+    "main.a145e741.js.map": "/static/js/main.a145e741.js.map",
+    "787.e20835cf.chunk.js.map": "/static/js/787.e20835cf.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a63fc50e.css",
+    "static/js/main.a145e741.js"
+  ]
+}

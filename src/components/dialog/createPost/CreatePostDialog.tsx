@@ -168,6 +168,7 @@ const CreatePostDialog = ({
       );
     }
   }
+  const PLACE_HOLDER_TEXT = 'Write something here...';
   const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
@@ -254,6 +255,9 @@ const CreatePostDialog = ({
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
+      if (textContent === PLACE_HOLDER_TEXT) {
+        textContent = '';
+      }
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
@@ -271,6 +275,9 @@ const CreatePostDialog = ({
       } else if (previewOGTagData !== null) {
         response = await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
       } else {
+        if (textContent === '') {
+          return;
+        }
         response = await lmFeedClient.addPost(textContent);
       }
       const post: IPost = response?.data?.post;

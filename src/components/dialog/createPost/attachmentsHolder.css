@@ -72,7 +72,9 @@ input[type='file'] {
 .initiateMediaUploadBox--closeIcon {
   position: absolute;
   top: 1rem;
-  right: 1rem;
+  right: 2rem;
+  cursor: pointer;
+  
 }
 .initiateMediaUploadBox--headingOne {
   font-weight: 400;
