@@ -13,6 +13,7 @@ import { DELETE_POST, EDIT_POST, LIKE_POST, SAVE_POST } from '../../services/fee
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
 import AllMembers from '../../components/AllMembers';
+import LMFeedClient from '@likeminds.community/feed-js-beta';
 
 const FeedComponent: React.FC = () => {
   const [user, setUser] = useState(null);
@@ -187,6 +188,21 @@ const FeedComponent: React.FC = () => {
 
     getFeeds();
   }, [user]);
+  useEffect(() => {
+    document.addEventListener('NOTIFICATION', handleNotificationAction);
+
+    return () => document.removeEventListener('NOTIFICATION', handleNotificationAction);
+  });
+  async function handleNotificationAction(e: any) {
+    let postId = e.detail;
+    try {
+      const resp: any = await lmFeedClient.getPostDetails(postId, 1);
+      setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
+      setUsersMap({ ...usersMap, ...resp.data.users });
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <UserContext.Provider
       value={{

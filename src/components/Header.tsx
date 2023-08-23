@@ -163,7 +163,11 @@ const Header: React.FC<HeaderProps> = () => {
     lmFeedClient.markReadNotification(activity.Id);
     switch (activity.action) {
       case 10: {
-        window.open(`/${activity.Id}`, '_blank');
+        document.dispatchEvent(
+          new CustomEvent('NOTIFICATION', {
+            detail: activity.activityEntityData.Id
+          })
+        );
       }
     }
   }
