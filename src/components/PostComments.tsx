@@ -311,8 +311,7 @@ const PostComents: React.FC<CommentProps> = ({
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
                   if (text.trim().length === 0) {
-                    // alert('hello');
-                    contentEditableDiv.current.textContent = `Write something here...`;
+                    contentEditableDiv.current.textContent = `Write your comment`;
                   }
                 }
               }}
@@ -359,21 +358,22 @@ const PostComents: React.FC<CommentProps> = ({
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div
                 style={{
-                  maxHeight: '100px',
-                  overflowY: 'auto'
+                  maxHeight: '150px',
+                  width: '250px',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  boxShadow: '0px 1px 16px 0 #0000003D',
+                  borderRadius: '0px',
+                  zIndex: 9
                 }}>
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
                       key={item?.id}
-                      style={{
-                        background: 'white',
-                        padding: '12px',
-                        display: 'block',
-                        border: 'none',
-                        width: '100%',
-                        textAlign: 'left'
-                      }}
+                      className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
                         let focusNode = window.getSelection()!.focusNode;

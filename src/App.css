@@ -77,12 +77,11 @@
 /* LM-Feed */
 .lmWrapper {
   width: 100%;
-  padding: 20px;
+  padding: 0px;
   box-sizing: border-box;
   background-color: #e6ebf5;
-  display: flex;
-  /* height: 100vh;
-  overflow: auto; */
+  display: flex; 
+  position: relative;
 }
 .lmWrapper__feed {
   background-color: transparent;
@@ -95,7 +94,8 @@
   box-shadow: 0px 0px 5px rgba(72, 79, 103, 0.16);
   border-radius: 8px;
   width: 100%;
-  margin-bottom: 20px;
+  margin: 20px 0;
+
 }
 .lmWrapper__feed__creatPost__write {
   display: flex;
@@ -279,15 +279,13 @@
   text-decoration: none;
 }
 .lmWrapper__feed__post__footer {
-  border-radius: 0 0 8px 8px;
-  
-  /* padding: 10px 20px; */
+  border-radius: 0 0 8px 8px; 
 }
 .lmWrapper__feed__post__footer__actions {
   display: flex;
   justify-content: space-between;
   padding: 1rem 1rem;
-  border-bottom: 1px solid #d0d8e2;
+  /* border-bottom: 1px solid #d0d8e2; */
 }
 .lmWrapper__feed__post__footer__actions__left {
   display: flex;
@@ -313,10 +311,13 @@
 /* LM-Feed */
 .lmWrapper__allMembers{
   min-width: 300px;
-  background-color: white;
-  border-radius: 0.5rem;
-  height: 600px;
+  background-color: #fff; 
+  height: 100vh;
+  position: sticky;
   overflow-y: auto;
+  top: 0;
+  right: 0;
+  border: none;
 }
 #allMembersScrollWrapper{
   height: 500px;
