@@ -18,7 +18,6 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
   const [showMediaAttachmentOnInitiation, setShowMediaAttachmentOnInitiation] =
     useState<boolean>(false);
   function closeCreatePostDialog() {
-    console.log('handles');
     setOpenCreatePostDialog(false);
     setShowMediaAttachmentOnInitiation(false);
   }

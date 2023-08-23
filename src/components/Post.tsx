@@ -20,7 +20,6 @@ const pattern = /<<.*?>>/g;
 
 const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index }) => {
   if (!user) {
-    console.log('the post is', post);
     return null;
   }
   return (

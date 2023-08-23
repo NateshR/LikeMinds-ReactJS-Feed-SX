@@ -576,7 +576,6 @@ function ImageVideoAttachmentView({
   setImageOrVideoUploadArray
 }: ImageVideoAttachmentViewProps) {
   let length = imageOrVideoUploadArray?.length;
-  console.log('the image array: ', imageOrVideoUploadArray);
   function renderImages() {
     // switch (length) {
     //   case undefined || 0 || null: {
@@ -681,7 +680,7 @@ const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagP
   function closePreviewBox() {
     setOgTagPreview(false);
   }
-  console.log(ogTagPreviewData);
+
   return (
     <div className="ogTagPreviewContainer">
       <HolderWithCross onCloseFunction={closePreviewBox}>

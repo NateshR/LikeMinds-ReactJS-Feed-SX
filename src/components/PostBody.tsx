@@ -144,7 +144,7 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
       <div className="lmWrapper__feed__post__body--media">
         {/* <img src={post} alt="post" /> */}
 
-        <Carousel className="postMediaAttachment" showThumbs={false}>
+        <Carousel className="postMediaAttachment" showThumbs={false} showStatus={false}>
           {renderAttachments(attachments)}
         </Carousel>
       </div>

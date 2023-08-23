@@ -66,9 +66,7 @@ export function findSpaceAfterIndex(str: string, index: number): number {
 
 export function checkAtSymbol(str: string, index: number): number {
   if (index < 0 || index >= str.length) {
-    console.log('The string is', str);
-    console.log('The index is', index);
-    throw new Error('Invalid index');
+    return -1;
   }
   let pos = -1;
   for (let i = index; i >= 0; i--) {
@@ -256,19 +254,15 @@ const CreatePostDialog = ({
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
-      console.log(textContent);
-      console.log(textContent.length);
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
-        console.log('the image Array is', imageOrVideoUploadArray);
         response = await lmFeedClient.addPostWithImageAttachments(
           textContent,
           imageOrVideoUploadArray,
           userContext?.user?.sdkClientInfo.userUniqueId
         );
       } else if (documentUploadArray?.length) {
-        console.log(userContext.user);
         response = await lmFeedClient.addPostWithDocumentAttachments(
           textContent,
           documentUploadArray,
@@ -307,7 +301,6 @@ const CreatePostDialog = ({
   }
 
   function extractTextFromNode(node: any) {
-    console.log(node);
     if (node.nodeType === Node.TEXT_NODE) {
       return node.textContent;
     } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -351,7 +344,6 @@ const CreatePostDialog = ({
   async function getTags() {
     const tagListResponse = await lmFeedClient.getTaggingList(tagString, taggingPageCount);
     const memberList = tagListResponse?.data?.members;
-    console.log(memberList);
     if (memberList && memberList.length > 0) {
       setTaggingMemberList([...taggingMemberList].concat([...memberList]));
       setTaggingPageCount(taggingPageCount + 1);
@@ -370,9 +362,7 @@ const CreatePostDialog = ({
     };
   }, [tagString]);
   useEffect(() => {
-    console.log('the tag string is', tagString);
     if (!tagString || tagString.length === 0) {
-      console.log('in this');
       setTaggingMemberList([]);
     }
   }, [tagString]);
