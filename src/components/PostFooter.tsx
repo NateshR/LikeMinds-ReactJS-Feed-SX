@@ -418,7 +418,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
               onClick={likePost}>
               {setLikeButton()}
             </IconButton>{' '}
-            <span>{postLikesCount} Likes</span>
+            <span>
+              {postLikesCount} {postLikesCount === 0 || postLikesCount > 1 ? 'Comments' : 'Comment'}
+            </span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
             <IconButton
@@ -444,7 +446,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 setOpenCommentsSection(true);
                 getPostComments();
               }}>
-              {postCommentsCount} Comments
+              {postCommentsCount}{' '}
+              {postCommentsCount === 0 || postCommentsCount > 1 ? 'Comments' : 'Comment'}
             </span>
           </div>
         </div>
@@ -469,7 +472,10 @@ const PostFooter: React.FC<PostFooterProps> = ({
         style={{
           display: openCommentsSection && commentList && commentList.length ? 'block' : 'none'
         }}>
-        <span>{postCommentsCount} Comments</span>
+        <span>
+          {postCommentsCount}{' '}
+          {postCommentsCount === 0 || postCommentsCount > 1 ? 'Comments' : 'Comment'}
+        </span>
       </div>
       <div className="commentsWrapper" id="wrapperComment">
         {commentList.length && openCommentsSection ? (
