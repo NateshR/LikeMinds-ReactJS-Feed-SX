@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
 import { IComment, IMenuItem, IUser } from 'likeminds-sdk';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
@@ -19,6 +19,8 @@ import {
 } from './dialog/createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import UserContext from '../contexts/UserContext';
+import ReportPostDialogBox from './ReportPost';
+import { truncateSync } from 'fs';
 interface CommentProps {
   comment: IComment;
   postId: string;
@@ -36,6 +38,7 @@ const PostComents: React.FC<CommentProps> = ({
   user
 }) => {
   const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
+  const [openDialogBox, setOpenDialogBox] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(comment.isLiked);
   const [likesCount, setLikesCount] = useState<number>(comment.likesCount);
   const [commentsCount, setCommentsCount] = useState<number>(comment.commentsCount);
@@ -161,8 +164,16 @@ const PostComents: React.FC<CommentProps> = ({
     const clickedElementid = e.currentTarget.id;
     switch (clickedElementid) {
       case '6':
-        return deleteComment();
+        deleteComment();
+        break;
+      case '7':
+        openReportDialogBox();
+        break;
     }
+    setMenuAnchor(null);
+  }
+  function openReportDialogBox() {
+    setOpenDialogBox(true);
   }
   // functions for input box
   const [text, setText] = useState<string>('');
@@ -556,6 +567,20 @@ const PostComents: React.FC<CommentProps> = ({
               })
             : null}
         </InfiniteScroll>
+        <Dialog
+          open={openDialogBox}
+          onClose={() => {
+            setOpenDialogBox(false);
+          }}>
+          <ReportPostDialogBox
+            entity={comment.level === 0 ? 6 : 7}
+            uuid={comment.uuid}
+            closeBox={() => {
+              setOpenDialogBox(false);
+            }}
+            reportedPostId={postId}
+          />
+        </Dialog>
       </div>
     </div>
   );

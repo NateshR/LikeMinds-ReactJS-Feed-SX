@@ -9,13 +9,18 @@ type ReportConversationDialogBoxType = {
   closeBox: any;
   reportedPostId: any;
   uuid: any;
+  entity?: any;
 };
 const ReportPostDialogBox = ({
+  entity,
   closeBox,
   reportedPostId,
   uuid
 }: ReportConversationDialogBoxType) => {
   const [reasonArr, setReasonArr] = useState([]);
+  const [openOtherReasonsInputBox, setOpenOtherReasonsInputBox] = useState(false);
+  const [otherReasonsText, setOtherReasonsText] = useState('');
+  const [selectedId, setSelectedId] = useState(-1);
   async function reportPostTags() {
     try {
       const tags: any = await lmFeedClient.getReportTags();
@@ -53,9 +58,38 @@ const ReportPostDialogBox = ({
                 key={item?.id}
                 uuid={uuid}
                 closeBox={closeBox}
+                setOpenOtherReasonsInputBox={setOpenOtherReasonsInputBox}
+                selectedId={selectedId}
+                setSelectedId={setSelectedId}
               />
             ))}
           </div>
+        </div>
+        <div
+          style={{
+            display: openOtherReasonsInputBox ? 'block' : 'none'
+          }}>
+          <input
+            type="text"
+            value={otherReasonsText}
+            onChange={(e) => setOtherReasonsText(e.target.value)}
+          />
+        </div>
+        <div>
+          <button
+            disabled={!(selectedId > 0)}
+            onClick={() => {
+              lmFeedClient.reportPost(
+                reportedPostId,
+                uuid,
+                entity ? entity : 5,
+                11,
+                otherReasonsText
+              );
+              closeBox();
+            }}>
+            Report
+          </button>
         </div>
       </div>
     </div>
@@ -67,21 +101,40 @@ type ReasonType = {
   id: any;
   uuid: any;
   closeBox: any;
+  setOpenOtherReasonsInputBox: any;
+  selectedId: any;
+  setSelectedId: any;
 };
-const ReportedReasonBlock = ({ reportedPostId, name, id, uuid, closeBox }: ReasonType) => (
+const ReportedReasonBlock = ({
+  reportedPostId,
+  name,
+  id,
+  uuid,
+  closeBox,
+  setOpenOtherReasonsInputBox,
+  setSelectedId,
+  selectedId
+}: ReasonType) => (
   <div
     onClick={() => {
-      lmFeedClient.reportPost(reportedPostId, uuid, 5, id, '');
-      closeBox();
+      setSelectedId(id);
+      if (id === 11) {
+        setOpenOtherReasonsInputBox(true);
+        return;
+      } else {
+        setOpenOtherReasonsInputBox(false);
+      }
     }}
     style={{
       display: 'inline-block',
-      border: '1px solid black',
+      cursor: 'pointer',
+      border: '1px solid rgb(155, 155, 155)',
       borderRadius: '20px',
       padding: '0.5rem 0.75rem',
       margin: '0px 0.5rem 0.5rem 0px',
       fontSize: '14px',
-      color: '#9b9b9b'
+      color: '#9b9b9b',
+      backgroundColor: selectedId === id ? 'blue' : 'white'
     }}>
     {/* // className="inline-block border rounded-[20px] py-2 px-3 mr-2 mb-2 text-sm text=[#9b9b9b]"> */}
     {name}
