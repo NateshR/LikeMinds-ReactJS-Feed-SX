@@ -357,6 +357,11 @@ const CreatePostDialog = ({
     }
   }
   useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      contentEditableDiv.current.focus();
+    }
+  }, [contentEditableDiv.current]);
+  useEffect(() => {
     if (!tagString && !(tagString.length > 0)) {
       return;
     }
@@ -416,6 +421,7 @@ const CreatePostDialog = ({
               contentEditable={true}
               suppressContentEditableWarning
               tabIndex={0}
+              autoFocus={true}
               id="editableDiv"
               style={{
                 width: '100%',
@@ -427,12 +433,12 @@ const CreatePostDialog = ({
                 fontFamily: 'Roboto',
                 overflowY: 'auto'
               }}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                }
-                // setStopInput(true);
-              }}
+              // onKeyDown={(e: React.KeyboardEvent) => {
+              //   if (e.key === 'Enter') {
+              //     e.preventDefault();
+              //   }
+              //   // setStopInput(true);
+              // }}
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
                   if (text.trim().length === 0) {

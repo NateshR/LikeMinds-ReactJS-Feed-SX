@@ -20,3 +20,6 @@
   margin-right: auto;
   margin-left: auto;
 }
+.lmWrapper__feed__post__body--content{
+  word-wrap: break-word;
+}
