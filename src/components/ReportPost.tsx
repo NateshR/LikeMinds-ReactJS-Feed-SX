@@ -33,21 +33,17 @@ const ReportPostDialogBox = ({
     reportPostTags();
   }, []);
   return (
-    <div style={{ backgroundColor: 'white', padding: '16px', width: '400px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
-        <div style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '8px' }}>Report Post</div>
-        <IconButton onClick={closeBox} style={{ cursor: 'pointer' }}>
+    <div className="lmReport">
+      <div className="lmReport-header">
+        Report Post
+        <IconButton onClick={closeBox} className="close">
           <CloseIcon />
         </IconButton>
       </div>
 
-      <div style={{ padding: '16px', paddingBottom: '16px' }}>
-        <p style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>
-          Please specify the problem to continue
-        </p>
-        <p style={{ fontSize: '14px', fontWeight: 'normal', color: '#666666' }}>
-          You would be able to report this Post after selecting a problem.
-        </p>
+      <div className="lmReport-body">
+        <p className="lm-title">Please specify the problem to continue</p>
+        <p>You would be able to report this Post after selecting a problem.</p>
         <div style={{ marginTop: '12px', width: '100%', textAlign: 'center' }}>
           <div style={{ marginTop: '12px', width: '100%', textAlign: 'left' }}>
             {reasonArr.map((item: any) => (
@@ -65,6 +61,8 @@ const ReportPostDialogBox = ({
             ))}
           </div>
         </div>
+      </div>
+      <div className="lmReport-footer">
         <div
           style={{
             display: openOtherReasonsInputBox ? 'block' : 'none'
@@ -125,17 +123,7 @@ const ReportedReasonBlock = ({
         setOpenOtherReasonsInputBox(false);
       }
     }}
-    style={{
-      display: 'inline-block',
-      cursor: 'pointer',
-      border: '1px solid rgb(155, 155, 155)',
-      borderRadius: '20px',
-      padding: '0.5rem 0.75rem',
-      margin: '0px 0.5rem 0.5rem 0px',
-      fontSize: '14px',
-      color: '#9b9b9b',
-      backgroundColor: selectedId === id ? 'blue' : 'white'
-    }}>
+    className="lmReportTag">
     {/* // className="inline-block border rounded-[20px] py-2 px-3 mr-2 mb-2 text-sm text=[#9b9b9b]"> */}
     {name}
   </div>
