@@ -169,6 +169,14 @@ const Header: React.FC<HeaderProps> = () => {
             detail: activity.activityEntityData.Id
           })
         );
+        break;
+      }
+      default: {
+        document.dispatchEvent(
+          new CustomEvent('NOTIFICATION', {
+            detail: activity.activityEntityData.Id
+          })
+        );
       }
     }
   }

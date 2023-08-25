@@ -212,6 +212,10 @@ const FeedComponent: React.FC = () => {
       const resp: any = await lmFeedClient.getPostDetails(postId, 1);
       const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
       if (doesPostExistInArray) {
+        const index = feedPostsArray.findIndex((feed: IPost) => feed.Id === postId);
+        const post = { ...feedPostsArray[index] };
+        feedPostsArray.splice(index, 1);
+        setFeedPostsArray([post, ...feedPostsArray]);
         return;
       }
       setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));

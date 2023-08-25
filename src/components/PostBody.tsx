@@ -1,14 +1,17 @@
 import post from '../assets/images/post.jpg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import React, { ReactChild, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Dialog, IconButton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { Attachment } from 'likeminds-sdk';
 import ReactDOMServer from 'react-dom/server';
 import { Parser } from 'html-to-react';
 import './../assets/css/post-body.css';
+import previewImage from '../assets/images/ogTagPreview.png';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { HolderWithCross } from './dialog/createPost/AttachmentsHolder';
+import { OgTags } from '../services/models';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url
@@ -28,6 +31,8 @@ interface MatchPattern {
 const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
   const [renderedData, setRenderedData] = useState<any>(null);
   const [pdfPageNo, setPdfPageNo] = useState<number>(1);
+  const [ogTagPreview, setOgTagPreview] = useState<boolean>(true);
+  const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
   useMemo(() => setRenderedData(renderAttachments(attachments)), [attachments]);
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/\S+|(?<!www\.)\S+\.\S+/g;
@@ -86,7 +91,8 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         (attachment: Attachment) =>
           attachment.attachmentType === 1 ||
           attachment.attachmentType === 2 ||
-          attachment.attachmentType === 3
+          attachment.attachmentType === 3 ||
+          attachment.attachmentType === 4
       )
       .map((attachment: Attachment) => {
         return renderMediaItem(attachment);
@@ -118,17 +124,6 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         );
       case 3:
         return (
-          // <object
-          //   key={attachment?.attachmentMeta?.url}
-          //   data={attachment?.attachmentMeta?.url}
-          //   type="application/pdf"
-          //   width="100%"
-          //   height="100%">
-          //   <p>
-          //     Alternative text - include a link{' '}
-          //     <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
-          //   </p>
-          // </object>
           <div
             style={{
               width: '100%',
@@ -148,14 +143,23 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
             </Document>
           </div>
         );
+      case 4: {
+        if (ogTagPreview) {
+          return (
+            <div>
+              <PreviewForOGTag
+                setOgTagPreview={setOgTagPreview}
+                ogTagPreviewData={attachment.attachmentMeta.ogTags as any}
+                setHasPreviewClosedOnce={setHasPreviewClosedOnce}
+              />
+            </div>
+          );
+        } else {
+          return null;
+        }
+      }
       default:
-        return (
-          <img
-            src={attachment.attachmentMeta.url}
-            alt="post"
-            key={attachment.attachmentMeta.url + Math.random().toString()}
-          />
-        );
+        return null;
     }
   }
   const [isReadMore, setIsReadMore] = useState(true);
@@ -197,6 +201,72 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           {renderedData}
         </Carousel>
       </div>
+    </div>
+  );
+};
+
+type PreviewForOGTagProps = {
+  ogTagPreviewData: OgTags;
+  setOgTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  setHasPreviewClosedOnce: any;
+};
+
+const PreviewForOGTag = ({
+  setOgTagPreview,
+  ogTagPreviewData,
+  setHasPreviewClosedOnce
+}: PreviewForOGTagProps) => {
+  function closePreviewBox() {
+    setOgTagPreview(false);
+    setHasPreviewClosedOnce(true);
+  }
+  console.log(ogTagPreviewData);
+  if (!ogTagPreviewData) {
+    return null;
+  }
+  return (
+    <div className="ogTagPreviewContainer">
+      <HolderWithCross onCloseFunction={closePreviewBox}>
+        <div
+          className="ogTagPreviewContainer--wrapper"
+          style={{
+            cursor: 'pointer'
+          }}
+          onClick={() =>
+            window.open(
+              ogTagPreviewData.url?.startsWith('https://') ||
+                ogTagPreviewData.url?.startsWith('http://')
+                ? ogTagPreviewData?.url
+                : 'https://' + ogTagPreviewData?.url,
+              '_blank'
+            )
+          }>
+          <div className="ogTagPreviewContainer__wrapper--imageWrapper">
+            {
+              <img
+                src={
+                  !ogTagPreviewData.image || ogTagPreviewData.image?.length === 0
+                    ? previewImage
+                    : ogTagPreviewData?.image
+                }
+                alt="preview"
+                style={{
+                  height: '100%',
+                  width: 'auto'
+                }}
+              />
+            }
+          </div>
+          <div className="ogTagPreviewContainer__wrapper--bodyWrapper">
+            <p className="ogTagPreviewContainer__wrapper__bodyWrapper--title">
+              {ogTagPreviewData.title}
+            </p>
+            <p className="ogTagPreviewContainer__wrapper__bodyWrapper--description">
+              {ogTagPreviewData.description}
+            </p>
+          </div>
+        </div>
+      </HolderWithCross>
     </div>
   );
 };

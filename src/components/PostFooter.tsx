@@ -222,7 +222,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     } else {
       const rights: any = userContext?.memberStateRights;
       isCommentingAllowed = rights.managerRights.some(
-        (item: any) => item.id === 10 && item.isSelected
+        (item: any) => item.id === 7 && item.isSelected
       );
     }
     if (isCommentingAllowed) {

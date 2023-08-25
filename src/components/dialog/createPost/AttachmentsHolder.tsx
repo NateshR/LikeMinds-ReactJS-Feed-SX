@@ -681,12 +681,12 @@ function ImageVideoAttachmentView({
   );
 }
 
-type HolderWithCrossProps = {
+export type HolderWithCrossProps = {
   children: ReactNode;
   onCloseFunction: () => void;
 };
 
-function HolderWithCross({ children, onCloseFunction }: HolderWithCrossProps) {
+export function HolderWithCross({ children, onCloseFunction }: HolderWithCrossProps) {
   return (
     <div className="holderWithCrossContainer">
       <span className="holderWithCrossContainer--closeIcon" onClick={onCloseFunction}>
