@@ -154,12 +154,12 @@ input[type='file'] {
   color: #484f67;
 }
 
-.ogTagPreviewContainer{
+.ogTagPreviewContainer{ 
 height: 355px;
 width: 100%;
 }
 .ogTagPreviewContainer--wrapper{
-border: 1px solid #484f67;
+border: 1px solid #e6ebf5;
 border-radius: 0.5rem;
 }
 
@@ -179,6 +179,7 @@ border-radius: 0.5rem;
 
 .ogTagPreviewContainer__wrapper--bodyWrapper{
   padding: 1rem;
+  text-align: left;
 }
 
 .ogTagPreviewContainer__wrapper__bodyWrapper--title{
@@ -186,6 +187,7 @@ border-radius: 0.5rem;
   font-size: 1rem;
   line-height: 1.25rem;
   color: #484F67;
+  font-weight: 500;
 }
 
 .ogTagPreviewContainer__wrapper__bodyWrapper--description{
