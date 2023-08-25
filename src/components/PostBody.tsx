@@ -12,6 +12,8 @@ import previewImage from '../assets/images/ogTagPreview.png';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { HolderWithCross } from './dialog/createPost/AttachmentsHolder';
 import { OgTags } from '../services/models';
+import pdfIcon from '../assets/images/poll.svg';
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url
@@ -124,12 +126,18 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         );
       case 3:
         return (
-          <div
-            style={{
-              width: '100%',
-              height: 'auto',
-              position: 'relative'
-            }}>
+          // <object
+          //   key={attachment?.attachmentMeta?.url}
+          //   data={attachment?.attachmentMeta?.url}
+          //   type="application/pdf"
+          //   width="100%"
+          //   height="100%">
+          //   <p>
+          //     Alternative text - include a link{' '}
+          //     <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
+          //   </p>
+          // </object>
+          <div className="lmPdfViewer">
             <Document key={attachment?.attachmentMeta?.url} file={attachment?.attachmentMeta?.url}>
               <Page
                 pageNumber={pdfPageNo}
@@ -141,6 +149,20 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
                 }}
               />
             </Document>
+
+            <div className="pdfInfo">
+              <div className="iconBox">
+                <img src={pdfIcon} alt="pdf icon" />
+              </div>
+              <div className="desc">
+                <h3>Event document</h3>
+                <div>
+                  <span>2 Pages</span>
+                  <span>278 KB</span>
+                  <span>PDF</span>
+                </div>
+              </div>
+            </div>
           </div>
         );
       case 4: {
