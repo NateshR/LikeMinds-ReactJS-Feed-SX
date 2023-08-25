@@ -268,7 +268,7 @@ const PreviewForOGTag = ({
   }
   return (
     <div className="ogTagPreviewContainer">
-      <HolderWithCross onCloseFunction={closePreviewBox}>
+      <HolderWithCross onCloseFunction={closePreviewBox} closeIconHide={true}>
         <div
           className="ogTagPreviewContainer--wrapper"
           style={{
