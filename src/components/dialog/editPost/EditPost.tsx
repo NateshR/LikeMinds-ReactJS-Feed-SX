@@ -4,7 +4,7 @@ import '../createPost/createPostDialog.css';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost } from 'likeminds-sdk';
+import { Attachment, AttachmentMeta, IPost } from 'likeminds-sdk';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -132,17 +132,69 @@ const EditPost = ({
   const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
-  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | File[]>(null);
-  const [documentUploadArray, setDocumentUploadArray] = useState<null | File[]>(null);
+  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<any>([]);
+  const [documentUploadArray, setDocumentUploadArray] = useState<any>([]);
   const [attachmentType, setAttachmentType] = useState<null | number>(0);
   const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
-  const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
+  const [previewOGTagData, setPreviewOGTagData] = useState<any>([]);
   const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
   const [limits, setLimits] = useState<Limits>({
     left: 0,
     right: 0
   });
-  const [tagString, setTagString] = useState('');
+  useEffect(() => {
+    const attachments = post?.attachments;
+    if (!attachments?.length) {
+      return;
+    }
+    const newMediaArray: any = [];
+    const newDocArray: any = [];
+    const newOGTagArray: any = [];
+    attachments.forEach((item: Attachment) => {
+      if (item.attachmentType === 1 || item.attachmentType === 2) {
+        newMediaArray.push(
+          Attachment.builder()
+            .setAttachmentType(item.attachmentType)
+            .setAttachmentMeta(
+              AttachmentMeta.builder()
+                .seturl(item.attachmentMeta.url!)
+                .setsize(item.attachmentMeta.size!)
+                .setname(item.attachmentMeta.name!)
+                .setformat(item.attachmentMeta.format!)
+                .setduration(item.attachmentType === 2 ? item.attachmentMeta.duration! : 0)
+                .build()
+            )
+            .build()
+        );
+      } else if (item.attachmentType === 3) {
+        newDocArray.push(
+          Attachment.builder()
+            .setAttachmentType(item.attachmentType)
+            .setAttachmentMeta(
+              AttachmentMeta.builder()
+                .seturl(item.attachmentMeta.url!)
+                .setsize(item.attachmentMeta.size!)
+                .setname(item.attachmentMeta.name!)
+                .build()
+            )
+            .build()
+        );
+      } else {
+        newOGTagArray.push(
+          Attachment.builder()
+            .setAttachmentType(item.attachmentType)
+            .setAttachmentMeta(
+              AttachmentMeta.builder().setogTags(item.attachmentMeta.ogTags).build()
+            )
+            .build()
+        );
+      }
+    });
+    setImageOrVideoUploadArray(newMediaArray);
+    setDocumentUploadArray(newDocArray);
+    setPreviewOGTagData(newOGTagArray);
+  }, [post, feedArray]);
+  const [tagString, setTagString] = useState<string | null>(null);
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -264,23 +316,38 @@ const EditPost = ({
     setShowInitiateUploadComponent(false);
     // setShowMediaAttachmentOnInitiation(false);
   }
-
+  const PLACE_HOLDER_TEXT = 'Write something here...';
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
+      if (textContent === PLACE_HOLDER_TEXT) {
+        textContent = '';
+      }
       closeDialogBox();
       let response: any;
-      if (previewOGTagData !== null) {
-        response = await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
-      } else {
-        response = await lmFeedClient.editPost(post?.Id!, textContent);
+
+      if (textContent === '') {
+        return;
       }
+      let newArr: any[] = [];
+      if (imageOrVideoUploadArray.length > 0) {
+        newArr = [...imageOrVideoUploadArray];
+      }
+      if (documentUploadArray.length > 0) {
+        newArr = [...documentUploadArray];
+      }
+      newArr = newArr.map((item: any) => {
+        if (item.attachmentType === 3) {
+          item.attachmentMeta.format = 'document/pdf';
+        }
+        return item;
+      });
+      response = await lmFeedClient.editPost(post?.Id!, textContent);
       const newpost: IPost = response?.data?.post;
       const newFeedArray = [...feedArray];
       const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
       newFeedArray[thisFeedIndex] = { ...newpost };
       setFeedArray(newFeedArray);
-      //   setFeedArray([{ ...newpost }].concat([...feedArray]));
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -334,25 +401,33 @@ const EditPost = ({
     const timeOut = setTimeout(() => {
       checkForOGTags();
     }, 500);
+    if (contentEditableDiv && contentEditableDiv.current) {
+      if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
+        contentEditableDiv.current.textContent = 'Write something here...';
+      }
+    }
     return () => {
       clearTimeout(timeOut);
     };
   }, [text]);
-
-  useEffect(() => {
-    if (!tagString && !(tagString.length > 0)) {
+  async function getTags() {
+    if (tagString === undefined || tagString === null) {
       return;
     }
-    async function getTags() {
-      const tagListResponse = await lmFeedClient.getTaggingList(tagString);
+    const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
-      const memberList = tagListResponse?.data?.members;
-      if (memberList && memberList.length > 0) {
-        setTaggingMemberList(memberList);
-      } else {
-        setTaggingMemberList(null);
-      }
+    const memberList = tagListResponse?.data?.members;
+    if (memberList && memberList.length > 0) {
+      setTaggingMemberList(memberList);
+    } else {
+      setTaggingMemberList(null);
     }
+  }
+  useEffect(() => {
+    if (tagString === null || tagString === undefined) {
+      return;
+    }
+
     const timeout = setTimeout(() => {
       getTags();
     }, 500);
@@ -360,6 +435,65 @@ const EditPost = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
+  useEffect(() => {
+    if (!tagString) {
+      setTaggingMemberList([]);
+    }
+  }, [tagString]);
+  useEffect(() => {
+    function handleClickOutside(e: any) {
+      if (contentEditableDiv && contentEditableDiv?.current) {
+        if (
+          !contentEditableDiv?.current?.contains(e.target as unknown as any) &&
+          !e.currentTarget?.classList?.contains('postTaggingTile')
+        ) {
+          setTaggingMemberList([]);
+        }
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contentEditableDiv]);
+  function setTagUserImage(user: any) {
+    const imageLink = user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
   return (
     // <div className="create-post-feed-dialog-wrapper">
     <div>
@@ -409,6 +543,20 @@ const EditPost = ({
                 fontFamily: 'Roboto',
                 overflowY: 'auto'
               }}
+              onBlur={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim().length === 0) {
+                    contentEditableDiv.current.textContent = `Write something here...`;
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (contentEditableDiv && contentEditableDiv.current) {
+                  if (text.trim() === '') {
+                    contentEditableDiv.current.textContent = ``;
+                  }
+                }
+              }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
@@ -428,11 +576,7 @@ const EditPost = ({
                 let textContentFocusNode = focusNode.textContent;
 
                 let tagOp = findTag(textContentFocusNode!);
-                if (
-                  tagOp?.tagString !== null &&
-                  tagOp?.tagString !== undefined &&
-                  tagOp?.tagString !== ''
-                ) {
+                if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
               }}></div>
@@ -474,9 +618,9 @@ const EditPost = ({
                         if (tagOp === undefined) return;
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
-                        if (!substr || substr.length === 0) {
-                          return;
-                        }
+                        // if (!substr || substr.length === 0) {
+                        //   return;
+                        // }
                         let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                         let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
@@ -492,7 +636,13 @@ const EditPost = ({
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
-                      {item?.name}
+                      {setTagUserImage(item)}
+                      <span
+                        style={{
+                          padding: '0px 0.5rem'
+                        }}>
+                        {item?.name}
+                      </span>
                     </button>
                   );
                 })}

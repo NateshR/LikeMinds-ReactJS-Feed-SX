@@ -21,10 +21,13 @@ import LMFeedClient, {
   GetNotificationFeedRequest,
   MarkReadNotificationRequest,
   EditPostRequest,
-  GetAllMembersRequest
+  GetAllMembersRequest,
+  GetPostLikesRequest,
+  GetCommentLikesRequest
 } from 'likeminds-sdk';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
+import EditCommentRequest from 'likeminds-sdk/dist/comment/model/EditCommentRequest';
 
 interface LMFeedClientInterface {
   initiateUser(userUniqueId: string, isGuestMember: boolean, username?: string): Promise<any>;
@@ -51,6 +54,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         InitiateUserRequest.builder()
           // .setUUID('1e9bc941-8817-4328-aa90-f1c90259b12c')
           .setUUID('siddharth-1')
+          // .setUUID('msks')
           // .setUUID('10003')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
@@ -73,10 +77,13 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   //   }
   // }
 
-  async addPost(text: string) {
+  async addPost(text: string, attachmentArr?: any) {
     try {
       const apiCallResponse = await this.client.addPost(
-        AddPostRequest.builder().setText(text).setAttachments([]).build()
+        AddPostRequest.builder()
+          .setText(text)
+          .setAttachments(attachmentArr ? attachmentArr : [])
+          .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);
     } catch (error) {
@@ -163,7 +170,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       const apiCallResponse: UploadMediaModel = await this.client.addPost(
         AddPostRequest.builder().setText(text).setAttachments(attachmentResponseArray).build()
       );
-      console.log(apiCallResponse);
+      return apiCallResponse;
     } catch (error) {
       console.log(error);
     }
@@ -191,6 +198,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     const apiCallResponse: UploadMediaModel = await this.client.addPost(
       AddPostRequest.builder().setText(text).setAttachments(attachmentResponseArray).build()
     );
+    return apiCallResponse;
   }
   async fetchFeed(pageNo: number) {
     try {
@@ -493,6 +501,35 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.getAllMembers(
         GetAllMembersRequest.builder().setpage(pageNo).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getPostLikes(entityId: string, pageCount: number) {
+    try {
+      const apiCallResponse = await this.client.getPostLikes(
+        GetPostLikesRequest.builder().setpostId(entityId).setpage(pageCount).setpageSize(10).build()
+      );
+      return apiCallResponse;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  async getCommentLikes(entityId: string, pageCount: number, commentId: string) {
+    try {
+      const apiCallResponse = await this.client.getCommentLikes(
+        GetCommentLikesRequest.builder()
+          .setpostId(entityId)
+          .setpage(pageCount)
+          .setpageSize(10)
+          .setcommentId(commentId)
+          .build()
       );
       return apiCallResponse;
     } catch (error) {

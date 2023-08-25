@@ -94,6 +94,46 @@ const CreatePostDialog = ({
   feedArray
 }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
+
+  const PLACE_HOLDER_TEXT = 'Write something here...';
+  const [text, setText] = useState<string>('');
+  const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
+  const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
+  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | File[]>(null);
+  const [documentUploadArray, setDocumentUploadArray] = useState<null | File[]>(null);
+  const [attachmentType, setAttachmentType] = useState<null | number>(0);
+  const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
+  const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
+  const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
+  const [limits, setLimits] = useState<Limits>({
+    left: 0,
+    right: 0
+  });
+  const [tagString, setTagString] = useState<string | null>(null);
+  const [taggingMemberList, setTaggingMemberList] = useState<any[]>([]);
+  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
+  const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
+  const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
+  const attachmentProps = {
+    showMediaUploadBar,
+    setShowMediaUploadBar,
+    imageOrVideoUploadArray,
+    setImageOrVideoUploadArray,
+    documentUploadArray,
+    setDocumentUploadArray,
+    attachmentType,
+    setAttachmentType,
+    showInitiateUploadComponent,
+    setShowInitiateUploadComponent,
+    showOGTagPreview,
+    setShowOGTagPreview,
+    previewOGTagData,
+    setPreviewOGTagData,
+    hasPreviewClosedOnce,
+    setHasPreviewClosedOnce,
+    showMediaAttachmentOnInitiation
+  };
+  const setCloseDialog = () => {};
   function setUserImage() {
     const imageLink = userContext?.user?.imageUrl;
     if (imageLink !== '') {
@@ -149,8 +189,8 @@ const CreatePostDialog = ({
       return (
         <span
           style={{
-            width: '48px',
-            height: '48px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             display: 'inline-flex',
             justifyContent: 'center',
@@ -168,47 +208,6 @@ const CreatePostDialog = ({
       );
     }
   }
-  const PLACE_HOLDER_TEXT = 'Write something here...';
-  const [text, setText] = useState<string>('');
-  const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
-  const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
-  const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<null | File[]>(null);
-  const [documentUploadArray, setDocumentUploadArray] = useState<null | File[]>(null);
-  const [attachmentType, setAttachmentType] = useState<null | number>(0);
-  const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
-  const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
-  const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
-  const [limits, setLimits] = useState<Limits>({
-    left: 0,
-    right: 0
-  });
-  const [tagString, setTagString] = useState('');
-  const [taggingMemberList, setTaggingMemberList] = useState<any[]>([]);
-  const contentEditableDiv = useRef<HTMLDivElement | null>(null);
-  const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
-  const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
-  useEffect(() => console.log(text));
-  const attachmentProps = {
-    showMediaUploadBar,
-    setShowMediaUploadBar,
-    imageOrVideoUploadArray,
-    setImageOrVideoUploadArray,
-    documentUploadArray,
-    setDocumentUploadArray,
-    attachmentType,
-    setAttachmentType,
-    showInitiateUploadComponent,
-    setShowInitiateUploadComponent,
-    showOGTagPreview,
-    setShowOGTagPreview,
-    previewOGTagData,
-    setPreviewOGTagData,
-    hasPreviewClosedOnce,
-    setHasPreviewClosedOnce,
-    showMediaAttachmentOnInitiation
-  };
-
-  const setCloseDialog = () => {};
   function findTag(str: string): TagInfo | undefined {
     if (str.length === 0) {
       return undefined;
@@ -228,6 +227,7 @@ const CreatePostDialog = ({
       right: rightLimit
     });
     setTaggingPageCount(1);
+
     return {
       tagString: substr,
       limitLeft: leftLimit,
@@ -280,8 +280,12 @@ const CreatePostDialog = ({
         }
         response = await lmFeedClient.addPost(textContent);
       }
+
       const post: IPost = response?.data?.post;
-      setFeedArray([{ ...post }].concat([...feedArray]));
+      console.log(post);
+      const newFeedArray = [{ ...post }].concat([...feedArray]);
+
+      setFeedArray(newFeedArray);
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -332,10 +336,6 @@ const CreatePostDialog = ({
   }
 
   useEffect(() => {
-    // console.log (imageOrVideoUploadArray);
-  }, [imageOrVideoUploadArray]);
-
-  useEffect(() => {
     const timeOut = setTimeout(() => {
       checkForOGTags();
     }, 500);
@@ -349,6 +349,10 @@ const CreatePostDialog = ({
     };
   }, [text]);
   async function getTags() {
+    if (tagString === undefined || tagString === null) {
+      return;
+    }
+
     const tagListResponse = await lmFeedClient.getTaggingList(tagString, taggingPageCount);
     const memberList = tagListResponse?.data?.members;
     if (memberList && memberList.length > 0) {
@@ -362,7 +366,7 @@ const CreatePostDialog = ({
     }
   }, [contentEditableDiv.current]);
   useEffect(() => {
-    if (!tagString && !(tagString.length > 0)) {
+    if (tagString === null || tagString === undefined) {
       return;
     }
 
@@ -374,16 +378,29 @@ const CreatePostDialog = ({
     };
   }, [tagString]);
   useEffect(() => {
-    if (!tagString || tagString.length === 0) {
+    if (!tagString) {
       setTaggingMemberList([]);
     }
   }, [tagString]);
-  const [stopInput, setStopInput] = useState(false);
-  // useEffect(() => {
-  //   if (contentEditableDiv && contentEditableDiv.current) {
-  //     contentEditableDiv.current.focus();
-  //   }
-  // }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: any) {
+      if (contentEditableDiv && contentEditableDiv?.current) {
+        if (
+          !contentEditableDiv?.current?.contains(e.target as unknown as any) &&
+          !e.currentTarget?.classList?.contains('taggingTile')
+        ) {
+          setTaggingMemberList([]);
+        }
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contentEditableDiv]);
+
   return (
     // <div className="create-post-feed-dialog-wrapper">
     <div>
@@ -522,9 +539,9 @@ const CreatePostDialog = ({
                           if (tagOp === undefined) return;
                           let substr = tagOp?.tagString;
                           const { limitLeft, limitRight } = tagOp;
-                          if (!substr || substr.length === 0) {
-                            return;
-                          }
+                          // if (!substr || substr.length === 0) {
+                          //   return;
+                          // }
                           let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                           let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 

@@ -8,6 +8,7 @@ import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Parser } from 'html-to-react';
 import './../assets/css/post-footer.css';
 import './../assets/css/comments.css';
 // import './../assets/css/post-footer.css';
@@ -21,6 +22,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import UserContext from '../contexts/UserContext';
 import ReportPostDialogBox from './ReportPost';
 import { truncateSync } from 'fs';
+import SeePostLikes from './SeePostLikes';
 interface CommentProps {
   comment: IComment;
   postId: string;
@@ -28,6 +30,8 @@ interface CommentProps {
   setCommentArray: React.Dispatch<IComment[]>;
   index: number;
   user?: IUser;
+  setParentCommentsCount: React.Dispatch<number>;
+  parentCommentsCount: number;
 }
 const PostComents: React.FC<CommentProps> = ({
   comment,
@@ -35,7 +39,9 @@ const PostComents: React.FC<CommentProps> = ({
   commentArray,
   index,
   setCommentArray,
-  user
+  user,
+  setParentCommentsCount,
+  parentCommentsCount
 }) => {
   const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
   const [openDialogBox, setOpenDialogBox] = useState<boolean>(false);
@@ -45,6 +51,7 @@ const PostComents: React.FC<CommentProps> = ({
   const [pageCount, setPageCount] = useState<number>(1);
   const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
   const [loadMoreReplies, setLoadMoreReplies] = useState<boolean>(true);
+  const [openCommentsLikesDialog, setOpenCommentsDialog] = useState<boolean>(false);
   const repliesDiv = useRef(null);
   useEffect(() => {
     setIsLiked(comment.isLiked);
@@ -116,6 +123,7 @@ const PostComents: React.FC<CommentProps> = ({
       const newArray = [...commentArray];
       newArray.splice(index, 1);
       setCommentArray(newArray);
+      setParentCommentsCount(parentCommentsCount - 1);
     } catch (error) {
       console.log(error);
     }
@@ -261,7 +269,7 @@ const PostComents: React.FC<CommentProps> = ({
     link?: string;
   }
   function convertTextToHTML(text: string) {
-    const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
+    const regex = /<<.*?>>|(?:https?|ftp):\/\/\S+|(?<!www\.)\S+\.\S+/g;
     const matches = text.match(regex) || [];
     const splits = text.split(regex);
 
@@ -304,6 +312,43 @@ const PostComents: React.FC<CommentProps> = ({
     }
 
     return container;
+  }
+  function setTagUserImage(user: any) {
+    const imageLink = user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
   }
 
   function showReplyBox() {
@@ -352,17 +397,13 @@ const PostComents: React.FC<CommentProps> = ({
                   return;
                 }
                 let text = div.childNodes;
-                if (focusNode === null || text.length === 0) {
-                  return;
-                }
+                // if (focusNode === null || text.length === 0) {
+                //   return;
+                // }
                 let textContentFocusNode = focusNode.textContent;
 
                 let tagOp = findTag(textContentFocusNode!);
-                if (
-                  tagOp?.tagString !== null &&
-                  tagOp?.tagString !== undefined &&
-                  tagOp?.tagString !== ''
-                ) {
+                if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
               }}></div>
@@ -422,7 +463,13 @@ const PostComents: React.FC<CommentProps> = ({
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
-                      {item?.name}
+                      {setTagUserImage(item)}
+                      <span
+                        style={{
+                          padding: '0px 0.5rem'
+                        }}>
+                        {item?.name}
+                      </span>
                     </button>
                   );
                 })}
@@ -440,7 +487,20 @@ const PostComents: React.FC<CommentProps> = ({
       return null;
     }
   }
+  async function getTags() {
+    if (tagString === undefined || tagString === null) {
+      return;
+    }
+    const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
+    const memberList = tagListResponse?.data?.members;
+
+    if (memberList && memberList.length > 0) {
+      setTaggingMemberList(memberList);
+    } else {
+      setTaggingMemberList(null);
+    }
+  }
   // function renamed to post comments
   async function postReply() {
     try {
@@ -466,26 +526,39 @@ const PostComents: React.FC<CommentProps> = ({
     }
   }
   useEffect(() => {
-    if (!tagString && !(tagString.length > 0)) {
+    if (tagString === null || tagString === undefined) {
       return;
     }
-    async function getTags() {
-      const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
-      const memberList = tagListResponse?.data?.members;
-
-      if (memberList && memberList.length > 0) {
-        setTaggingMemberList(memberList);
-      } else {
-        setTaggingMemberList(null);
-      }
-    }
     const timeout = setTimeout(() => {
       getTags();
     }, 500);
     return () => {
       clearTimeout(timeout);
     };
+  }, [tagString]);
+  const [isReadMore, setIsReadMore] = useState(true);
+  useEffect(() => {
+    function handleClickOutside(e: any) {
+      if (contentEditableDiv && contentEditableDiv?.current) {
+        if (
+          !contentEditableDiv?.current?.contains(e.target as unknown as any) &&
+          !e.currentTarget?.classList?.contains('postTaggingTile')
+        ) {
+          setTaggingMemberList([]);
+        }
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contentEditableDiv]);
+  useEffect(() => {
+    if (!tagString) {
+      setTaggingMemberList([]);
+    }
   }, [tagString]);
   return (
     <div className="commentWrapper">
@@ -496,9 +569,26 @@ const PostComents: React.FC<CommentProps> = ({
       <div className="commentWrapper--commentContent">
         <div
           className="commentWrapper__commentContent--content"
-          dangerouslySetInnerHTML={{
-            __html: convertTextToHTML(comment.text).innerHTML
-          }}>
+          // dangerouslySetInnerHTML={{
+          //   __html: convertTextToHTML(comment.text).innerHTML
+          // }}
+        >
+          {isReadMore && comment.text.length > 300
+            ? Parser().parse(convertTextToHTML(comment.text.substring(0, 300)).innerHTML)
+            : Parser().parse(convertTextToHTML(comment.text).innerHTML)}
+          {isReadMore && comment.text.length > 300 ? (
+            <span
+              style={{
+                color: 'gray',
+                fontWeight: '400',
+                cursor: 'pointer',
+                // textDecoration: 'underline',
+                fontSize: '14px'
+              }}
+              onClick={() => setIsReadMore(false)}>
+              ...ReadMore
+            </span>
+          ) : null}
           {/* {} */}
         </div>
         <IconButton onClick={openMenu}>
@@ -514,7 +604,12 @@ const PostComents: React.FC<CommentProps> = ({
         <span className="like">
           <IconButton onClick={likeComment}>{renderLikeButton()}</IconButton>
         </span>
-        <span className="replies">{likesCount} Likes</span>
+        <span
+          className="replies"
+          onClick={() => setOpenCommentsDialog(true)}
+          style={{ cursor: 'pointer' }}>
+          {likesCount} Likes
+        </span>
         <span className="replies">| </span>
 
         <span className="replies">
@@ -536,6 +631,7 @@ const PostComents: React.FC<CommentProps> = ({
             <span>{commentsCount} replies</span>
           </span>
         </span>
+
         {showReplyBox()}
       </div>
       <div
@@ -555,6 +651,8 @@ const PostComents: React.FC<CommentProps> = ({
             ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
                 return (
                   <PostComents
+                    parentCommentsCount={commentsCount}
+                    setParentCommentsCount={setCommentsCount}
                     comment={comment}
                     postId={postId}
                     key={comment.Id}
@@ -579,6 +677,15 @@ const PostComents: React.FC<CommentProps> = ({
               setOpenDialogBox(false);
             }}
             reportedPostId={postId}
+          />
+        </Dialog>
+        <Dialog open={openCommentsLikesDialog} onClose={() => setOpenCommentsDialog(false)}>
+          <SeePostLikes
+            entityType={2}
+            entityId={postId}
+            onClose={() => setOpenCommentsDialog(false)}
+            likesCount={likesCount}
+            commentId={comment.Id}
           />
         </Dialog>
       </div>

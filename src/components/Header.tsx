@@ -149,18 +149,19 @@ const Header: React.FC<HeaderProps> = () => {
       setActivityArray([...activityArray].concat(response?.data?.activities));
       setUserMap({ ...userMap, ...response?.data?.users });
       setPageCount(pageCount + 1);
-      const newUnreadCount = parseInt(notificationsCount.toString()) - activityArray.length;
-      if (newUnreadCount > 0) {
-        setNotificationsCount(newUnreadCount);
-      } else {
-        setNotificationsCount(0);
-      }
+      // const newUnreadCount = parseInt(notificationsCount.toString()) - activityArray.length;
+      // if (newUnreadCount > 0) {
+      //   setNotificationsCount(newUnreadCount);
+      // } else {
+      //   setNotificationsCount(0);
+      // }
     } catch (error) {
       console.log(error);
     }
   }
   function handleNotification(activity: IActivity) {
     lmFeedClient.markReadNotification(activity.Id);
+    setNotificationsCount(parseInt(notificationsCount.toString()) - 1);
     switch (activity.action) {
       case 10: {
         document.dispatchEvent(
@@ -194,7 +195,7 @@ const Header: React.FC<HeaderProps> = () => {
                     className="customMenuItem"
                     onClick={() => handleNotification(activity)}
                     style={{
-                      background: activity.isRead ? 'none' : 'gray'
+                      background: activity.isRead ? 'none' : '#e8e8e8'
                     }}>
                     <div className="notificationIist">
                       <div className="notiImg">
@@ -251,7 +252,9 @@ const Header: React.FC<HeaderProps> = () => {
               getNotifications();
               setNotificationsCount(0);
             }}>
-            <Badge badgeContent={notificationsCount} color="primary">
+            <Badge
+              badgeContent={parseInt(notificationsCount.toString()) <= 0 ? 0 : notificationsCount}
+              color="primary">
               <NotificationsIcon />
             </Badge>
           </IconButton>

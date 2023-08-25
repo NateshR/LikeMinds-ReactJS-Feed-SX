@@ -1,11 +1,12 @@
 import post from '../assets/images/post.jpg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import React, { ReactChild, useState } from 'react';
+import React, { ReactChild, useMemo, useState } from 'react';
 import { Dialog, IconButton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { Attachment } from 'likeminds-sdk';
-
+import ReactDOMServer from 'react-dom/server';
+import { Parser } from 'html-to-react';
 import './../assets/css/post-body.css';
 interface PostBodyProps {
   answer: string;
@@ -20,11 +21,15 @@ interface MatchPattern {
 }
 
 const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
+  const [renderedData, setRenderedData] = useState<any>(null);
+  useMemo(() => setRenderedData(renderAttachments(attachments)), [attachments]);
   function convertTextToHTML(text: string) {
-    const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
+    const regex = /<<.*?>>|(?:https?|ftp):\/\/\S+|(?<!www\.)\S+\.\S+/g;
+    // const regex =
+    //   /(?:<<.*?>>)|(?:https?|ftp):\/\/[^\s/$.?#]+\.[^\s]*|www\.[^\s/$.?#]+\.[^\s]*|\b(?<!:\/\/)(?<!\w)(?:www\.)?([^\s.]+\.[^\s]{2,}|localhost)(?:\/[^\s]*)?(?:\?[^\s]*)?\b/g;
+
     const matches = text.match(regex) || [];
     const splits = text.split(regex);
-
     const container = document.createElement('div');
 
     for (let i = 0; i < splits.length; i++) {
@@ -61,14 +66,12 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           if (!url?.startsWith('http://') && !url?.startsWith('https://')) {
             url = 'http://' + url;
           }
-
           linkNode.href = url!; // You can set the appropriate URL here
           linkNode.textContent = userObject.link!;
           container.appendChild(linkNode);
         }
       }
     }
-
     return container;
   }
   function renderAttachments(attachmentsArray: Attachment[]) {
@@ -131,19 +134,43 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         );
     }
   }
+  const [isReadMore, setIsReadMore] = useState(true);
+
   return (
     <div className="lmWrapper__feed__post__body">
       {answer && (
         <div
           className="lmWrapper__feed__post__body--content"
-          dangerouslySetInnerHTML={{
-            __html: convertTextToHTML(answer).innerHTML
-          }}></div>
+          // dangerouslySetInnerHTML={{
+          //   __html: convertTextToHTML(answer).innerHTML
+          // }}
+        >
+          {isReadMore && answer.length > 300
+            ? Parser().parse(convertTextToHTML(answer.substring(0, 300)).innerHTML)
+            : Parser().parse(convertTextToHTML(answer).innerHTML)}
+          {isReadMore && answer.length > 300 ? (
+            <span
+              style={{
+                color: 'gray',
+                fontWeight: '400',
+                cursor: 'pointer',
+                // textDecoration: 'underline',
+                fontSize: '14px'
+              }}
+              onClick={() => setIsReadMore(false)}>
+              ...ReadMore
+            </span>
+          ) : null}
+        </div>
       )}
 
       <div className="lmWrapper__feed__post__body--media">
-        <Carousel className="postMediaAttachment" showThumbs={false} showStatus={false}>
-          {renderAttachments(attachments)}
+        <Carousel
+          className="postMediaAttachment"
+          showThumbs={false}
+          showStatus={false}
+          showIndicators={false}>
+          {renderedData}
         </Carousel>
       </div>
     </div>
