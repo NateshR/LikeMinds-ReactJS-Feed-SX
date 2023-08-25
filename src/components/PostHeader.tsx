@@ -22,6 +22,7 @@ interface PostHeaderProps {
   index: number;
   feedModerationHandler: (action: string, index: number, value: any) => void;
   uuid: any;
+  isPinned: boolean;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
@@ -32,7 +33,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   postId,
   feedModerationHandler,
   index,
-  uuid
+  uuid,
+  isPinned
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
@@ -133,7 +135,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   }
   function setPinnedIcon() {
-    if (postMenuOptions.some((item: any) => item?.id === 3)) {
+    if (isPinned) {
       return (
         <div
           style={{

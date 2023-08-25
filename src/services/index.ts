@@ -465,10 +465,14 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     }
   }
 
-  async editPost(postId: string, text: string) {
+  async editPost(postId: string, text: string, attachments: Attachment[]) {
     try {
       const apiCallResponse = await this.client.editPost(
-        EditPostRequest.builder().setpostId(postId).settext(text).setattachments([]).build()
+        EditPostRequest.builder()
+          .setpostId(postId)
+          .settext(text)
+          .setattachments(attachments)
+          .build()
       );
       return apiCallResponse;
     } catch (error) {

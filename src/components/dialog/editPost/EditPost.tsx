@@ -129,7 +129,7 @@ const EditPost = ({
       );
     }
   }
-  const [text, setText] = useState<string>('');
+  const [text, setText] = useState<string>(post?.text!);
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
   const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<any>([]);
@@ -141,6 +141,30 @@ const EditPost = ({
   const [limits, setLimits] = useState<Limits>({
     left: 0,
     right: 0
+  });
+  function setToEndOfContent(element: HTMLDivElement): void {
+    if (element.contentEditable === 'true') {
+      const range = document.createRange();
+      const selection = window.getSelection();
+
+      if (selection) {
+        const lastChild = element.lastChild;
+        const lastNode =
+          lastChild instanceof Text ? lastChild : element.appendChild(document.createTextNode(''));
+
+        range.setStart(lastNode, lastNode.length);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      setToEndOfContent(contentEditableDiv.current);
+    }
   });
   useEffect(() => {
     const attachments = post?.attachments;
@@ -175,6 +199,7 @@ const EditPost = ({
                 .seturl(item.attachmentMeta.url!)
                 .setsize(item.attachmentMeta.size!)
                 .setname(item.attachmentMeta.name!)
+                .setformat('document/pdf')
                 .build()
             )
             .build()
@@ -342,7 +367,11 @@ const EditPost = ({
         }
         return item;
       });
-      response = await lmFeedClient.editPost(post?.Id!, textContent);
+      response = await lmFeedClient.editPost(post?.Id!, textContent, [
+        ...imageOrVideoUploadArray,
+        ...documentUploadArray,
+        ...previewOGTagData
+      ]);
       const newpost: IPost = response?.data?.post;
       const newFeedArray = [...feedArray];
       const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);

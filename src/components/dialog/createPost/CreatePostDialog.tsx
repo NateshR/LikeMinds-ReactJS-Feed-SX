@@ -114,6 +114,7 @@ const CreatePostDialog = ({
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
   const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
+  const [previewTagsUrl, setPreviewTagsUrl] = useState<string>('');
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -290,14 +291,14 @@ const CreatePostDialog = ({
       lmFeedClient.logError(error);
     }
   }
-  async function checkForOGTags() {
+  async function checkForOGTags(ogTagLinkArray: string[]) {
     try {
-      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
       // console.log (ogTagLinkArray);
       if (ogTagLinkArray.length) {
         const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
         // console.log ('the og tag call is :', getOgTag);
         setPreviewOGTagData(getOgTag);
+
         if (!hasPreviewClosedOnce) {
           setShowOGTagPreview(true);
         }
@@ -337,13 +338,18 @@ const CreatePostDialog = ({
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      checkForOGTags();
+      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
+      if (text.includes(ogTagLinkArray[0])) {
+        //
+      }
+      checkForOGTags(ogTagLinkArray);
     }, 500);
     if (contentEditableDiv && contentEditableDiv.current) {
       if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
         contentEditableDiv.current.textContent = 'Write something here...';
       }
     }
+
     return () => {
       clearTimeout(timeOut);
     };

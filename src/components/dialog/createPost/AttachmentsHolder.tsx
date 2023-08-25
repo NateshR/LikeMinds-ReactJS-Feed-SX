@@ -736,7 +736,7 @@ const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagP
           <div className="ogTagPreviewContainer__wrapper--imageWrapper">
             {
               <img
-                src={ogTagPreviewData.image?.length === 0 ? previewImage : ogTagPreviewData.image}
+                src={ogTagPreviewData.image?.length === 0 ? previewImage : ogTagPreviewData?.image}
                 alt="preview"
               />
             }

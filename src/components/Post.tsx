@@ -38,6 +38,7 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
           feedModerationHandler={feedModerationHandler}
           index={index}
           uuid={post.uuid}
+          isPinned={post.isPinned}
         />
         {/* post */}
         <PostBody
