@@ -206,13 +206,21 @@ const PostComents: React.FC<CommentProps> = ({
   }
   function renderMenu() {
     return (
-      <Menu open={Boolean(menuAnchor)} anchorEl={menuAnchor} onClose={closeMenu}>
+      <Menu
+        className="lmOverflowMenu"
+        open={Boolean(menuAnchor)}
+        anchorEl={menuAnchor}
+        onClose={closeMenu}>
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8) return null;
           return (
-            <MenuItem id={item.id.toString()} key={item.id.toString()} onClick={handleMenuClick}>
+            <div
+              className="lmOverflowMenuTitle"
+              id={item.id.toString()}
+              key={item.id.toString()}
+              onClick={handleMenuClick}>
               {item.title}
-            </MenuItem>
+            </div>
           );
         })}
       </Menu>
@@ -552,7 +560,7 @@ const PostComents: React.FC<CommentProps> = ({
   return (
     <div className="commentWrapper">
       <div className="commentWrapper--username">
-        <span className="displayName">{user?.name || 'Ronald Richard'}</span>
+        <span className="displayName">{user?.name}</span>
         <span className="displayTitle"></span>
       </div>
       <div className="commentWrapper--commentContent">

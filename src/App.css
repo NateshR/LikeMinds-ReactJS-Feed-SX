@@ -297,7 +297,7 @@
 }
 .lmWrapper__feed__post__body--media {
   width: 100%;
-  max-height: 300px;
+  /* max-height: 300px; */
   overflow: hidden;
 }
 .lmWrapper__feed__post__footer {
@@ -457,4 +457,23 @@
  
 .taggingTile span, .postTaggingTile span{
   text-transform: capitalize;
+}
+
+/* Overflow Menu */
+
+.lmOverflowMenu{
+  width: 196px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 1px 16px 0px rgba(0, 0, 0, 0.24);
+}
+
+.lmOverflowMenuTitle{
+  width: 196px;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(34, 32, 32, 1);
+  line-height: 20px;
+  padding: 1rem;
+  cursor: pointer;
 }
