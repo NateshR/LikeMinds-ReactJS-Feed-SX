@@ -9,7 +9,13 @@ import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialo
 import { IPost, IUser, IMemberState } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress, Dialog, Snackbar } from '@mui/material';
-import { DELETE_POST, EDIT_POST, LIKE_POST, SAVE_POST } from '../../services/feedModerationActions';
+import {
+  DELETE_POST,
+  EDIT_POST,
+  LIKE_POST,
+  SAVE_POST,
+  SHOW_SNACKBAR
+} from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
 import AllMembers from '../../components/AllMembers';
@@ -25,8 +31,9 @@ const FeedComponent: React.FC = () => {
   const [snackBarMessage, setSnackBarMessage] = useState<string>('');
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [tempPost, setTempPost] = useState<IPost | null>(null);
+  const [pageCount, setPageCount] = useState<number>(1);
   const getFeeds = async (pgNo: number) => {
-    let feeds = await lmFeedClient.fetchFeed(pgNo);
+    let feeds = await lmFeedClient.fetchFeed(pageCount);
     if (!feeds) {
       setHasMoreFeed(false);
       return;
@@ -34,7 +41,7 @@ const FeedComponent: React.FC = () => {
     if (feeds.posts.length < 10) {
       setHasMoreFeed(false);
     }
-
+    setPageCount(pageCount + 1);
     setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
     setUsersMap({ ...usersMap, ...feeds.users });
     // feeds?.posts.
@@ -82,6 +89,11 @@ const FeedComponent: React.FC = () => {
       case EDIT_POST: {
         setOpenDialogBox(true);
         setTempPost(feedPostsArray[index]);
+        break;
+      }
+      case SHOW_SNACKBAR: {
+        setOpenSnackBar(true);
+        setSnackBarMessage(value);
         break;
       }
       default:
@@ -173,7 +185,7 @@ const FeedComponent: React.FC = () => {
       return;
     }
     const getFeeds = async () => {
-      let feeds = await lmFeedClient.fetchFeed(1);
+      let feeds = await lmFeedClient.fetchFeed(pageCount);
       if (!feeds) {
         setHasMoreFeed(false);
         return;
@@ -181,6 +193,7 @@ const FeedComponent: React.FC = () => {
       if (feeds.posts.length < 10) {
         setHasMoreFeed(false);
       }
+      setPageCount(pageCount + 1);
       setFeedPostsArray(feeds?.posts!);
       setUsersMap(feeds.users);
       // feeds?.posts.

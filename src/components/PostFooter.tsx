@@ -10,8 +10,8 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostComents from './PostComments';
 import { lmFeedClient } from '..';
-import { IconButton } from '@mui/material';
-import { LIKE_POST, SAVE_POST } from '../services/feedModerationActions';
+import { Dialog, IconButton } from '@mui/material';
+import { LIKE_POST, SAVE_POST, SHOW_SNACKBAR } from '../services/feedModerationActions';
 import { IComment, IMemberRight, IUser } from 'likeminds-sdk';
 import SendIcon from '@mui/icons-material/Send';
 import {
@@ -24,6 +24,7 @@ import {
 import './../assets/css/post-footer.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import UserContext from '../contexts/UserContext';
+import SeePostLikes from './SeePostLikes';
 interface PostFooterProps {
   postId: string;
   isEdited: boolean;
@@ -55,6 +56,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [pageCount, setPageCount] = useState<number>(1);
   const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
   const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
+  const [openSeeLikesDialog, setOpenSeeLikesDialog] = useState(false);
+
   useEffect(() => {
     setIsPostLiked(isLiked);
     setIsPostSaved(isSaved);
@@ -75,6 +78,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
   function sharePOst() {}
   function savePost() {
     setIsPostSaved(!isPostSaved);
+    feedModerationHandler(
+      SHOW_SNACKBAR,
+      index,
+      isPostSaved ? 'Post removed from Saved Posts' : 'Post added to Saved Posts'
+    );
     return lmFeedClient.savePost(postId);
   }
   async function getPostComments() {
@@ -166,6 +174,43 @@ const PostFooter: React.FC<PostFooterProps> = ({
       );
     }
   }
+  function setTagUserImage(user: any) {
+    const imageLink = user?.imageUrl;
+    if (imageLink !== '') {
+      return (
+        <img
+          src={imageLink}
+          alt={userContext.user?.imageUrl}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%'
+          }}
+        />
+      );
+    } else {
+      return (
+        <span
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#5046e5',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#fff',
+            letterSpacing: '1px'
+          }}>
+          {user?.name?.split(' ').map((part: string) => {
+            return part.charAt(0)?.toUpperCase();
+          })}
+        </span>
+      );
+    }
+  }
 
   function showCommentBox() {
     const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
@@ -222,11 +267,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 let textContentFocusNode = focusNode.textContent;
 
                 let tagOp = findTag(textContentFocusNode!);
-                if (
-                  tagOp?.tagString !== null &&
-                  tagOp?.tagString !== undefined &&
-                  tagOp?.tagString !== ''
-                ) {
+                if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
               }}></div>
@@ -268,9 +309,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         if (tagOp === undefined) return;
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
-                        if (!substr || substr.length === 0) {
-                          return;
-                        }
+                        // if (!substr || substr.length === 0) {
+                        //   return;
+                        // }
                         let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                         let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
@@ -286,7 +327,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
-                      {item?.name}
+                      {setTagUserImage(item)}
+                      <span
+                        style={{
+                          padding: '0px 0.5rem'
+                        }}>
+                        {item?.name}
+                      </span>
                     </button>
                   );
                 })}
@@ -305,11 +352,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return null;
     }
   }
+
   // end of utility functions
 
   // functions for comment input box
   const [text, setText] = useState<string>('');
-  const [tagString, setTagString] = useState('');
+  const [tagString, setTagString] = useState<string | null>(null);
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -379,24 +427,29 @@ const PostFooter: React.FC<PostFooterProps> = ({
       setCommentList([{ ...comment }].concat(commentList));
       setPostUsersMap({ ...postUsersMap, ...user });
       setPostCommentsCount(postCommentsCount + 1);
+      setOpenCommentsSection(true);
     } catch (error) {
       lmFeedClient.logError(error);
     }
   }
-  useEffect(() => {
-    if (!tagString && !(tagString.length > 0)) {
+  async function getTags() {
+    if (tagString === undefined || tagString === null) {
       return;
     }
-    async function getTags() {
-      const tagListResponse = await lmFeedClient.getTaggingList(tagString);
+    const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
-      const memberList = tagListResponse?.data?.members;
-      if (memberList && memberList.length > 0) {
-        setTaggingMemberList(memberList);
-      } else {
-        setTaggingMemberList(null);
-      }
+    const memberList = tagListResponse?.data?.members;
+    if (memberList && memberList.length > 0) {
+      setTaggingMemberList(memberList);
+    } else {
+      setTaggingMemberList(null);
     }
+  }
+  useEffect(() => {
+    if (tagString === null || tagString === undefined) {
+      return;
+    }
+
     const timeout = setTimeout(() => {
       getTags();
     }, 500);
@@ -404,6 +457,28 @@ const PostFooter: React.FC<PostFooterProps> = ({
       clearTimeout(timeout);
     };
   }, [tagString]);
+  useEffect(() => {
+    if (!tagString) {
+      setTaggingMemberList([]);
+    }
+  }, [tagString]);
+  useEffect(() => {
+    function handleClickOutside(e: any) {
+      if (contentEditableDiv && contentEditableDiv?.current) {
+        if (
+          !contentEditableDiv?.current?.contains(e.target as unknown as any) &&
+          !e.currentTarget?.classList?.contains('postTaggingTile')
+        ) {
+          setTaggingMemberList([]);
+        }
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contentEditableDiv]);
   return (
     <div className="lmWrapper__feed__post__footer">
       <div className="lmWrapper__feed__post__footer__actions">
@@ -418,8 +493,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
               onClick={likePost}>
               {setLikeButton()}
             </IconButton>{' '}
-            <span>
-              {postLikesCount} {postLikesCount === 0 || postLikesCount > 1 ? 'Comments' : 'Comment'}
+            <span onClick={() => setOpenSeeLikesDialog(true)}>
+              {postLikesCount} {postLikesCount === 0 || postLikesCount > 1 ? 'Likes' : 'Like'}
             </span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">
@@ -495,11 +570,21 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   setCommentArray={setCommentList}
                   index={index}
                   user={postUsersMap[comment?.uuid]}
+                  setParentCommentsCount={setPostCommentsCount}
+                  parentCommentsCount={postCommentsCount}
                 />
               );
             })}
           </InfiniteScroll>
         ) : null}
+        <Dialog open={openSeeLikesDialog} onClose={() => setOpenSeeLikesDialog(false)}>
+          <SeePostLikes
+            entityId={postId}
+            onClose={() => setOpenSeeLikesDialog(false)}
+            likesCount={postLikesCount}
+            entityType={1}
+          />
+        </Dialog>
       </div>
       {/* Comments */}
     </div>

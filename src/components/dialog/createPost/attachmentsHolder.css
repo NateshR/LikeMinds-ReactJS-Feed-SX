@@ -14,7 +14,7 @@
   width: 100%;
 }
 .attachmentHolder__singleBlock{
-    height: 194px;
+    height: 300px;
     width: 100%;
     text-align: center;
     background-color: #f9f9f9;
@@ -193,6 +193,10 @@ border-radius: 0.5rem;
   font-size: 0.75rem;
   line-height: 1.25rem;
   color: #484F67;
+}
+.postMediaAttachment{
+  height: 300px;
+  width: 100%;
 }
 .postMediaAttachment--image {
   object-position: center;

@@ -37,7 +37,14 @@ const PostOptions: React.FC<{
         </ul>
       </div>
       <div className="lmWrapper__feed__creatPost__actionBtn">
-        <button type="button">Post</button>
+        <button
+          style={{
+            cursor: 'pointer'
+          }}
+          type="button"
+          onClick={openCreatePostDialogBox}>
+          Post
+        </button>
       </div>
     </div>
   );

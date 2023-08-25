@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import './attachmentsHolder.css';
 import phoneImageSample from '../../../assets/images/phoneImgaeSample.png';
 import { ChangeEvent } from 'react';
@@ -63,7 +63,6 @@ const AttachmentsHolder = ({
       setAttachmentTypeImage();
     }
   }, []);
-  const [selectedSlide, setSelectedSlide] = useState(0);
 
   function setMediaUploadBar() {
     if (showMediaUploadBar) {
@@ -543,7 +542,7 @@ function renderMediaItem(attachment: File) {
           key={attachment.name + Math.random().toString()}
           loading="lazy"
           style={{
-            height: '194px',
+            height: '100%',
             width: 'auto'
           }}
         />
@@ -557,7 +556,7 @@ function renderMediaItem(attachment: File) {
             key={attachment.name + Math.random().toString()}
             controls
             style={{
-              height: '194px',
+              height: '100%',
               width: 'auto'
             }}
           />
@@ -589,11 +588,10 @@ function renderMediaItem(attachment: File) {
 function ImageVideoAttachmentView({
   imageOrVideoUploadArray,
   setImageOrVideoUploadArray,
-  showInitiateUploadComponent,
   setShowInitiateUploadComponent
 }: ImageVideoAttachmentViewProps) {
-  let length = imageOrVideoUploadArray?.length;
   const [selectedSlide, setSelectedSlide] = useState<number>(0);
+  const [rI, setRI] = useState<any>(null);
   function removeAMedia(index: number) {
     let newMediaArray = [...imageOrVideoUploadArray!];
     newMediaArray.splice(index, 1);
@@ -602,22 +600,9 @@ function ImageVideoAttachmentView({
     }
     setImageOrVideoUploadArray(newMediaArray);
   }
+  useMemo(() => renderImages(), [imageOrVideoUploadArray]);
   function renderImages() {
-    // switch (length) {
-    //   case undefined || 0 || null: {
-    //     return null;
-    //   }
-    //   case 1: {
-    //     return <SingleImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
-    //   }
-    //   case 2: {
-    //     return <MaxTwoImage imageOrVideoUploadArray={imageOrVideoUploadArray} />;
-    //   }
-    //   default: {
-    //     return <MinThreeImage />;
-    //   }
-    // }
-    return (
+    setRI(
       <div
         style={{
           position: 'relative',
@@ -649,30 +634,7 @@ function ImageVideoAttachmentView({
             />
           </svg>
         </span>
-        {/* <span
-          onClick={() => removeAMedia(selectedSlide)}
-          style={{
-            position: 'absolute',
-            zIndex: 1,
-            right: '1rem',
-            top: '1rem',
-            height: '40px',
-            width: '114px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'white',
-            borderRadius: '0.5rem',
-            cursor: 'pointer'
-          }}>
-          <DeleteOutlined />
-          <span
-            style={{
-              fontSize: '12px'
-            }}>
-            Remove Item
-          </span>
-        </span> */}
+
         <Carousel
           className="postMediaAttachment"
           showThumbs={false}
@@ -713,7 +675,7 @@ function ImageVideoAttachmentView({
           Add More
         </span>
       </label>
-      {renderImages()}
+      {rI}
     </div>
   );
 }
