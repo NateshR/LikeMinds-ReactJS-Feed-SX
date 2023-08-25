@@ -192,9 +192,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           onClose={handleCloseMoreOptionsMenu}>
           {postMenuOptions?.map((menuItem: IMenuItem) => {
             return (
-              <MenuItem onClick={onClickHandler} id={menuItem?.id?.toString()} key={menuItem?.id}>
+              <div onClick={onClickHandler} id={menuItem?.id?.toString()} key={menuItem?.id}>
                 {menuItem?.title}
-              </MenuItem>
+              </div>
             );
           })}
         </Menu>
