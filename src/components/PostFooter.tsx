@@ -272,19 +272,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 }
               }}></div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
-              <div
-                style={{
-                  maxHeight: '150px',
-                  width: '250px',
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  boxShadow: '0px 1px 16px 0 #0000003D',
-                  borderRadius: '0px',
-                  zIndex: 9
-                }}>
+              <div className="taggingBox">
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
@@ -330,7 +318,8 @@ const PostFooter: React.FC<PostFooterProps> = ({
                       {setTagUserImage(item)}
                       <span
                         style={{
-                          padding: '0px 0.5rem'
+                          padding: '0px 0.5rem',
+                          textTransform: 'capitalize'
                         }}>
                         {item?.name}
                       </span>

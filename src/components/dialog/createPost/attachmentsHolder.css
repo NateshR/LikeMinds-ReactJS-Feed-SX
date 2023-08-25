@@ -195,7 +195,7 @@ border-radius: 0.5rem;
   color: #484F67;
 }
 .postMediaAttachment{
-  height: 300px;
+  /* height: 300px; */
   width: 100%;
 }
 .postMediaAttachment--image {

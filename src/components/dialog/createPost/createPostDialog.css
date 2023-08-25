@@ -109,23 +109,4 @@
   cursor: pointer;
   font-weight: 500;
 }
-
-.taggingTile{
-  background: #fff;
-  padding: 10px 15px;
-  display: block;
-  border: none;
-  border-bottom: 1px solid #eceff3;
-  width: 250px;
-  text-align: left;
-  color: #333;
-  font-size: 14px;
-  text-transform: capitalize;
-  
-}
-.taggingTile:hover{
-  cursor: pointer;
-  transition: 0.3s all ease-in-out;
-  background-color: #5046e5;
-  color: #fff;
-}
+ 
