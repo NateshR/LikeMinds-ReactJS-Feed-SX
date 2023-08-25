@@ -8,6 +8,11 @@ import { Attachment } from 'likeminds-sdk';
 import ReactDOMServer from 'react-dom/server';
 import { Parser } from 'html-to-react';
 import './../assets/css/post-body.css';
+import { Document, Page, pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 interface PostBodyProps {
   answer: string;
   attachments: Attachment[];
@@ -22,6 +27,7 @@ interface MatchPattern {
 
 const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
   const [renderedData, setRenderedData] = useState<any>(null);
+  const [pdfPageNo, setPdfPageNo] = useState<number>(1);
   useMemo(() => setRenderedData(renderAttachments(attachments)), [attachments]);
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/\S+|(?<!www\.)\S+\.\S+/g;
@@ -112,17 +118,35 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         );
       case 3:
         return (
-          <object
-            key={attachment?.attachmentMeta?.url}
-            data={attachment?.attachmentMeta?.url}
-            type="application/pdf"
-            width="100%"
-            height="100%">
-            <p>
-              Alternative text - include a link{' '}
-              <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
-            </p>
-          </object>
+          // <object
+          //   key={attachment?.attachmentMeta?.url}
+          //   data={attachment?.attachmentMeta?.url}
+          //   type="application/pdf"
+          //   width="100%"
+          //   height="100%">
+          //   <p>
+          //     Alternative text - include a link{' '}
+          //     <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
+          //   </p>
+          // </object>
+          <div
+            style={{
+              width: '100%',
+              height: 'auto',
+              position: 'relative'
+            }}>
+            <Document key={attachment?.attachmentMeta?.url} file={attachment?.attachmentMeta?.url}>
+              <Page
+                pageNumber={pdfPageNo}
+                height={200}
+                renderAnnotationLayer={false}
+                renderTextLayer={false}
+                onClick={() => {
+                  window.open(attachment?.attachmentMeta?.url, '_blank');
+                }}
+              />
+            </Document>
+          </div>
         );
       default:
         return (

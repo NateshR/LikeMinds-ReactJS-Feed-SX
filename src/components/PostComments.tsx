@@ -207,15 +207,19 @@ const PostComents: React.FC<CommentProps> = ({
   function renderMenu() {
     return (
       <Menu
-        className="lmOverflowMenu"
+        // className="lmOverflowMenu"
         open={Boolean(menuAnchor)}
         anchorEl={menuAnchor}
-        onClose={closeMenu}>
+        onClose={closeMenu}
+        sx={{
+          width: '196px',
+          boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
+        }}>
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8) return null;
           return (
             <div
-              className="lmOverflowMenuTitle"
+              // className="lmOverflowMenuTitle"
               id={item.id.toString()}
               key={item.id.toString()}
               onClick={handleMenuClick}>

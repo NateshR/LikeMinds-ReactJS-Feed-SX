@@ -114,7 +114,7 @@ const CreatePostDialog = ({
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
   const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
-  const [previewTagsUrl, setPreviewTagsUrl] = useState<string>('');
+  const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -298,10 +298,11 @@ const CreatePostDialog = ({
         const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
         // console.log ('the og tag call is :', getOgTag);
         setPreviewOGTagData(getOgTag);
-
         if (!hasPreviewClosedOnce) {
           setShowOGTagPreview(true);
         }
+      } else {
+        setPreviewOGTagData(null);
       }
     } catch (error) {
       // console.log (error);
@@ -339,8 +340,8 @@ const CreatePostDialog = ({
   useEffect(() => {
     const timeOut = setTimeout(() => {
       const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
-      if (text.includes(ogTagLinkArray[0])) {
-        //
+      if (!text.includes(ogTagLinkArray[0])) {
+        ogTagLinkArray.splice(0, 1);
       }
       checkForOGTags(ogTagLinkArray);
     }, 500);
@@ -456,12 +457,6 @@ const CreatePostDialog = ({
                 fontFamily: 'Roboto',
                 overflowY: 'auto'
               }}
-              // onKeyDown={(e: React.KeyboardEvent) => {
-              //   if (e.key === 'Enter') {
-              //     e.preventDefault();
-              //   }
-              //   // setStopInput(true);
-              // }}
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
                   if (text.trim().length === 0) {

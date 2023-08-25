@@ -206,6 +206,7 @@ const AttachmentsHolder = ({
         <PreviewForOGTag
           ogTagPreviewData={previewOGTagData!}
           setOgTagPreview={setShowOGTagPreview}
+          setHasPreviewClosedOnce={setHasPreviewClosedOnce}
         />
       );
     }
@@ -722,13 +723,21 @@ interface OgTags {
 type PreviewForOGTagProps = {
   ogTagPreviewData: OgTags;
   setOgTagPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  setHasPreviewClosedOnce: any;
 };
 
-const PreviewForOGTag = ({ setOgTagPreview, ogTagPreviewData }: PreviewForOGTagProps) => {
+const PreviewForOGTag = ({
+  setOgTagPreview,
+  ogTagPreviewData,
+  setHasPreviewClosedOnce
+}: PreviewForOGTagProps) => {
   function closePreviewBox() {
     setOgTagPreview(false);
+    setHasPreviewClosedOnce(true);
   }
-
+  if (!ogTagPreviewData) {
+    return null;
+  }
   return (
     <div className="ogTagPreviewContainer">
       <HolderWithCross onCloseFunction={closePreviewBox}>

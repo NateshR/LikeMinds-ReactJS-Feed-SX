@@ -213,9 +213,18 @@ const PostFooter: React.FC<PostFooterProps> = ({
   }
 
   function showCommentBox() {
-    const isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
-      (item: IMemberRight) => item.id === 10 && item.isSelected
-    );
+    const memberState = userContext.memberStateRights?.state;
+    let isCommentingAllowed: any = false;
+    if (memberState == 4) {
+      isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
+        (item: IMemberRight) => item.id === 10 && item.isSelected
+      );
+    } else {
+      const rights: any = userContext?.memberStateRights;
+      isCommentingAllowed = rights.managerRights.some(
+        (item: any) => item.id === 10 && item.isSelected
+      );
+    }
     if (isCommentingAllowed) {
       return (
         <>

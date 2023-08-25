@@ -6,16 +6,30 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 
 function AllMembers() {
   const [allMembersArray, setAllMembersArray] = useState<IMember[]>([]);
-  const [pageCount, setPageCount] = useState<number>(1);
+  const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [totalMembers, setTotalMembers] = useState<number>(0);
   useEffect(() => {
-    getAllMembers();
+    getAllMembersThrice();
   }, []);
+  async function getAllMembersThrice() {
+    try {
+      const responseOne: any = await lmFeedClient.getAllMembers(1);
+      const responseTwo: any = await lmFeedClient.getAllMembers(2);
+      const responseThree: any = await lmFeedClient.getAllMembers(3);
+      const membersArrayOne: IMember[] = responseOne?.data?.members;
+      const membersArrayTwo: IMember[] = responseTwo?.data?.members;
+      const membersArrayThree: IMember[] = responseThree?.data?.members;
+      setTotalMembers(responseOne?.data?.totalMembers);
+      setAllMembersArray([...membersArrayOne, ...membersArrayTwo, ...membersArrayThree]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async function getAllMembers() {
     try {
       const response: any = await lmFeedClient.getAllMembers(pageCount);
-      const membersArray: IMember[] = response.data.members;
+      const membersArray: IMember[] = response?.data?.members;
       if (!membersArray.length) {
         setLoadMore(false);
         return;
