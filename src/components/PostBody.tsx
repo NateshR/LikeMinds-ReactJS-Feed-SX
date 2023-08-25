@@ -9,6 +9,8 @@ import ReactDOMServer from 'react-dom/server';
 import { Parser } from 'html-to-react';
 import './../assets/css/post-body.css';
 import { Document, Page, pdfjs } from 'react-pdf';
+import pdfIcon from '../assets/images/poll.svg';
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url
@@ -129,12 +131,7 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           //     <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
           //   </p>
           // </object>
-          <div
-            style={{
-              width: '100%',
-              height: 'auto',
-              position: 'relative'
-            }}>
+          <div className="lmPdfViewer">
             <Document key={attachment?.attachmentMeta?.url} file={attachment?.attachmentMeta?.url}>
               <Page
                 pageNumber={pdfPageNo}
@@ -146,6 +143,20 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
                 }}
               />
             </Document>
+
+            <div className="pdfInfo">
+              <div className="iconBox">
+                <img src={pdfIcon} alt="pdf icon" />
+              </div>
+              <div className="desc">
+                <h3>Event document</h3>
+                <div>
+                  <span>2 Pages</span>
+                  <span>278 KB</span>
+                  <span>PDF</span>
+                </div>
+              </div>
+            </div>
           </div>
         );
       default:
