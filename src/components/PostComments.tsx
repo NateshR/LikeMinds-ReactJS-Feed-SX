@@ -206,13 +206,21 @@ const PostComents: React.FC<CommentProps> = ({
   }
   function renderMenu() {
     return (
-      <Menu open={Boolean(menuAnchor)} anchorEl={menuAnchor} onClose={closeMenu}>
+      <Menu
+        className="lmOverflowMenu"
+        open={Boolean(menuAnchor)}
+        anchorEl={menuAnchor}
+        onClose={closeMenu}>
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8) return null;
           return (
-            <MenuItem id={item.id.toString()} key={item.id.toString()} onClick={handleMenuClick}>
+            <div
+              className="lmOverflowMenuTitle"
+              id={item.id.toString()}
+              key={item.id.toString()}
+              onClick={handleMenuClick}>
               {item.title}
-            </MenuItem>
+            </div>
           );
         })}
       </Menu>
@@ -408,19 +416,7 @@ const PostComents: React.FC<CommentProps> = ({
                 }
               }}></div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
-              <div
-                style={{
-                  maxHeight: '150px',
-                  width: '250px',
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  boxShadow: '0px 1px 16px 0 #0000003D',
-                  borderRadius: '0px',
-                  zIndex: 9
-                }}>
+              <div className="taggingBox">
                 {taggingMemberList?.map!((item: any) => {
                   return (
                     <button
@@ -466,7 +462,8 @@ const PostComents: React.FC<CommentProps> = ({
                       {setTagUserImage(item)}
                       <span
                         style={{
-                          padding: '0px 0.5rem'
+                          padding: '0px 0.5rem',
+                          textTransform: 'capitalize'
                         }}>
                         {item?.name}
                       </span>
@@ -563,7 +560,7 @@ const PostComents: React.FC<CommentProps> = ({
   return (
     <div className="commentWrapper">
       <div className="commentWrapper--username">
-        <span className="displayName">{user?.name || 'Ronald Richard'}</span>
+        <span className="displayName">{user?.name}</span>
         <span className="displayTitle"></span>
       </div>
       <div className="commentWrapper--commentContent">

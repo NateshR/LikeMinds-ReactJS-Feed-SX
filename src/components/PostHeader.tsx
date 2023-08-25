@@ -179,6 +179,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           <MoreHorizIcon />
         </IconButton>
         <Menu
+          className="lmOverflowMenu"
           anchorEl={moreAnchorsMenu}
           open={Boolean(moreAnchorsMenu)}
           anchorOrigin={{
@@ -192,7 +193,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           onClose={handleCloseMoreOptionsMenu}>
           {postMenuOptions?.map((menuItem: IMenuItem) => {
             return (
-              <div onClick={onClickHandler} id={menuItem?.id?.toString()} key={menuItem?.id}>
+              <div
+                className="lmOverflowMenuTitle"
+                onClick={onClickHandler}
+                id={menuItem?.id?.toString()}
+                key={menuItem?.id}>
                 {menuItem?.title}
               </div>
             );
