@@ -544,7 +544,7 @@ function renderMediaItem(attachment: File) {
           loading="lazy"
           style={{
             height: '100%',
-            width: 'auto'
+            width: '100%'
           }}
         />
       );
@@ -654,7 +654,11 @@ function ImageVideoAttachmentView({
     setImageOrVideoUploadArray(newImageArray);
   }
   return (
-    <div className="attachmentHolder__singleBlock">
+    <div
+      className="attachmentHolder__singleBlock"
+      style={{
+        height: 'auto'
+      }}>
       <label>
         <span
           className="attachmentHolder__addMoreButton"
