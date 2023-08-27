@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { KeyboardEventHandler, useContext, useEffect, useRef, useState } from 'react';
 
 import './createPostDialog.css';
 import defaultUserImage from '../../../assets/images/defaultUserImage.png';
@@ -65,6 +65,8 @@ export function findSpaceAfterIndex(str: string, index: number): number {
 }
 
 export function checkAtSymbol(str: string, index: number): number {
+  console.log('The index is ,', index);
+  console.log('the string is, ', str);
   if (index < 0 || index >= str.length) {
     return -1;
   }
@@ -75,6 +77,7 @@ export function checkAtSymbol(str: string, index: number): number {
       break;
     }
   }
+  console.log('the pos is, ', pos);
   if (pos === -1) {
     return -1;
   } else if (pos === 0) {
@@ -214,8 +217,10 @@ const CreatePostDialog = ({
       return undefined;
     }
     const cursorPosition = getCaretPosition();
+
     // // console.log ("the cursor position is: ", cursorPosition)
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
+
     if (leftLimit === -1) {
       setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
@@ -367,6 +372,24 @@ const CreatePostDialog = ({
       setTaggingPageCount(taggingPageCount + 1);
     }
   }
+  function setToEndOfContent(element: HTMLDivElement): void {
+    if (element.contentEditable === 'true') {
+      const range = document.createRange();
+      const selection = window.getSelection();
+
+      if (selection) {
+        const lastChild = element.lastChild;
+        const lastNode =
+          lastChild instanceof Text ? lastChild : element.appendChild(document.createTextNode(''));
+
+        range.setStart(lastNode, lastNode.length);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+  }
   useEffect(() => {
     if (contentEditableDiv && contentEditableDiv.current) {
       contentEditableDiv.current.focus();
@@ -407,6 +430,18 @@ const CreatePostDialog = ({
       document.removeEventListener('click', handleClickOutside);
     };
   }, [contentEditableDiv]);
+
+  // useEffect(() => {
+  //   if (contentEditableDiv && contentEditableDiv.current) {
+  //     if (contentEditableDiv.current.children.length === 0) {
+  //       if (contentEditableDiv.current.firstChild) {
+  //         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
+  //       }
+
+  //       contentEditableDiv.current.appendChild(document.createElement('span'));
+  //     }
+  //   }
+  // });
 
   return (
     // <div className="create-post-feed-dialog-wrapper">
@@ -467,13 +502,16 @@ const CreatePostDialog = ({
               onFocus={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
                   if (text.trim() === '') {
-                    contentEditableDiv.current.textContent = ``;
+                    while (contentEditableDiv.current?.firstChild) {
+                      contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
+                    }
                   }
                 }
               }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
-                setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
+                setText(event.currentTarget.textContent!);
+                console.log(selection?.focusNode);
                 if (selection === null) return;
                 let focusNode = selection.focusNode;
                 if (focusNode === null) {
@@ -504,33 +542,43 @@ const CreatePostDialog = ({
                   scrollableTarget="scrollableTaggingContainer">
                   {taggingMemberList?.map!((item: any) => {
                     return (
-                      <div
+                      <button
                         key={item?.id.toString() + Math.random().toString()}
                         className="taggingTile"
                         onClick={(e) => {
                           e.preventDefault();
+
                           let focusNode = window.getSelection()!.focusNode;
                           if (focusNode === null) {
                             return;
                           }
+
                           let div = focusNode.parentElement;
                           let text = div!.childNodes;
                           if (focusNode === null || text.length === 0) {
                             return;
                           }
+
                           let textContentFocusNode = focusNode.textContent;
                           if (textContentFocusNode === null) {
                             return;
                           }
+
                           let tagOp = findTag(textContentFocusNode);
+
                           // console.log ('the tag string is ', tagOp!.tagString);
                           if (tagOp === undefined) return;
+
                           let substr = tagOp?.tagString;
+
                           const { limitLeft, limitRight } = tagOp;
+
                           // if (!substr || substr.length === 0) {
                           //   return;
                           // }
+
                           let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+
                           let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
                           let textNode1 = document.createTextNode(textNode1Text);
@@ -540,9 +588,12 @@ const CreatePostDialog = ({
                           anchorNode.textContent = `@${item?.name.trim()}`;
                           anchorNode.contentEditable = 'false';
                           let textNode2 = document.createTextNode(textNode2Text);
+                          const dummyNode = document.createElement('span');
                           div!.replaceChild(textNode2, focusNode);
+
                           div!.insertBefore(anchorNode, textNode2);
-                          div!.insertBefore(textNode1, anchorNode);
+                          div!.insertBefore(dummyNode, anchorNode);
+                          div!.insertBefore(textNode1, dummyNode);
                           setTaggingMemberList([]);
                         }}>
                         {setTagUserImage(item)}
@@ -553,7 +604,7 @@ const CreatePostDialog = ({
                           }}>
                           {item?.name}
                         </span>
-                      </div>
+                      </button>
                     );
                   })}
                 </InfiniteScroll>

@@ -665,7 +665,7 @@ function ImageVideoAttachmentView({
           style={{
             zIndex: 1
           }}>
-          <input type="file" onChange={addMoreImages} />
+          <input type="file" onChange={addMoreImages} accept="image/*, video/*" />
           <svg
             width="16"
             height="16"

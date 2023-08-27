@@ -13,11 +13,10 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { HolderWithCross } from './dialog/createPost/AttachmentsHolder';
 import { OgTags } from '../services/models';
 import pdfIcon from '../assets/images/poll.svg';
+import ImageMedia from './media-components/ImageMedia';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url
-).toString();
+const url = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = url;
 interface PostBodyProps {
   answer: string;
   attachments: Attachment[];
@@ -103,16 +102,21 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
 
   function renderMediaItem(attachment: Attachment) {
     switch (attachment.attachmentType) {
-      case 1:
+      case 1: {
+        const img = new Image();
+        img.src = attachment?.attachmentMeta?.url!;
         return (
-          <img
-            className="postMediaAttachment--image"
-            src={attachment.attachmentMeta.url}
-            alt="post"
-            key={attachment.attachmentMeta.url + Math.random().toString()}
-            loading="lazy"
-          />
+          //   <img
+          //     className="postMediaAttachment--image"
+          //     src={attachment.attachmentMeta.url}
+          //     alt="post"
+          //     key={attachment.attachmentMeta.url + Math.random().toString()}
+          //     loading="lazy"
+          //   />
+          // );
+          <ImageMedia attachment={attachment} />
         );
+      }
       case 2:
         return (
           <>
@@ -137,16 +141,20 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           //     <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
           //   </p>
           // </object>
-          <div className="lmPdfViewer">
+          <div
+            className="lmPdfViewer"
+            onClick={() => {
+              window.open(attachment?.attachmentMeta?.url, '_blank');
+            }}
+            style={{
+              cursor: 'pointer'
+            }}>
             <Document key={attachment?.attachmentMeta?.url} file={attachment?.attachmentMeta?.url}>
               <Page
                 pageNumber={pdfPageNo}
                 height={200}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
-                onClick={() => {
-                  window.open(attachment?.attachmentMeta?.url, '_blank');
-                }}
               />
             </Document>
 

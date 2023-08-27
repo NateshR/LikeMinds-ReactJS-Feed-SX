@@ -11,6 +11,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Parser } from 'html-to-react';
 import './../assets/css/post-footer.css';
 import './../assets/css/comments.css';
+import overflowIcon from '../assets/images/commentOverflowMenuIconShape.png';
+import commentLikes from '../assets/images/commentLikes.png';
 // import './../assets/css/post-footer.css';
 import {
   TagInfo,
@@ -23,6 +25,9 @@ import UserContext from '../contexts/UserContext';
 import ReportPostDialogBox from './ReportPost';
 import { truncateSync } from 'fs';
 import SeePostLikes from './SeePostLikes';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 interface CommentProps {
   comment: IComment;
   postId: string;
@@ -70,15 +75,24 @@ const PostComents: React.FC<CommentProps> = ({
   function renderLikeButton() {
     if (isLiked) {
       return (
-        <Favorite
-          sx={{
-            color: '#FB1609',
-            fontSize: '16px'
+        <img
+          src={commentLikes}
+          alt="like button"
+          style={{
+            verticalAlign: 'bottom'
           }}
         />
       );
     } else {
-      return <FavoriteBorder sx={{ fontSize: '16px' }} />;
+      return (
+        <img
+          src={commentLikes}
+          alt="like button"
+          style={{
+            verticalAlign: 'bottom'
+          }}
+        />
+      );
     }
   }
   async function getComments() {
@@ -185,7 +199,7 @@ const PostComents: React.FC<CommentProps> = ({
   }
   // functions for input box
   const [text, setText] = useState<string>('');
-  const [tagString, setTagString] = useState('');
+  const [tagString, setTagString] = useState<string | null>(null);
   const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
   const [openReplyBox, setOpenReplyBox] = useState<boolean>(false);
   const contentEditableDiv = useRef<HTMLDivElement>(null);
@@ -211,9 +225,13 @@ const PostComents: React.FC<CommentProps> = ({
         open={Boolean(menuAnchor)}
         anchorEl={menuAnchor}
         onClose={closeMenu}
-        sx={{
-          width: '196px',
-          boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
+        anchorOrigin={{
+          horizontal: 'right',
+          vertical: 'top'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
         }}>
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8) return null;
@@ -222,7 +240,12 @@ const PostComents: React.FC<CommentProps> = ({
               // className="lmOverflowMenuTitle"
               id={item.id.toString()}
               key={item.id.toString()}
-              onClick={handleMenuClick}>
+              onClick={handleMenuClick}
+              style={{
+                width: '196px',
+                padding: '1rem'
+                // boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
+              }}>
               {item.title}
             </div>
           );
@@ -368,7 +391,11 @@ const PostComents: React.FC<CommentProps> = ({
       return (
         <div className="commentInputBox">
           <div className="lmProfile">{setUserImage()}</div>
-          <div className="inputDiv">
+          <div
+            className="inputDiv"
+            style={{
+              overflow: 'visible'
+            }}>
             <div
               ref={contentEditableDiv}
               contentEditable={true}
@@ -378,14 +405,14 @@ const PostComents: React.FC<CommentProps> = ({
               id="editableDiv"
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim().length === 0) {
+                  if (text?.trim().length === 0) {
                     contentEditableDiv.current.textContent = `Write your comment`;
                   }
                 }
               }}
               onFocus={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim() === '') {
+                  if (text?.trim() === '') {
                     contentEditableDiv.current.textContent = ``;
                   }
                 }
@@ -416,9 +443,12 @@ const PostComents: React.FC<CommentProps> = ({
 
                 let tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
+                  console.log('here the tag string is, :', tagOp);
                   setTagString(tagOp?.tagString!);
                 }
-              }}></div>
+              }}>
+              {/*  */}
+            </div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div className="taggingBox">
                 {taggingMemberList?.map!((item: any) => {
@@ -458,8 +488,10 @@ const PostComents: React.FC<CommentProps> = ({
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
                         let textNode2 = document.createTextNode(textNode2Text);
+                        const dummyNode = document.createElement('span');
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
+                        div!.insertBefore(dummyNode, anchorNode);
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
@@ -492,6 +524,7 @@ const PostComents: React.FC<CommentProps> = ({
     if (tagString === undefined || tagString === null) {
       return;
     }
+    console.log('calling getTags');
     const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
     const memberList = tagListResponse?.data?.members;
@@ -563,53 +596,87 @@ const PostComents: React.FC<CommentProps> = ({
   }, [tagString]);
   return (
     <div className="commentWrapper">
-      <div className="commentWrapper--username">
-        <span className="displayName">{user?.name}</span>
-        <span className="displayTitle"></span>
-      </div>
-      <div className="commentWrapper--commentContent">
-        <div
-          className="commentWrapper__commentContent--content"
-          // dangerouslySetInnerHTML={{
-          //   __html: convertTextToHTML(comment.text).innerHTML
-          // }}
-        >
-          {isReadMore && comment.text.length > 300
-            ? Parser().parse(convertTextToHTML(comment.text.substring(0, 300)).innerHTML)
-            : Parser().parse(convertTextToHTML(comment.text).innerHTML)}
-          {isReadMore && comment.text.length > 300 ? (
-            <span
+      <div className="commentWrapper--upperLayer">
+        <div className="commentWrapper__upperLayer--contentBox">
+          <div className="commentWrapper--username">
+            <span className="displayName">{user?.name}</span>
+            <span className="displayTitle"></span>
+          </div>
+          <div className="commentWrapper--commentContent">
+            <div
+              className="commentWrapper__commentContent--content"
+              // dangerouslySetInnerHTML={{
+              //   __html: convertTextToHTML(comment.text).innerHTML
+              // }}
               style={{
-                color: 'gray',
-                fontWeight: '400',
-                cursor: 'pointer',
-                // textDecoration: 'underline',
-                fontSize: '14px'
-              }}
-              onClick={() => setIsReadMore(false)}>
-              ...ReadMore
-            </span>
-          ) : null}
-          {/* {} */}
+                overflowWrap: 'anywhere'
+              }}>
+              {isReadMore && comment.text.length > 300
+                ? Parser().parse(convertTextToHTML(comment.text.substring(0, 300)).innerHTML)
+                : Parser().parse(convertTextToHTML(comment.text).innerHTML)}
+              {isReadMore && comment.text.length > 300 ? (
+                <span
+                  style={{
+                    color: 'gray',
+                    fontWeight: '400',
+                    cursor: 'pointer',
+                    // textDecoration: 'underline',
+                    fontSize: '14px'
+                  }}
+                  onClick={() => setIsReadMore(false)}>
+                  ...ReadMore
+                </span>
+              ) : null}
+              {/* {} */}
+            </div>
+          </div>
         </div>
-        <IconButton onClick={openMenu}>
-          <MoreVertIcon
-            sx={{
-              fontSize: '14px'
-            }}
-          />
-        </IconButton>
-        {renderMenu()}
+        <div className="commentWrapper__upperLayer--menuActionArea">
+          <IconButton
+            onClick={openMenu}
+            style={{
+              height: '24px',
+              width: '24px',
+              marginLeft: '8px',
+              marginRight: '16px',
+              cursor: 'pointer'
+            }}>
+            {/* <span
+              style={{
+                height: '24px',
+                width: '24px',
+                marginLeft: '8px',
+                marginRight: '16px',
+                cursor: 'pointer'
+              }}
+              onClick={openMenu}> */}
+            <img
+              src={overflowIcon}
+              alt="overflow icon"
+              style={{
+                margin: 'auto'
+              }}
+            />
+            {/* </span> */}
+          </IconButton>
+          {renderMenu()}
+        </div>
       </div>
       <div className="commentWrapper--commentActions">
-        <span className="like">
-          <IconButton onClick={likeComment}>{renderLikeButton()}</IconButton>
+        <span
+          className="like"
+          style={{
+            height: '24px',
+            width: '24px'
+          }}
+          onClick={likeComment}>
+          {renderLikeButton()}
         </span>
         <span
-          className="replies"
+          className="likes-count"
           onClick={() => setOpenCommentsDialog(true)}
           style={{ cursor: 'pointer' }}>
-          {likesCount} Likes
+          {likesCount} {likesCount === 0 || likesCount > 1 ? 'Likes' : 'Like'}
         </span>
         <span className="replies">| </span>
 
@@ -619,25 +686,42 @@ const PostComents: React.FC<CommentProps> = ({
               cursor: 'pointer'
             }}
             onClick={() => setOpenReplyBox(!openReplyBox)}>
-            Reply.
+            {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
           </span>{' '}
           <span
             style={{
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: '#5046E5'
             }}
+            className="replyCount"
             onClick={() => {
-              getComments();
-              setOpenCommentsSection(true);
+              if (commentsCount !== repliesArray.length) {
+                getComments();
+              }
+              if (commentsCount > 0) {
+                setOpenCommentsSection(!openCommentsSection);
+              }
             }}>
-            <span>{commentsCount} replies</span>
+            <span>
+              {commentsCount > 0 ? commentsCount + ' ' : null}
+              {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
+            </span>
           </span>
         </span>
 
-        {showReplyBox()}
+        <span
+          className="replies"
+          style={{
+            flexGrow: 1,
+            textAlign: 'right'
+          }}>
+          {dayjs(comment.createdAt).fromNow()}
+        </span>
       </div>
+      {showReplyBox()}
       <div
         style={{
-          paddingLeft: '2rem',
+          paddingLeft: '52px',
           maxHeight: '300px',
           overflowY: 'auto'
         }}

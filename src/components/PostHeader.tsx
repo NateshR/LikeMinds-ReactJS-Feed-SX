@@ -23,6 +23,7 @@ interface PostHeaderProps {
   feedModerationHandler: (action: string, index: number, value: any) => void;
   uuid: any;
   isPinned: boolean;
+  isEdited: boolean;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
@@ -34,7 +35,8 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   feedModerationHandler,
   index,
   uuid,
-  isPinned
+  isPinned,
+  isEdited
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
@@ -165,9 +167,15 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           {transformUsername(username)}
           {customTitle.length ? <span>Admin</span> : null}
         </div>
-        <div className="subTitle">
-          Post <span>{dayjs(createdAt).fromNow()}</span>
-        </div>
+        {isEdited ? (
+          <div className="subTitle edited">
+            <span>{dayjs(createdAt).fromNow()}</span> Edited
+          </div>
+        ) : (
+          <div className="subTitle nonEdited">
+            Post <span>{dayjs(createdAt).fromNow()}</span>
+          </div>
+        )}
       </div>
       <div
         className="lmWrapper__feed__post__header--menu"

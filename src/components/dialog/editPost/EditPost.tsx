@@ -648,8 +648,11 @@ const EditPost = ({
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
                         let textNode2 = document.createTextNode(textNode2Text);
+                        const dummyNode = document.createElement('span');
+
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
+                        div!.insertBefore(dummyNode, anchorNode);
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                       }}>
