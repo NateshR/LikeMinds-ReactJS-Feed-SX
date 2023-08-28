@@ -3,6 +3,11 @@
     padding: 8px 16px;
     display: flex;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: white;
+    flex-grow: 1;
 }
 
 .postDetailsHeaderWrapper--backIconHolder > img {
@@ -13,5 +18,6 @@
     margin-left: 10px;
 }
 .postDetailsContentWrapper{
-    padding: 24px 50%;
+    margin-top: 24px;
+   
 }

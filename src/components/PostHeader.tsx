@@ -12,6 +12,8 @@ import UserContext from '../contexts/UserContext';
 import EditPost from './dialog/editPost/EditPost';
 import { IPost, IMenuItem } from 'likeminds-sdk';
 import ReportPostDialogBox from './ReportPost';
+import { useLocation, useNavigate } from 'react-router-dom';
+import DeleteDialog from './DeleteDialog';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -41,6 +43,13 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
   const [postMenuOptions, setPostMenuOptions] = useState([...menuOptions]);
+  const [isPostPinned, setIsPostPinned] = useState<boolean>(isPinned);
+  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState<boolean>(false);
+  function closeDeleteDialog() {
+    setOpenDeleteConfirmationDialog(false);
+  }
+  const location = useLocation();
+  const navigate = useNavigate();
   function handleOpenMoreOptionsMenu(event: React.MouseEvent<HTMLElement>) {
     setMoreOptionsMenu(event.currentTarget);
   }
@@ -56,14 +65,22 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       .join(' ');
   }
   async function pinPost() {
+    setIsPostPinned(!isPostPinned);
     return await lmFeedClient.pinPost(postId);
   }
   async function unpinPost() {
+    setIsPostPinned(!isPostPinned);
     return await lmFeedClient.pinPost(postId);
   }
   async function deletePost() {
     feedModerationHandler(DELETE_POST, index, null);
-    return await lmFeedClient.deletePost(postId);
+    await lmFeedClient.deletePost(postId);
+    if (location.pathname.includes('/post')) {
+      navigate('/');
+    } else {
+      return;
+    }
+    // location.
   }
 
   function closeEditPostDialog() {
@@ -85,7 +102,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         await unpinPost();
         break;
       case '1':
-        await deletePost();
+        setOpenDeleteConfirmationDialog(true);
         break;
       case '5':
         await editPost();
@@ -137,7 +154,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   }
   function setPinnedIcon() {
-    if (isPinned) {
+    if (isPostPinned) {
       return (
         <div
           style={{
@@ -157,10 +174,15 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           </svg>
         </div>
       );
+    } else {
+      return null;
     }
   }
   return (
     <div className="lmWrapper__feed__post__header">
+      <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
+        <DeleteDialog onClose={closeDeleteDialog} deletePost={deletePost} type={1} />
+      </Dialog>
       <div className="lmWrapper__feed__post__header--profile">{setUserImage()}</div>
       <div className="lmWrapper__feed__post__header--info">
         <div className="title">

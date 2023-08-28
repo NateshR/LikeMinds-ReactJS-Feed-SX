@@ -3,7 +3,7 @@ import PostComents from './PostComments';
 import { lmFeedClient } from '..';
 import { Dialog, IconButton } from '@mui/material';
 import { LIKE_POST, SAVE_POST, SHOW_SNACKBAR } from '../services/feedModerationActions';
-import { IComment, IMemberRight, IUser } from 'likeminds-sdk';
+import { IComment, IMemberRight, IPost, IUser } from 'likeminds-sdk';
 import SendIcon from '@mui/icons-material/Send';
 import nonSavedPost from '../assets/images/nonSavedPost.png';
 import savedPost from '../assets/images/savedPost.png';
@@ -18,6 +18,7 @@ import './../assets/css/post-footer.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import UserContext from '../contexts/UserContext';
 import SeePostLikes from './SeePostLikes';
+import { useLocation, useNavigate, useNavigation } from 'react-router-dom';
 interface PostFooterProps {
   postId: string;
   isEdited: boolean;
@@ -28,6 +29,8 @@ interface PostFooterProps {
   feedModerationHandler: (action: string, index: number, value: any) => void;
   index: number;
   commentsCount: number;
+  post: IPost;
+  user: IUser;
 }
 const PostFooter: React.FC<PostFooterProps> = ({
   postId,
@@ -38,7 +41,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
   likesCount,
   index,
   feedModerationHandler,
-  commentsCount
+  commentsCount,
+  post,
+  user
 }) => {
   const [commentList, setCommentList] = useState<IComment[]>([]);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(isLiked);
@@ -51,6 +56,9 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
   const [openSeeLikesDialog, setOpenSeeLikesDialog] = useState(false);
 
+  const navigation = useNavigate();
+  const location = useLocation();
+  console.log(location);
   useEffect(() => {
     setIsPostLiked(isLiked);
     setIsPostSaved(isSaved);
@@ -643,6 +651,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
                     : 'rgba(72, 79, 103, 0.7)'
               }}
               onClick={() => {
+                if (location.pathname !== '/post') {
+                  navigation(`/post/${postId}`, {
+                    state: {
+                      index: index
+                    }
+                  });
+                }
                 if (postCommentsCount > 0) {
                   setOpenCommentsSection(!openCommentsSection);
                 }
@@ -673,7 +688,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
         </div>
       </div>
       {/* Comments */}
-      {showPostScreenSection(true)}
+      {showPostScreenSection(location.pathname.includes('/post') ? true : false)}
       {/* Comments */}
     </div>
   );

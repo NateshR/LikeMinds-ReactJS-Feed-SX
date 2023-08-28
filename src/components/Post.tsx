@@ -49,6 +49,8 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
         />
         {/* footer */}
         <PostFooter
+          user={user}
+          post={post}
           postId={post.Id}
           isLiked={post.isLiked}
           isPinned={post.isPinned}

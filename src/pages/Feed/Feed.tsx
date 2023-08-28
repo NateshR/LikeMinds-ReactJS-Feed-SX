@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CreatePost from '../../components/CreatePost';
 import FeedFilter from '../../components/FeedFilter';
 import Post from '../../components/Post';
@@ -20,8 +20,12 @@ import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
 import AllMembers from '../../components/AllMembers';
 import LMFeedClient from '@likeminds.community/feed-js-beta';
-
-const FeedComponent: React.FC = () => {
+import { Route, Routes } from 'react-router-dom';
+import PostDetails from '../../components/post-details';
+interface FeedProps {
+  setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
+}
+const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   const [user, setUser] = useState(null);
   const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
   const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
@@ -46,12 +50,7 @@ const FeedComponent: React.FC = () => {
     setUsersMap({ ...usersMap, ...feeds.users });
     // feeds?.posts.
   };
-  function feedModerationLocalHandler(
-    action: string,
-    index: number,
-    value: any,
-    data?: { [key: string]: any }
-  ) {
+  function feedModerationLocalHandler(action: string, index: number, value: any) {
     function reNewFeedArray(index: number, newFeedObject: IPost) {
       newFeedArray[index] = newFeedObject;
       setFeedPostsArray(newFeedArray);
@@ -112,6 +111,7 @@ const FeedComponent: React.FC = () => {
   //       );
   //   }
   // }
+  useMemo(() => setCallBack(feedModerationLocalHandler), [feedModerationLocalHandler]);
   function setAppUserState(user: any) {
     switch (user) {
       case null:
@@ -232,7 +232,22 @@ const FeedComponent: React.FC = () => {
         memberStateRights
       }}>
       {/* {setHeader()} */}
-      {setAppUserState(user)}
+      <Routes>
+        <Route path="/" element={<>{setAppUserState(user)}</>} />
+        <Route
+          path="/post/:postId"
+          element={
+            <div className="main">
+              <PostDetails
+                callBack={feedModerationLocalHandler}
+                feedArray={feedPostsArray}
+                users={usersMap}
+              />
+            </div>
+          }
+        />
+      </Routes>
+
       <Snackbar
         open={openSnackBar}
         onClose={() => {

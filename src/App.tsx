@@ -6,7 +6,9 @@ import Nav from './components/Nav';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PostDetails from './components/post-details';
 function App() {
-  const [callback, setCallBack] = useState<() => void | null>(null);
+  const [callback, setCallBack] = useState<
+    null | ((action: string, index: number, value: any) => void)
+  >(null);
   return (
     <div>
       <div className="header">
@@ -17,12 +19,12 @@ function App() {
           <Nav />
         </div>
         <BrowserRouter>
-          <Routes>
+          {/* <Routes>
             <Route
               path="/"
               element={
                 <div className="main">
-                  <FeedComponent />
+                  <FeedComponent setCallBack={setCallBack} />
                 </div>
               }
             />
@@ -30,11 +32,14 @@ function App() {
               path="/post"
               element={
                 <div className="main">
-                  <PostDetails />
+                  <PostDetails callBack={callback} />
                 </div>
               }
             />
-          </Routes>
+          </Routes> */}
+          <div className="main">
+            <FeedComponent setCallBack={setCallBack} />
+          </div>
         </BrowserRouter>
       </section>
     </div>

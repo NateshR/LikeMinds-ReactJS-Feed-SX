@@ -27,6 +27,7 @@ import { truncateSync } from 'fs';
 import SeePostLikes from './SeePostLikes';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import DeleteDialog from './DeleteDialog';
 dayjs.extend(relativeTime);
 interface CommentProps {
   comment: IComment;
@@ -57,6 +58,10 @@ const PostComents: React.FC<CommentProps> = ({
   const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
   const [loadMoreReplies, setLoadMoreReplies] = useState<boolean>(true);
   const [openCommentsLikesDialog, setOpenCommentsDialog] = useState<boolean>(false);
+  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState<boolean>(false);
+  function closeDeleteDialog() {
+    setOpenDeleteConfirmationDialog(false);
+  }
   const repliesDiv = useRef(null);
   useEffect(() => {
     setIsLiked(comment.isLiked);
@@ -186,7 +191,7 @@ const PostComents: React.FC<CommentProps> = ({
     const clickedElementid = e.currentTarget.id;
     switch (clickedElementid) {
       case '6':
-        deleteComment();
+        setOpenDeleteConfirmationDialog(true);
         break;
       case '7':
         openReportDialogBox();
@@ -596,6 +601,9 @@ const PostComents: React.FC<CommentProps> = ({
   }, [tagString]);
   return (
     <div className="commentWrapper">
+      <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
+        <DeleteDialog onClose={closeDeleteDialog} deleteComment={deleteComment} type={2} />
+      </Dialog>
       <div className="commentWrapper--upperLayer">
         <div className="commentWrapper__upperLayer--contentBox">
           <div className="commentWrapper--username">
