@@ -2,7 +2,12 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostComents from './PostComments';
 import { lmFeedClient } from '..';
 import { Dialog, IconButton } from '@mui/material';
-import { LIKE_POST, SAVE_POST, SHOW_SNACKBAR } from '../services/feedModerationActions';
+import {
+  LIKE_POST,
+  SAVE_POST,
+  SHOW_POST_LIKES_BAR,
+  SHOW_SNACKBAR
+} from '../services/feedModerationActions';
 import { IComment, IMemberRight, IPost, IUser } from 'likeminds-sdk';
 import SendIcon from '@mui/icons-material/Send';
 import nonSavedPost from '../assets/images/nonSavedPost.png';
@@ -29,8 +34,7 @@ interface PostFooterProps {
   feedModerationHandler: (action: string, index: number, value: any) => void;
   index: number;
   commentsCount: number;
-  post: IPost;
-  user: IUser;
+  rightSidebarHandler: (action: string, value: any) => void;
 }
 const PostFooter: React.FC<PostFooterProps> = ({
   postId,
@@ -42,8 +46,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
   index,
   feedModerationHandler,
   commentsCount,
-  post,
-  user
+  rightSidebarHandler
 }) => {
   const [commentList, setCommentList] = useState<IComment[]>([]);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(isLiked);
@@ -428,13 +431,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
               </span>
             </div>
             <div className="commentsWrapper" id="wrapperComment">
-              {commentList.length && openCommentsSection ? (
+              {commentList.length ? (
                 <InfiniteScroll
                   dataLength={commentList.length}
                   loader={null}
                   next={getPostComments}
                   hasMore={hasMoreComments}
-                  scrollableTarget={'wrapperComment'}>
+                  scrollableTarget={'postDetailsContainer'}>
                   {commentList.map((comment: IComment, index: number, commentArray: IComment[]) => {
                     return (
                       <PostComents
@@ -469,7 +472,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
       }
     }
   }
-
+  useEffect(() => {
+    if (location.pathname.includes('/post')) {
+      getPostComments();
+    }
+  }, []);
   // end of utility functions
 
   // functions for comment input box
@@ -612,8 +619,19 @@ const PostFooter: React.FC<PostFooterProps> = ({
               onClick={likePost}>
               {setLikeButton()}
             </span>{' '}
-            <span onClick={() => setOpenSeeLikesDialog(true)}>
-              {postLikesCount} {postLikesCount === 0 || postLikesCount > 1 ? 'Likes' : 'Like'}
+            <span
+              onClick={() => {
+                if (postLikesCount) {
+                  rightSidebarHandler(SHOW_POST_LIKES_BAR, {
+                    postId: postId,
+                    entityType: 1,
+                    totalLikes: postLikesCount
+                  });
+                } else {
+                  likePost();
+                }
+              }}>
+              {postLikesCount ? postLikesCount : null} {postLikesCount > 1 ? 'Likes' : 'Like'}
             </span>
           </div>
           <div className="lm-d-flex lm-align-center lm-cursor-pointer">

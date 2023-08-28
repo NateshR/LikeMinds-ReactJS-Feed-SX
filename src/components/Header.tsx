@@ -181,73 +181,95 @@ const Header: React.FC<HeaderProps> = () => {
     }
   }
   function renderNotification() {
-    return (
-      <Menu
-        open={Boolean(notificationAnchor)}
-        anchorEl={notificationAnchor}
-        onClose={() => setNotificationAnchor(null)}
-        id="activityHolder">
-        {activityArray.length > 0 ? (
-          <InfiniteScroll
-            dataLength={activityArray.length}
-            hasMore={hasMoreUnreadActivities}
-            next={getNotifications}
-            loader={null}
-            scrollableTarget="activityHolder">
-            <div className="lmNotification">
-              <div className="title">Notification</div>
-              {activityArray.map((activity: IActivity) => {
-                return (
-                  <div
-                    key={activity.Id}
-                    className="customMenuItem"
-                    onClick={() => handleNotification(activity)}
-                    style={{
-                      background: activity.isRead ? 'none' : '#e8e8e8'
-                    }}>
-                    <div className="notificationIist">
-                      <div className="notiImg">
-                        {setUserImage(userMap[activity.actionBy[activity.actionBy.length - 1]])}
-                      </div>
-                      <div>
-                        <div
-                          className="lmNoti"
-                          dangerouslySetInnerHTML={{
-                            __html: convertTextToHTML(activity.activityText).innerHTML
-                          }}></div>
-                        <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
-                      </div>
-                      <div>
-                        {/* <IconButton
+    if (activityArray.length > 0) {
+      return (
+        <Menu
+          open={Boolean(notificationAnchor)}
+          anchorEl={notificationAnchor}
+          onClose={() => setNotificationAnchor(null)}
+          id="activityHolder">
+          {activityArray.length > 0 ? (
+            <InfiniteScroll
+              dataLength={activityArray.length}
+              hasMore={hasMoreUnreadActivities}
+              next={getNotifications}
+              loader={null}
+              scrollableTarget="activityHolder">
+              <div className="lmNotification">
+                <div className="title">Notification</div>
+                {activityArray.map((activity: IActivity) => {
+                  return (
+                    <div
+                      key={activity.Id}
+                      className="customMenuItem"
+                      onClick={() => handleNotification(activity)}
+                      style={{
+                        background: activity.isRead ? 'none' : '#e8e8e8'
+                      }}>
+                      <div className="notificationIist">
+                        <div className="notiImg">
+                          {setUserImage(userMap[activity.actionBy[activity.actionBy.length - 1]])}
+                        </div>
+                        <div>
+                          <div
+                            className="lmNoti"
+                            dangerouslySetInnerHTML={{
+                              __html: convertTextToHTML(activity.activityText).innerHTML
+                            }}></div>
+                          <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
+                        </div>
+                        <div>
+                          {/* <IconButton
                           onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                             setMenuAnchor(e.currentTarget)
                           }>
                           <MoreVertIcon />
                         </IconButton> */}
-                      </div>
+                        </div>
 
-                      <Menu
-                        open={Boolean(menuAnchor)}
-                        onClose={() => setMenuAnchor(null)}
-                        anchorEl={menuAnchor}
-                        className="menu-block">
-                        <div className="menu-block-item">Remove this notification</div>
-                        <div className="menu-block-item">Mute this notification</div>
-                      </Menu>
+                        <Menu
+                          open={Boolean(menuAnchor)}
+                          onClose={() => setMenuAnchor(null)}
+                          anchorEl={menuAnchor}
+                          className="menu-block">
+                          <div className="menu-block-item">Remove this notification</div>
+                          <div className="menu-block-item">Mute this notification</div>
+                        </Menu>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            </InfiniteScroll>
+          ) : (
+            <div className="lmNoNotification noNotifications">
+              <img src={noNotification} alt="default image" />
+              Oops! You do not have any no notifications yet.
             </div>
-          </InfiniteScroll>
-        ) : (
-          <div className="lmNoNotification">
+          )}
+        </Menu>
+      );
+    } else {
+      return (
+        <Menu
+          open={Boolean(notificationAnchor)}
+          anchorEl={notificationAnchor}
+          onClose={() => setNotificationAnchor(null)}
+          slotProps={{
+            paper: {
+              style: {
+                transform: 'translateX(-0%)'
+              }
+            }
+          }}
+          id="activityHolder">
+          <div className="lmNoNotification noNotifications">
             <img src={noNotification} alt="default image" />
             Oops! You do not have any no notifications yet.
           </div>
-        )}
-      </Menu>
-    );
+        </Menu>
+      );
+    }
   }
   return (
     <div className="headerWrapper">

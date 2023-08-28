@@ -13,6 +13,7 @@ import './../assets/css/post-footer.css';
 import './../assets/css/comments.css';
 import overflowIcon from '../assets/images/commentOverflowMenuIconShape.png';
 import commentLikes from '../assets/images/commentLikes.png';
+import commentLikesFilled from '../assets/images/commentLikesFilled.png';
 // import './../assets/css/post-footer.css';
 import {
   TagInfo,
@@ -81,7 +82,7 @@ const PostComents: React.FC<CommentProps> = ({
     if (isLiked) {
       return (
         <img
-          src={commentLikes}
+          src={commentLikesFilled}
           alt="like button"
           style={{
             verticalAlign: 'bottom'
@@ -248,7 +249,8 @@ const PostComents: React.FC<CommentProps> = ({
               onClick={handleMenuClick}
               style={{
                 width: '196px',
-                padding: '1rem'
+                padding: '1rem',
+                cursor: 'pointer'
                 // boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
               }}>
               {item.title}

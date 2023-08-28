@@ -6,49 +6,60 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { IPost, IUser } from 'likeminds-sdk';
 import { lmFeedClient } from '../..';
 import AllMembers from '../AllMembers';
+import { SHOW_SNACKBAR } from '../../services/feedModerationActions';
 interface PostDetailsProps {
   callBack: ((action: string, index: number, value: any) => void) | null;
   feedArray: IPost[];
   users: { [key: string]: IUser };
+  rightSidebarHandler: (action: string, value: any) => void;
 }
 interface UseParamsProps {
   index: number;
   user: IUser;
   post: IPost;
 }
-function PostDetails({ callBack, feedArray, users }: PostDetailsProps) {
+function PostDetails({ callBack, feedArray, rightSidebarHandler }: PostDetailsProps) {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
-  if (!location.state) {
-    return null;
-  }
-  const { index = 0 } = location.state;
+
   const [post, setPost] = useState<IPost | null>(null);
   const [user, setUser] = useState<null | IUser>(null);
+  const [index, setIndex] = useState<number | null>(null);
   useEffect(() => {
     async function setPostDetails() {
       try {
-        console.log(params);
-        let newPost: any = feedArray.find((post: IPost) => post.Id === params.postId);
-
+        console.log(location);
+        let newPostIndex: any = feedArray.findIndex((post: IPost) => post.Id === params.postId);
+        let newPost: any;
+        setIndex(newPostIndex);
         const resp: any = await lmFeedClient.getPostDetails(params.postId!, 1);
         newPost = resp.data.post;
-
+        console.log(newPost);
         setPost(newPost!);
         setUser(resp.data.users[newPost.uuid]);
       } catch (error) {
-        console.log(error);
+        navigate('/');
+        callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
       }
     }
-    setPostDetails();
+    console.log(location.pathname.split('/')[1]);
+    if (location.pathname.split('/')[2] === params.postId) {
+      setPostDetails();
+    }
   }, [params]);
-  if (!post && !user) {
+  if (!post || !user) {
     return null;
   }
   return (
     <div>
-      <div className="lmWrapper">
+      <div
+        className="lmWrapper"
+        id="postDetailsContainer"
+        style={{
+          maxHeight: '100%',
+          overflowY: 'auto'
+        }}>
         <div
           style={{
             flexGrow: 1
@@ -68,7 +79,13 @@ function PostDetails({ callBack, feedArray, users }: PostDetailsProps) {
           </div>
           <div className="lmWrapper__feed">
             <div className="postDetailsContentWrapper">
-              <Post index={index} feedModerationHandler={callBack!} post={post!} user={user!} />
+              <Post
+                index={index!}
+                feedModerationHandler={callBack!}
+                post={post!}
+                user={user!}
+                rightSidebarHandler={rightSidebarHandler}
+              />
             </div>
           </div>
         </div>

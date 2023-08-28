@@ -14,14 +14,17 @@ import {
   EDIT_POST,
   LIKE_POST,
   SAVE_POST,
+  SHOW_COMMENTS_LIKES_BAR,
+  SHOW_POST_LIKES_BAR,
   SHOW_SNACKBAR
 } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
 import AllMembers from '../../components/AllMembers';
 import LMFeedClient from '@likeminds.community/feed-js-beta';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import PostDetails from '../../components/post-details';
+import PostLikesList from '../../components/PostLikesList';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
 }
@@ -36,6 +39,11 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [tempPost, setTempPost] = useState<IPost | null>(null);
   const [pageCount, setPageCount] = useState<number>(1);
+  const [sideBar, setSideBar] = useState<any>(null);
+  useEffect(() => {
+    rightSidebarhandler('', null);
+  }, []);
+  const navigate = useNavigate();
   const getFeeds = async (pgNo: number) => {
     let feeds = await lmFeedClient.fetchFeed(pageCount);
     if (!feeds) {
@@ -99,6 +107,36 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         return null;
     }
   }
+  function rightSidebarhandler(action: string, value: any) {
+    switch (action) {
+      case SHOW_POST_LIKES_BAR: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+          />
+        );
+        break;
+      }
+      case SHOW_COMMENTS_LIKES_BAR: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+          />
+        );
+        break;
+      }
+      default:
+        setSideBar(<AllMembers />);
+    }
+  }
   // function setHeader() {
   //   switch (user) {
   //     case null:
@@ -148,6 +186,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                       user={usersMap[post.uuid]}
                       feedModerationHandler={feedModerationLocalHandler}
                       index={index}
+                      rightSidebarHandler={rightSidebarhandler}
                     />
                   );
                 })}
@@ -155,9 +194,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 {/* Post */}
               </InfiniteScroll>
             </div>
-            <div className="lmWrapper__allMembers">
-              <AllMembers />
-            </div>
+            <div className="lmWrapper__allMembers">{sideBar}</div>
           </div>
         );
     }
@@ -207,22 +244,23 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     return () => document.removeEventListener('NOTIFICATION', handleNotificationAction);
   });
   async function handleNotificationAction(e: any) {
-    let postId = e.detail;
-    try {
-      const resp: any = await lmFeedClient.getPostDetails(postId, 1);
-      const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
-      if (doesPostExistInArray) {
-        const index = feedPostsArray.findIndex((feed: IPost) => feed.Id === postId);
-        const post = { ...feedPostsArray[index] };
-        feedPostsArray.splice(index, 1);
-        setFeedPostsArray([post, ...feedPostsArray]);
-        return;
-      }
-      setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
-      setUsersMap({ ...usersMap, ...resp.data.users });
-    } catch (error) {
-      console.log(error);
-    }
+    navigate(`/post/${e.detail}`);
+    // let postId = e.detail;
+    // try {
+    //   const resp: any = await lmFeedClient.getPostDetails(postId, 1);
+    //   const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
+    //   if (doesPostExistInArray) {
+    //     const index = feedPostsArray.findIndex((feed: IPost) => feed.Id === postId);
+    //     const post = { ...feedPostsArray[index] };
+    //     feedPostsArray.splice(index, 1);
+    //     setFeedPostsArray([post, ...feedPostsArray]);
+    //     return;
+    //   }
+    //   setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
+    //   setUsersMap({ ...usersMap, ...resp.data.users });
+    // } catch (error) {
+    //   console.log(error);
+    // }
   }
   return (
     <UserContext.Provider
@@ -239,6 +277,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
           element={
             <div className="main">
               <PostDetails
+                rightSidebarHandler={rightSidebarhandler}
                 callBack={feedModerationLocalHandler}
                 feedArray={feedPostsArray}
                 users={usersMap}
