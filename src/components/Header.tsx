@@ -5,7 +5,7 @@ import './../assets/css/header.css';
 import { Badge, CircularProgress, IconButton, Menu, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { lmFeedClient } from '..';
-import { IActivity, IUser } from '@likeminds.community/feed-js-beta';
+import { IActivity, IUser } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import noNotification from '../assets/images/default.svg';
 import dayjs from 'dayjs';

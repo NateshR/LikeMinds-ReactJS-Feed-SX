@@ -4,7 +4,7 @@ import '../createPost/createPostDialog.css';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { Attachment, AttachmentMeta, IPost } from '@likeminds.community/feed-js-beta';
+import { Attachment, AttachmentMeta, IPost } from '@likeminds.community/feed-js';
 import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
 

@@ -3,7 +3,7 @@ import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { IPost, IUser } from '@likeminds.community/feed-js-beta';
+import { IPost, IUser } from '@likeminds.community/feed-js';
 import { lmFeedClient } from '../..';
 import AllMembers from '../AllMembers';
 import { SHOW_SNACKBAR } from '../../services/feedModerationActions';

@@ -7,7 +7,7 @@ import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 import { lmFeedClient } from '..';
 import { Dialog } from '@mui/material';
 import UserContext from '../contexts/UserContext';
-import { IPost } from '@likeminds.community/feed-js-beta';
+import { IPost } from '@likeminds.community/feed-js';
 interface CreateFeedProps {
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
   feedArray: IPost[];
