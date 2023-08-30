@@ -1,0 +1,15 @@
+.image-container {
+    max-width: 100%; /* Ensure the container doesn't exceed its parent's width */
+    /* Set initial height to 0 to maintain aspect ratio */
+   /* padding-bottom: 75%;  75% represents the aspect ratio (height / width) */
+    /* Establish a positioning context for absolute positioning */
+   ; /* Hide any overflowing image parts */
+  }
+  
+  .image-container img {
+   /* Position the image absolutely within the container */
+    /* Ensure the image covers the entire container */
+ /* Ensure the image covers the entire container */
+    /* Scale and crop the image to cover the container */
+  }
+  

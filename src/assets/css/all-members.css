@@ -1,0 +1,54 @@
+.allMembers{
+    height: 100%;
+    width: 360px;
+    border-left: 1px solid rgba(218, 225, 238, 1);
+}
+.allMembers__header{
+padding: 1.5rem 1rem; 
+border-bottom: 1px solid rgba(218, 225, 238, 1);
+font-weight: 500;
+font-size: 1rem;
+color: #484f67;
+}
+.memberTile{
+    color: #484f67;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+/* .memberTile:hover{
+    background-color:  #E6EBF5;
+} */
+.memberTile__image{
+    height: 48px;
+    width: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.memberTile__profile{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 1;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap; /* Prevent content from wrapping */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Display ellipsis (...) for overflow */
+}
+.memberTile:hover{
+    background-color: rgba(230, 235, 245, 1);
+}
+.noMemberSkeletonContainer{
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    min-width: 360px;
+}
+.textContentSkeleton{
+    flex-grow: 1;
+    padding: 0.5rem 1rem;;
+}
