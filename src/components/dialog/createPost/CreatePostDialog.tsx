@@ -6,7 +6,7 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost, IUser } from '@likeminds.community/feed-js-beta';
+import { IPost, IUser } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface CreatePostDialogProps {

@@ -1,4 +1,4 @@
-import { IMemberState } from '@likeminds.community/feed-js-beta';
+import { IMemberState } from '@likeminds.community/feed-js';
 import React from 'react';
 const UserContext = React.createContext<UserContextInterface>({
   user: null,

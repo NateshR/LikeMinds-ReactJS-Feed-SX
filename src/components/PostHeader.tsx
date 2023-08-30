@@ -10,7 +10,7 @@ import { lmFeedClient } from '..';
 import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
 import UserContext from '../contexts/UserContext';
 import EditPost from './dialog/editPost/EditPost';
-import { IPost, IMenuItem } from '@likeminds.community/feed-js-beta';
+import { IPost, IMenuItem } from '@likeminds.community/feed-js';
 import ReportPostDialogBox from './ReportPost';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DeleteDialog from './DeleteDialog';
