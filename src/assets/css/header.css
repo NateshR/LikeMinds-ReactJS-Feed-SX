@@ -1,0 +1,111 @@
+.headerWrapper{
+    display: flex;
+}
+.headerWrapper--notification{
+    text-align: right;
+}
+.headerWrapper--notification{
+    text-align: right;
+    flex-grow: 1;
+}
+
+.lmNotification{ 
+    padding: 5px 0rem;
+}
+
+.lmNotification .title{
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 24px;
+    padding: 0px 1rem;
+}
+.lmNotification .notificationIist{
+    margin: 1px 0 0 0;
+    display: flex; 
+    padding: 10px 1rem;
+    align-items: center;
+    position: relative;
+    width: 100%
+}
+
+.lmNotification .notificationIist .menu-block{
+    background-color: #fff;
+    position: absolute;
+    padding: 10px;
+    right: 100%;
+    top: 100%
+}
+.menu-block-item{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    padding: 10px;
+    color: #484F67;
+}
+.menu-block-item:hover{
+    cursor: pointer;
+    background-color: #f0f0f0;
+}
+.lmNotification .notificationIist:hover{
+    background: rgba(230, 235, 245, 1);
+    cursor: pointer;
+}
+.lmNotification .notificationIist .notiImg{
+    height: 48px;
+    width: 48px;
+    border-radius: 50%;
+    background-color: #f4f4f4;
+    margin: 0 1rem 0 0;
+}
+.lmNotification .notificationIist .lmNoti{
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #484F67;
+    max-width: 325px;
+    margin-bottom: 5px;
+    -webkit-line-clamp: 2;
+    /* autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+}
+
+.lmNotification .notificationIist .lmNoti a{
+    color: #484F67;
+    text-decoration: none;
+    font-weight: 500;
+}
+ 
+
+.lmNoNotification{
+    display: flex;
+    height: 400px;
+    width: 100%;
+    /* max-width: 270px; */
+    justify-content: center;
+    align-items: center;
+    color: rgb(69 76 99 / 70%);
+    font-size: 14px;
+    font-weight: 390;
+    text-align: center;
+    flex-direction: column;
+    padding: 0 1rem;
+    /* transform: translateX(-50%); */
+}
+
+.lmNoNotification img{
+    margin-bottom: 20px;
+}
+
+.notiTime{
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(72, 79, 103, 0.5);
+}
+.noNotifications{
+    width: 422px;
+    /* max-width: unset; */
+}

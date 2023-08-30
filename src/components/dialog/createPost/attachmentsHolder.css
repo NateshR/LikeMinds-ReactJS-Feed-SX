@@ -1,0 +1,231 @@
+.attachmentHolder {
+  margin: 0 0 20px 0;
+  display: flex; 
+  width: 100%;
+  height: auto;
+  max-height: 194px;
+}
+.attachmentHolder__imgBlock {
+  border-radius: 0.5rem;
+  flex-grow: 1;
+  text-align: center;
+  margin: 0.25rem;
+}
+.attachmentHolder__imgBlock > img {
+  margin: auto;
+  width: 100%;
+}
+.attachmentHolder__singleBlock{
+    height: 300px;
+    width: 100%;
+    text-align: center;
+    background-color: #f9f9f9;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.attachmentHolder__singleBlock > div {
+  max-height: 100%;
+  background-color: rgba(35, 32, 32, 0.5);
+  margin: 0;
+}
+.attachmentHolder__imgBlock > img {
+  
+  height: 100%;
+  width: auto;
+}
+.attachmentHolder__addMoreButton {
+  color: #5046e5;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #5046e5;
+  border-radius: 0.5rem;
+  background-color: white;
+  height: 40px;
+  width: 114px;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+.attachmentHolder__addMoreButton > svg {
+  margin-right: 0.25rem;
+}
+
+input[type='file'] {
+  display: none;
+}
+
+.initiateMediaUploadBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  height: 194px;
+  width: 100%;
+  background-color: #f7f9fc;
+  border: 1px solid #e6ebf5;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.initiateMediaUploadBox--closeIcon {
+  position: absolute;
+  top: 1rem;
+  right: 2rem;
+  cursor: pointer;
+  
+}
+.initiateMediaUploadBox--headingOne {
+  font-weight: 400;
+  line-height: 1.25rem;
+  font-size: 1rem;
+  color: #484f67;
+  margin: 10px 0 0 0;
+}
+.initiateMediaUploadBox--headingTwo {
+  font-weight: 400;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  color: rgba(72, 79, 103, 0.5);
+  margin: 0;
+}
+.initiateMediaUploadBox > input[type='file'] {
+  display: none;
+}
+
+.holderWithCrossContainer {
+  position: relative;
+  border: 1px solid #e6ebf5;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
+.holderWithCrossContainer--closeIcon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+}
+.documentAttachmentWrapperContainer {
+  width: 100%
+}
+.documentAttachmentContainer {
+  max-height: 220px;
+  width: 100%;
+  overflow-y: scroll;
+}
+.documentAttachmentContainer--addMoreContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+.documentAttachmentContainer--addMoreContainer > span {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  color: #484f67;
+  margin: 0px 0.25rem;
+}
+.attachedDocumentWrapper {
+  height: 72px;
+  display: flex;
+  align-items: center;
+}
+.attachedDocumentWrapper > span {
+  padding: 1rem;
+}
+
+.attachedDocumentWrapper--attachmentBody {
+  max-width: 75%;
+  overflow-x: hidden;
+  flex-grow: 1;
+  padding: 1rem 0px;
+}
+
+.attachedDocumentWrapper__attachmentBody--headingMain {
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 20px;
+  color: #484f67;
+  margin: 0px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attachedDocumentWrapper__attachmentBody--headingSub{
+  margin: 0px;
+  font-size: 0.75rem;
+  color: #484f67;
+}
+
+.ogTagPreviewContainer{ 
+height: 355px;
+width: 100%;
+}
+.ogTagPreviewContainer--wrapper{
+border: 1px solid #e6ebf5;
+border-radius: 0.5rem;
+}
+
+.ogTagPreviewContainer__wrapper--imageWrapper{
+  height: 216px;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+}
+
+.ogTagPreviewContainer__wrapper--imageWrapper > img{
+  height: 100%;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ogTagPreviewContainer__wrapper--bodyWrapper{
+  padding: 1rem;
+  text-align: left;
+}
+
+.ogTagPreviewContainer__wrapper__bodyWrapper--title{
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  color: #484F67;
+  font-weight: 500;
+}
+
+.ogTagPreviewContainer__wrapper__bodyWrapper--description{
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: #484F67;
+}
+.postMediaAttachment{
+  /* height: 300px; */
+  width: 100%;
+  height: auto
+}
+.postMediaAttachment--image {
+  object-position: center;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  background-position: 50%;
+  background-size: cover;
+  color: #000;
+}
+.carousel .slider-wrapper.axis-horizontal .slider {
+  align-items: center;
+}
+.postMediaAttachment--video {
+  display: block;
+  max-width: 100%;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  margin-right: auto;
+  margin-left: auto;
+}
