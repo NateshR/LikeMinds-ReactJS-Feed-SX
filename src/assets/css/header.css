@@ -25,6 +25,7 @@
     padding: 10px 1rem;
     align-items: center;
     position: relative;
+    width: 100%
 }
 
 .lmNotification .notificationIist .menu-block{
@@ -83,7 +84,7 @@
     display: flex;
     height: 400px;
     width: 100%;
-    max-width: 270px;
+    /* max-width: 270px; */
     justify-content: center;
     align-items: center;
     color: rgb(69 76 99 / 70%);
@@ -92,6 +93,7 @@
     text-align: center;
     flex-direction: column;
     padding: 0 1rem;
+    /* transform: translateX(-50%); */
 }
 
 .lmNoNotification img{
@@ -102,4 +104,8 @@
     font-size: 14px;
     line-height: 20px;
     color: rgba(72, 79, 103, 0.5);
+}
+.noNotifications{
+    width: 422px;
+    /* max-width: unset; */
 }

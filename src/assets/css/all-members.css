@@ -1,5 +1,7 @@
 .allMembers{
     height: 100%;
+    width: 360px;
+    border-left: 1px solid rgba(218, 225, 238, 1);
 }
 .allMembers__header{
 padding: 1.5rem 1rem; 
@@ -15,6 +17,7 @@ color: #484f67;
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 /* .memberTile:hover{
     background-color:  #E6EBF5;
@@ -31,5 +34,21 @@ color: #484f67;
     justify-content: flex-start;
     align-items: center;
     flex-grow: 1;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap; /* Prevent content from wrapping */
+    overflow: hidden; /* Hide overflowing content */
+    text-overflow: ellipsis; /* Display ellipsis (...) for overflow */
+}
+.memberTile:hover{
+    background-color: rgba(230, 235, 245, 1);
+}
+.noMemberSkeletonContainer{
+    display: flex;
+    align-items: center;
     padding: 0.5rem 1rem;
+    min-width: 360px;
+}
+.textContentSkeleton{
+    flex-grow: 1;
+    padding: 0.5rem 1rem;;
 }

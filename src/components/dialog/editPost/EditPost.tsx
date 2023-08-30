@@ -4,7 +4,9 @@ import '../createPost/createPostDialog.css';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { Attachment, AttachmentMeta, IPost } from 'likeminds-sdk';
+import { Attachment, AttachmentMeta, IPost } from '@likeminds.community/feed-js-beta';
+import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -64,7 +66,7 @@ export function findSpaceAfterIndex(str: string, index: number): number {
 
 export function checkAtSymbol(str: string, index: number): number {
   if (index < 0 || index >= str.length) {
-    throw new Error('Invalid index');
+    return -1;
   }
   let pos = -1;
   for (let i = index; i >= 0; i--) {
@@ -129,7 +131,7 @@ const EditPost = ({
       );
     }
   }
-  const [text, setText] = useState<string>('');
+  const [text, setText] = useState<string>(post?.text!);
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
   const [showInitiateUploadComponent, setShowInitiateUploadComponent] = useState<boolean>(false);
   const [imageOrVideoUploadArray, setImageOrVideoUploadArray] = useState<any>([]);
@@ -138,10 +140,30 @@ const EditPost = ({
   const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
   const [previewOGTagData, setPreviewOGTagData] = useState<any>([]);
   const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
+  const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [limits, setLimits] = useState<Limits>({
     left: 0,
     right: 0
   });
+  function setToEndOfContent(element: HTMLDivElement): void {
+    if (element.contentEditable === 'true') {
+      const range = document.createRange();
+      const selection = window.getSelection();
+
+      if (selection) {
+        const lastChild = element.lastChild;
+        const lastNode =
+          lastChild instanceof Text ? lastChild : element.appendChild(document.createTextNode(''));
+
+        range.setStart(lastNode, lastNode.length);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+  }
+
   useEffect(() => {
     const attachments = post?.attachments;
     if (!attachments?.length) {
@@ -175,6 +197,7 @@ const EditPost = ({
                 .seturl(item.attachmentMeta.url!)
                 .setsize(item.attachmentMeta.size!)
                 .setname(item.attachmentMeta.name!)
+                .setformat('document/pdf')
                 .build()
             )
             .build()
@@ -195,8 +218,9 @@ const EditPost = ({
     setPreviewOGTagData(newOGTagArray);
   }, [post, feedArray]);
   const [tagString, setTagString] = useState<string | null>(null);
-  const [taggingMemberList, setTaggingMemberList] = useState<any[] | null>(null);
+  const [taggingMemberList, setTaggingMemberList] = useState<any[]>([]);
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (contentEditableDiv.current) {
       contentEditableDiv.current.innerHTML = convertTextToHTML(post?.text!).innerHTML;
@@ -279,20 +303,20 @@ const EditPost = ({
       return undefined;
     }
     const cursorPosition = getCaretPosition();
-    // // console.log ("the cursor position is: ", cursorPosition)
+    // // ("the cursor position is: ", cursorPosition)
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
     if (leftLimit === -1) {
       setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
     }
     const rightLimit = findSpaceAfterIndex(str, cursorPosition - 1);
-    // // console.log ("the right limit is :", rightLimit)
+    // // ("the right limit is :", rightLimit)
     const substr = str.substring(leftLimit, rightLimit + 1);
     setLimits({
       left: leftLimit,
       right: rightLimit
     });
-
+    setTaggingPageCount(1);
     return {
       tagString: substr,
       limitLeft: leftLimit,
@@ -320,9 +344,11 @@ const EditPost = ({
   async function postFeed() {
     try {
       let textContent = extractTextFromNode(contentEditableDiv.current);
+      textContent.trim();
       if (textContent === PLACE_HOLDER_TEXT) {
         textContent = '';
       }
+
       closeDialogBox();
       let response: any;
 
@@ -342,7 +368,11 @@ const EditPost = ({
         }
         return item;
       });
-      response = await lmFeedClient.editPost(post?.Id!, textContent);
+      response = await lmFeedClient.editPost(post?.Id!, textContent, [
+        ...imageOrVideoUploadArray,
+        ...documentUploadArray,
+        ...previewOGTagData
+      ]);
       const newpost: IPost = response?.data?.post;
       const newFeedArray = [...feedArray];
       const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
@@ -352,20 +382,20 @@ const EditPost = ({
       lmFeedClient.logError(error);
     }
   }
-  async function checkForOGTags() {
+  async function checkForOGTags(ogTagLinkArray: string[]) {
     try {
       const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
-      // console.log (ogTagLinkArray);
+      // (ogTagLinkArray);
       if (ogTagLinkArray.length) {
         const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
-        // console.log ('the og tag call is :', getOgTag);
+        // ('the og tag call is :', getOgTag);
         setPreviewOGTagData(getOgTag);
         if (!hasPreviewClosedOnce) {
           setShowOGTagPreview(true);
         }
       }
     } catch (error) {
-      // console.log (error);
+      // (error);
     }
   }
   function closeDialogBox() {
@@ -382,6 +412,9 @@ const EditPost = ({
         textContent = textContent.substring(1);
         const id = node.getAttribute('id');
         return `<<${textContent}|route://user_profile/${id}>>`;
+      } else if (node.nodeName === 'BR') {
+        // Handle <br> tag
+        return '\n'; // Add a new line
       } else {
         let text = '';
         const childNodes = node.childNodes;
@@ -390,7 +423,7 @@ const EditPost = ({
           text += extractTextFromNode(childNode);
         }
 
-        return text;
+        return '\n' + text;
       }
     } else {
       return '';
@@ -399,7 +432,11 @@ const EditPost = ({
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
-      checkForOGTags();
+      const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
+      if (!text.includes(ogTagLinkArray[0])) {
+        ogTagLinkArray.splice(0, 1);
+      }
+      checkForOGTags(ogTagLinkArray);
     }, 500);
     if (contentEditableDiv && contentEditableDiv.current) {
       if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
@@ -410,17 +447,22 @@ const EditPost = ({
       clearTimeout(timeOut);
     };
   }, [text]);
+  const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
   async function getTags() {
     if (tagString === undefined || tagString === null) {
       return;
     }
-    const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
+    const tagListResponse = await lmFeedClient.getTaggingList(tagString, taggingPageCount);
     const memberList = tagListResponse?.data?.members;
     if (memberList && memberList.length > 0) {
-      setTaggingMemberList(memberList);
-    } else {
-      setTaggingMemberList(null);
+      if (taggingPageCount === 1) {
+        setTaggingMemberList([...memberList]);
+      } else {
+        setTaggingMemberList([...taggingMemberList].concat([...memberList]));
+      }
+
+      setTaggingPageCount(taggingPageCount + 1);
     }
   }
   useEffect(() => {
@@ -432,6 +474,9 @@ const EditPost = ({
       getTags();
     }, 500);
     return () => {
+      setTaggingMemberList([]);
+      setTaggingPageCount(1);
+      setLoadMoreTaggingUsers(true);
       clearTimeout(timeout);
     };
   }, [tagString]);
@@ -457,6 +502,11 @@ const EditPost = ({
       document.removeEventListener('click', handleClickOutside);
     };
   }, [contentEditableDiv]);
+  useEffect(() => {
+    if (contentEditableDiv && contentEditableDiv.current) {
+      setToEndOfContent(contentEditableDiv.current);
+    }
+  }, [contentEditableDiv.current]);
   function setTagUserImage(user: any) {
     const imageLink = user?.imageUrl;
     if (imageLink !== '') {
@@ -473,12 +523,13 @@ const EditPost = ({
       );
     } else {
       return (
-        <span
+        <div
           style={{
+            minWidth: '36px',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            display: 'inline-flex',
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#5046e5',
@@ -490,14 +541,102 @@ const EditPost = ({
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
-        </span>
+        </div>
       );
     }
   }
   return (
     // <div className="create-post-feed-dialog-wrapper">
-    <div>
-      <div className="create-post-feed-dialog-wrapper--container">
+    <div
+      style={{
+        position: 'relative'
+      }}>
+      {taggingMemberList && taggingMemberList?.length > 0 ? (
+        <div
+          className="taggingBox"
+          id="scrollableTaggingContainer"
+          style={returnCSSForTagging(containerRef)}>
+          <InfiniteScroll
+            loader={null}
+            hasMore={loadMoreTaggingUsers}
+            next={getTags}
+            dataLength={taggingMemberList.length}
+            scrollableTarget="scrollableTaggingContainer">
+            {taggingMemberList?.map!((item: any) => {
+              return (
+                <button
+                  key={item?.id.toString() + Math.random().toString()}
+                  className="taggingTile"
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    let focusNode = window.getSelection()!.focusNode;
+                    if (focusNode === null) {
+                      return;
+                    }
+
+                    let div = focusNode.parentElement;
+                    let text = div!.childNodes;
+                    if (focusNode === null || text.length === 0) {
+                      return;
+                    }
+
+                    let textContentFocusNode = focusNode.textContent;
+                    if (textContentFocusNode === null) {
+                      return;
+                    }
+
+                    let tagOp = findTag(textContentFocusNode);
+
+                    // ('the tag string is ', tagOp!.tagString);
+                    if (tagOp === undefined) return;
+
+                    const { limitLeft, limitRight } = tagOp;
+
+                    let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+
+                    let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+
+                    let textNode1 = document.createTextNode(textNode1Text);
+                    let anchorNode = document.createElement('a');
+                    anchorNode.id = item?.id;
+                    anchorNode.href = '#';
+                    anchorNode.textContent = `@${item?.name.trim()}`;
+                    anchorNode.contentEditable = 'false';
+                    let textNode2 = document.createTextNode(textNode2Text);
+                    const dummyNode = document.createElement('span');
+                    div!.replaceChild(textNode2, focusNode);
+
+                    div!.insertBefore(anchorNode, textNode2);
+                    div!.insertBefore(dummyNode, anchorNode);
+                    div!.insertBefore(textNode1, dummyNode);
+                    // setTaggingMemberList([]);
+                    anchorNode.focus();
+                    setCursorAtEnd(contentEditableDiv);
+                  }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                    {setTagUserImage(item)}
+                    <div
+                      style={{
+                        padding: '0px 0.5rem',
+                        textTransform: 'capitalize',
+                        overflowY: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                      {item?.name}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </InfiniteScroll>
+        </div>
+      ) : null}
+      <div className="create-post-feed-dialog-wrapper--container" ref={containerRef}>
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
           onClick={closeDialogBox}>
@@ -515,7 +654,7 @@ const EditPost = ({
         </span>
         <div className="create-post-feed-dialog-wrapper_container--post-wrapper">
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
-            <span>Edit Post</span>
+            <p>Edit Post</p>
           </div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
@@ -578,64 +717,10 @@ const EditPost = ({
                 let tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
+                } else {
+                  setTagString(null);
                 }
               }}></div>
-            {taggingMemberList && taggingMemberList?.length > 0 ? (
-              <div className="taggingBox">
-                {taggingMemberList?.map!((item: any) => {
-                  return (
-                    <button
-                      key={item?.id}
-                      className="postTaggingTile"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
-                        if (focusNode === null) {
-                          return;
-                        }
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
-                        if (focusNode === null || text.length === 0) {
-                          return;
-                        }
-                        let textContentFocusNode = focusNode.textContent;
-                        if (textContentFocusNode === null) {
-                          return;
-                        }
-                        let tagOp = findTag(textContentFocusNode);
-                        if (tagOp === undefined) return;
-                        let substr = tagOp?.tagString;
-                        const { limitLeft, limitRight } = tagOp;
-                        // if (!substr || substr.length === 0) {
-                        //   return;
-                        // }
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
-
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
-                        anchorNode.id = item?.id;
-                        anchorNode.href = '#';
-                        anchorNode.textContent = `@${item?.name.trim()}`;
-                        anchorNode.contentEditable = 'false';
-                        let textNode2 = document.createTextNode(textNode2Text);
-                        div!.replaceChild(textNode2, focusNode);
-                        div!.insertBefore(anchorNode, textNode2);
-                        div!.insertBefore(textNode1, anchorNode);
-                        setTaggingMemberList([]);
-                      }}>
-                      {setTagUserImage(item)}
-                      <span
-                        style={{
-                          padding: '0px 0.5rem'
-                        }}>
-                        {item?.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
           </div>
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"

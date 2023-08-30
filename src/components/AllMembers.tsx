@@ -1,21 +1,37 @@
-import { IMember } from 'likeminds-sdk';
+import { IMember } from '@likeminds.community/feed-js-beta';
 import React, { useEffect, useState } from 'react';
 import { lmFeedClient } from '..';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { Skeleton } from '@mui/material';
 
 function AllMembers() {
   const [allMembersArray, setAllMembersArray] = useState<IMember[]>([]);
-  const [pageCount, setPageCount] = useState<number>(1);
+  const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [totalMembers, setTotalMembers] = useState<number>(0);
+
   useEffect(() => {
-    getAllMembers();
+    getAllMembersThrice();
   }, []);
+  async function getAllMembersThrice() {
+    try {
+      const responseOne: any = await lmFeedClient.getAllMembers(1);
+      const responseTwo: any = await lmFeedClient.getAllMembers(2);
+      const responseThree: any = await lmFeedClient.getAllMembers(3);
+      const membersArrayOne: IMember[] = responseOne?.data?.members;
+      const membersArrayTwo: IMember[] = responseTwo?.data?.members;
+      const membersArrayThree: IMember[] = responseThree?.data?.members;
+      setTotalMembers(responseOne?.data?.totalMembers);
+      setAllMembersArray([...membersArrayOne, ...membersArrayTwo, ...membersArrayThree]);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async function getAllMembers() {
     try {
       const response: any = await lmFeedClient.getAllMembers(pageCount);
-      const membersArray: IMember[] = response.data.members;
+      const membersArray: IMember[] = response?.data?.members;
       if (!membersArray.length) {
         setLoadMore(false);
         return;
@@ -79,13 +95,41 @@ function AllMembers() {
       );
     });
   }
+  function renderComponent() {
+    switch (allMembersArray.length) {
+      case 0:
+        return Array(30)
+          .fill(0)
+          .map((value: number, index: number) => {
+            return (
+              <div className="noMemberSkeletonContainer" key={(Math.random() + index).toString()}>
+                <Skeleton variant="circular" width={40} height={40} />
+                <div className="textContentSkeleton">
+                  <Skeleton variant="text" width={'80%'} />
+                </div>
+              </div>
+            );
+          });
+      default:
+        return renderMembersList();
+    }
+  }
   return (
     <div className="allMembers">
-      <div className="allMembers__header">
-        Members {'('}
-        {totalMembers}
-        {')'}
-      </div>
+      {allMembersArray.length ? (
+        <div className="allMembers__header">
+          Members {'('}
+          {totalMembers}
+          {')'}
+        </div>
+      ) : (
+        <div className="noMemberSkeletonContainer">
+          <Skeleton variant="circular" width={40} height={40} />
+          <div className="textContentSkeleton">
+            <Skeleton variant="text" width={'80%'} />
+          </div>
+        </div>
+      )}
       <div className="allMembers__list" id="allMembersScrollWrapper">
         <InfiniteScroll
           loader={null}
@@ -93,7 +137,7 @@ function AllMembers() {
           dataLength={allMembersArray.length}
           next={getAllMembers}
           scrollableTarget="allMembersScrollWrapper">
-          {renderMembersList()}
+          {renderComponent()}
         </InfiniteScroll>
       </div>
     </div>

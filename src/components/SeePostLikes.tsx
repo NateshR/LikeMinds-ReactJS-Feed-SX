@@ -73,10 +73,18 @@ function SeePostLikes({ entityId, onClose, likesCount, entityType, commentId }: 
       );
     }
   }
-  500;
   useEffect(() => {
     getLikes();
   }, []);
+  useEffect(() => {
+    likesArr;
+    return () => {
+      setLikesArray([]);
+    };
+  }, [entityId, commentId, entityType]);
+  useEffect(() => {
+    likesArr;
+  }, [likesArr]);
   return (
     <div className="lmPostLikesWrapper">
       <span

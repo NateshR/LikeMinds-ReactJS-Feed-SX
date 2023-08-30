@@ -8,17 +8,24 @@ import React from 'react';
 import PostHeader from './PostHeader';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
-import { IPost, IUser } from 'likeminds-sdk';
+import { IPost, IUser } from '@likeminds.community/feed-js-beta';
 
 interface PostProps {
   post: IPost;
   user: IUser;
   feedModerationHandler: (action: string, index: number, value: any) => void;
   index: number;
+  rightSidebarHandler: (action: string, value: any) => void;
 }
 const pattern = /<<.*?>>/g;
 
-const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index }) => {
+const Post: React.FC<PostProps> = ({
+  post,
+  user,
+  feedModerationHandler,
+  index,
+  rightSidebarHandler
+}) => {
   if (!user) {
     return null;
   }
@@ -38,6 +45,8 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
           feedModerationHandler={feedModerationHandler}
           index={index}
           uuid={post.uuid}
+          isPinned={post.isPinned}
+          isEdited={post.isEdited}
         />
         {/* post */}
         <PostBody
@@ -47,6 +56,7 @@ const Post: React.FC<PostProps> = ({ post, user, feedModerationHandler, index })
         />
         {/* footer */}
         <PostFooter
+          rightSidebarHandler={rightSidebarHandler}
           postId={post.Id}
           isLiked={post.isLiked}
           isPinned={post.isPinned}

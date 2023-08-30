@@ -10,8 +10,10 @@ import { lmFeedClient } from '..';
 import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
 import UserContext from '../contexts/UserContext';
 import EditPost from './dialog/editPost/EditPost';
-import { IPost, IMenuItem } from 'likeminds-sdk';
+import { IPost, IMenuItem } from '@likeminds.community/feed-js-beta';
 import ReportPostDialogBox from './ReportPost';
+import { useLocation, useNavigate } from 'react-router-dom';
+import DeleteDialog from './DeleteDialog';
 interface PostHeaderProps {
   imgUrl: string;
   username: string;
@@ -22,6 +24,8 @@ interface PostHeaderProps {
   index: number;
   feedModerationHandler: (action: string, index: number, value: any) => void;
   uuid: any;
+  isPinned: boolean;
+  isEdited: boolean;
 }
 const PostHeader: React.FC<PostHeaderProps> = ({
   username,
@@ -32,11 +36,20 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   postId,
   feedModerationHandler,
   index,
-  uuid
+  uuid,
+  isPinned,
+  isEdited
 }) => {
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
   const [postMenuOptions, setPostMenuOptions] = useState([...menuOptions]);
+  const [isPostPinned, setIsPostPinned] = useState<boolean>(isPinned);
+  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState<boolean>(false);
+  function closeDeleteDialog() {
+    setOpenDeleteConfirmationDialog(false);
+  }
+  const location = useLocation();
+  const navigate = useNavigate();
   function handleOpenMoreOptionsMenu(event: React.MouseEvent<HTMLElement>) {
     setMoreOptionsMenu(event.currentTarget);
   }
@@ -52,14 +65,22 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       .join(' ');
   }
   async function pinPost() {
+    setIsPostPinned(!isPostPinned);
     return await lmFeedClient.pinPost(postId);
   }
   async function unpinPost() {
+    setIsPostPinned(!isPostPinned);
     return await lmFeedClient.pinPost(postId);
   }
   async function deletePost() {
     feedModerationHandler(DELETE_POST, index, null);
-    return await lmFeedClient.deletePost(postId);
+    await lmFeedClient.deletePost(postId);
+    if (location.pathname.includes('/post')) {
+      navigate('/');
+    } else {
+      return;
+    }
+    // location.
   }
 
   function closeEditPostDialog() {
@@ -81,7 +102,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         await unpinPost();
         break;
       case '1':
-        await deletePost();
+        setOpenDeleteConfirmationDialog(true);
         break;
       case '5':
         await editPost();
@@ -133,7 +154,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     }
   }
   function setPinnedIcon() {
-    if (postMenuOptions.some((item: any) => item?.id === 3)) {
+    if (isPostPinned) {
       return (
         <div
           style={{
@@ -153,19 +174,30 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           </svg>
         </div>
       );
+    } else {
+      return null;
     }
   }
   return (
     <div className="lmWrapper__feed__post__header">
+      <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
+        <DeleteDialog onClose={closeDeleteDialog} deletePost={deletePost} type={1} />
+      </Dialog>
       <div className="lmWrapper__feed__post__header--profile">{setUserImage()}</div>
       <div className="lmWrapper__feed__post__header--info">
         <div className="title">
           {transformUsername(username)}
           {customTitle.length ? <span>Admin</span> : null}
         </div>
-        <div className="subTitle">
-          Post <span>{dayjs(createdAt).fromNow()}</span>
-        </div>
+        {isEdited ? (
+          <div className="subTitle edited">
+            <span>{dayjs(createdAt).fromNow()}</span> Edited
+          </div>
+        ) : (
+          <div className="subTitle nonEdited">
+            Post <span>{dayjs(createdAt).fromNow()}</span>
+          </div>
+        )}
       </div>
       <div
         className="lmWrapper__feed__post__header--menu"
@@ -179,7 +211,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           <MoreHorizIcon />
         </IconButton>
         <Menu
-          className="lmOverflowMenu"
+          // className="lmOverflowMenu"
           anchorEl={moreAnchorsMenu}
           open={Boolean(moreAnchorsMenu)}
           anchorOrigin={{
@@ -189,6 +221,10 @@ const PostHeader: React.FC<PostHeaderProps> = ({
           transformOrigin={{
             vertical: 'top',
             horizontal: 'right'
+          }}
+          sx={{
+            paddingY: '0px',
+            boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
           }}
           onClose={handleCloseMoreOptionsMenu}>
           {postMenuOptions?.map((menuItem: IMenuItem) => {

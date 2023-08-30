@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CreatePost from '../../components/CreatePost';
 import FeedFilter from '../../components/FeedFilter';
 import Post from '../../components/Post';
@@ -6,22 +6,35 @@ import UserContext from '../../contexts/UserContext';
 import { lmFeedClient } from '../..';
 import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
-import { IPost, IUser, IMemberState } from 'likeminds-sdk';
+import { IPost, IUser, IMemberState } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { CircularProgress, Dialog, Snackbar } from '@mui/material';
+import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
 import {
   DELETE_POST,
   EDIT_POST,
   LIKE_POST,
+  REFRESH_LIKES_LIST,
   SAVE_POST,
-  SHOW_SNACKBAR
+  SHOW_COMMENTS_LIKES_BAR,
+  SHOW_POST_LIKES_BAR,
+  SHOW_SNACKBAR,
+  UPDATE_LIKES_COUNT_DECREMENT,
+  UPDATE_LIKES_COUNT_DECREMENT_POST,
+  UPDATE_LIKES_COUNT_INCREMENT,
+  UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
 import AllMembers from '../../components/AllMembers';
 import LMFeedClient from '@likeminds.community/feed-js-beta';
-
-const FeedComponent: React.FC = () => {
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import PostDetails from '../../components/post-details';
+import PostLikesList from '../../components/PostLikesList';
+import '../../assets/css/skeleton-post.css';
+interface FeedProps {
+  setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
+}
+const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   const [user, setUser] = useState(null);
   const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
   const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
@@ -32,6 +45,11 @@ const FeedComponent: React.FC = () => {
   const [openDialogBox, setOpenDialogBox] = useState(false);
   const [tempPost, setTempPost] = useState<IPost | null>(null);
   const [pageCount, setPageCount] = useState<number>(1);
+  const [sideBar, setSideBar] = useState<any>(null);
+  useEffect(() => {
+    rightSidebarhandler('', null);
+  }, []);
+  const navigate = useNavigate();
   const getFeeds = async (pgNo: number) => {
     let feeds = await lmFeedClient.fetchFeed(pageCount);
     if (!feeds) {
@@ -44,14 +62,8 @@ const FeedComponent: React.FC = () => {
     setPageCount(pageCount + 1);
     setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
     setUsersMap({ ...usersMap, ...feeds.users });
-    // feeds?.posts.
   };
-  function feedModerationLocalHandler(
-    action: string,
-    index: number,
-    value: any,
-    data?: { [key: string]: any }
-  ) {
+  function feedModerationLocalHandler(action: string, index: number, value: any) {
     function reNewFeedArray(index: number, newFeedObject: IPost) {
       newFeedArray[index] = newFeedObject;
       setFeedPostsArray(newFeedArray);
@@ -59,7 +71,6 @@ const FeedComponent: React.FC = () => {
     const newFeedArray = [...feedPostsArray];
     const newFeedObject = { ...newFeedArray[index] };
     switch (action) {
-      // For hadling likes/dislikes by user
       case LIKE_POST: {
         newFeedObject.isLiked = value;
         if (value) {
@@ -83,7 +94,7 @@ const FeedComponent: React.FC = () => {
         newFeedArray.splice(index, 1);
         setFeedPostsArray(newFeedArray);
         setOpenSnackBar(true);
-        setSnackBarMessage('Deleted Post');
+        setSnackBarMessage('Post Deleted');
         break;
       }
       case EDIT_POST: {
@@ -100,18 +111,139 @@ const FeedComponent: React.FC = () => {
         return null;
     }
   }
-  // function setHeader() {
-  //   switch (user) {
-  //     case null:
-  //       return null;
-  //     default:
-  //       return (
-  //         <div className="header">
-  //           <Header user={user} />
-  //         </div>
-  //       );
-  //   }
-  // }
+  function rightSidebarhandler(action: string, value: any) {
+    action;
+    switch (action) {
+      case SHOW_POST_LIKES_BAR: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+          />
+        );
+        break;
+      }
+      case SHOW_COMMENTS_LIKES_BAR: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_INCREMENT: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_INCREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_DECREMENT: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_DECREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_INCREMENT_POST: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_INCREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_DECREMENT_POST: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_DECREMENT
+            }}
+          />
+        );
+        break;
+      }
+      default:
+        setSideBar(<AllMembers />);
+    }
+  }
+
+  function setFeedPosts() {
+    switch (feedPostsArray.length) {
+      case 0:
+        return Array(10)
+          .fill(0)
+          .map((val: number) => {
+            return (
+              <div className="skeletonPostContainer" key={(Math.random() + val).toString()}>
+                <div className="skeletonHeader">
+                  <Skeleton variant="circular" width={40} height={40} />
+                  <Skeleton
+                    sx={{
+                      marginX: '16px'
+                    }}
+                    variant="text"
+                    width={'40%'}
+                  />
+                </div>
+                <div className="skeletonContent">
+                  <Skeleton variant="rounded" width={'100%'} height={150} />
+                </div>
+              </div>
+            );
+          });
+      default:
+        return feedPostsArray.map((post: IPost, index: number) => {
+          return (
+            <Post
+              key={post.Id}
+              post={post}
+              user={usersMap[post.uuid]}
+              feedModerationHandler={feedModerationLocalHandler}
+              index={index}
+              rightSidebarHandler={rightSidebarhandler}
+            />
+          );
+        });
+    }
+  }
+
+  useMemo(() => setCallBack(feedModerationLocalHandler), [feedModerationLocalHandler]);
   function setAppUserState(user: any) {
     switch (user) {
       case null:
@@ -140,24 +272,12 @@ const FeedComponent: React.FC = () => {
                 {/* Filter */}
 
                 {/* Post */}
-                {feedPostsArray.map((post: IPost, index: number) => {
-                  return (
-                    <Post
-                      key={post.Id}
-                      post={post}
-                      user={usersMap[post.uuid]}
-                      feedModerationHandler={feedModerationLocalHandler}
-                      index={index}
-                    />
-                  );
-                })}
+                {setFeedPosts()}
                 {/* <Post /> */}
                 {/* Post */}
               </InfiniteScroll>
             </div>
-            <div className="lmWrapper__allMembers">
-              <AllMembers />
-            </div>
+            <div className="lmWrapper__allMembers">{sideBar}</div>
           </div>
         );
     }
@@ -165,10 +285,7 @@ const FeedComponent: React.FC = () => {
 
   useEffect(() => {
     async function setUserState() {
-      const userResponse = await lmFeedClient.initiateUser(
-        '28f7f107-5916-4cce-bbb7-4ee48b35e64d',
-        false
-      );
+      const userResponse = await lmFeedClient.initiateUser('', false);
       const memberStateResponse: any = await lmFeedClient.getMemberState();
       setMemberStateRights(memberStateResponse.data);
       setUser(userResponse?.data?.user);
@@ -207,18 +324,10 @@ const FeedComponent: React.FC = () => {
     return () => document.removeEventListener('NOTIFICATION', handleNotificationAction);
   });
   async function handleNotificationAction(e: any) {
-    let postId = e.detail;
-    try {
-      const resp: any = await lmFeedClient.getPostDetails(postId, 1);
-      const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
-      if (doesPostExistInArray) {
-        return;
-      }
-      setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
-      setUsersMap({ ...usersMap, ...resp.data.users });
-    } catch (error) {
-      console.log(error);
-    }
+    navigate(`/post/${e.detail}`);
+  }
+  if (!user) {
+    return null;
   }
   return (
     <UserContext.Provider
@@ -228,7 +337,24 @@ const FeedComponent: React.FC = () => {
         memberStateRights
       }}>
       {/* {setHeader()} */}
-      {setAppUserState(user)}
+      <Routes>
+        <Route path="/" element={<>{setAppUserState(user)}</>} />
+        <Route
+          path="/post/:postId"
+          element={
+            <div className="main">
+              <PostDetails
+                rightSidebarHandler={rightSidebarhandler}
+                callBack={feedModerationLocalHandler}
+                feedArray={feedPostsArray}
+                users={usersMap}
+                rightSideBar={sideBar}
+              />
+            </div>
+          }
+        />
+      </Routes>
+
       <Snackbar
         open={openSnackBar}
         onClose={() => {

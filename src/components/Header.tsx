@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import './../assets/css/header.css';
-import { Badge, IconButton, Menu, MenuItem } from '@mui/material';
+import { Badge, CircularProgress, IconButton, Menu, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { lmFeedClient } from '..';
-import { IActivity, IUser } from 'likeminds-sdk';
+import { IActivity, IUser } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import noNotification from '../assets/images/default.svg';
 import dayjs from 'dayjs';
@@ -30,10 +30,11 @@ const Header: React.FC<HeaderProps> = () => {
   const [pageCount, setPageCount] = useState(1);
   const [user, setUser] = useState<null | IUser>();
   const [menuAnchor, setMenuAnchor] = useState<HTMLButtonElement | null>(null);
+  const [showLoader, setShowLoader] = useState<boolean>(true);
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
-    const matches = text.match(regex) || [];
-    const splits = text.split(regex);
+    const matches = text?.match(regex) || [];
+    const splits = text?.split(regex);
 
     const container = document.createElement('div');
 
@@ -44,7 +45,7 @@ const Header: React.FC<HeaderProps> = () => {
       if (matches[i]) {
         const text = matches[i];
         const getInfoPattern = /<<([^|]+)\|([^>>]+)>>/;
-        const match = text.match(getInfoPattern);
+        const match = text?.match(getInfoPattern);
         const userObject: MatchPattern = {
           type: 1
         };
@@ -94,6 +95,7 @@ const Header: React.FC<HeaderProps> = () => {
     async function getNotificationsCount() {
       try {
         const response: any = await lmFeedClient.getUnreadNotificationCount();
+
         const count = response?.data?.count;
         if (count > 99) setNotificationsCount(response?.data?.count + '+');
         else setNotificationsCount(count);
@@ -146,9 +148,11 @@ const Header: React.FC<HeaderProps> = () => {
   async function getNotifications() {
     try {
       const response: any = await lmFeedClient.getNotificationFeed(pageCount);
+
       setActivityArray([...activityArray].concat(response?.data?.activities));
       setUserMap({ ...userMap, ...response?.data?.users });
       setPageCount(pageCount + 1);
+      setShowLoader(false);
       // const newUnreadCount = parseInt(notificationsCount.toString()) - activityArray.length;
       // if (newUnreadCount > 0) {
       //   setNotificationsCount(newUnreadCount);
@@ -159,88 +163,136 @@ const Header: React.FC<HeaderProps> = () => {
       console.log(error);
     }
   }
-  function handleNotification(activity: IActivity) {
-    lmFeedClient.markReadNotification(activity.Id);
+  function handleNotification(activity: IActivity, index: number) {
+    lmFeedClient.markReadNotification(activity?.Id);
+    setActivityArray(
+      (function () {
+        let newArr = [...activityArray];
+        newArr[index].isRead = true;
+        return newArr;
+      })()
+    );
     setNotificationsCount(parseInt(notificationsCount.toString()) - 1);
-    switch (activity.action) {
+    setNotificationAnchor(null);
+    switch (activity?.action) {
       case 10: {
         document.dispatchEvent(
           new CustomEvent('NOTIFICATION', {
-            detail: activity.activityEntityData.Id
+            detail: activity?.activityEntityData.Id
+          })
+        );
+        break;
+      }
+      default: {
+        document.dispatchEvent(
+          new CustomEvent('NOTIFICATION', {
+            detail: activity?.activityEntityData.Id
           })
         );
       }
     }
   }
   function renderNotification() {
-    return (
-      <Menu
-        open={Boolean(notificationAnchor)}
-        anchorEl={notificationAnchor}
-        onClose={() => setNotificationAnchor(null)}
-        id="activityHolder">
-        {activityArray.length > 0 ? (
-          <InfiniteScroll
-            dataLength={activityArray.length}
-            hasMore={hasMoreUnreadActivities}
-            next={getNotifications}
-            loader={null}
-            scrollableTarget="activityHolder">
-            <div className="lmNotification">
-              <div className="title">Notification</div>
-              {activityArray.map((activity: IActivity) => {
-                return (
-                  <div
-                    key={activity.Id}
-                    className="customMenuItem"
-                    onClick={() => handleNotification(activity)}
-                    style={{
-                      background: activity.isRead ? 'none' : '#e8e8e8'
-                    }}>
-                    <div className="notificationIist">
-                      <div className="notiImg">
-                        {setUserImage(userMap[activity.actionBy[activity.actionBy.length - 1]])}
-                      </div>
-                      <div>
-                        <div
-                          className="lmNoti"
-                          dangerouslySetInnerHTML={{
-                            __html: convertTextToHTML(activity.activityText).innerHTML
-                          }}></div>
-                        <div className="notiTime">{dayjs(activity.updatedAt).fromNow()}</div>
-                      </div>
-                      <div>
-                        {/* <IconButton
+    if (!showLoader) {
+      return (
+        <Menu
+          open={Boolean(notificationAnchor)}
+          anchorEl={notificationAnchor}
+          onClose={() => setNotificationAnchor(null)}>
+          <div
+            id="activityHolder"
+            style={{
+              maxHeight: '650px',
+              overflowY: 'auto'
+            }}>
+            {activityArray.length > 0 ? (
+              <InfiniteScroll
+                dataLength={activityArray.length}
+                hasMore={hasMoreUnreadActivities}
+                next={getNotifications}
+                loader={null}
+                scrollableTarget="activityHolder">
+                <div className="lmNotification">
+                  <div className="title">Notification</div>
+                  {activityArray.map((activity: IActivity, index: number) => {
+                    return (
+                      <div
+                        key={activity?.Id}
+                        className="customMenuItem"
+                        onClick={() => handleNotification(activity, index)}
+                        style={{
+                          background: activity?.isRead ? 'none' : '#e8e8e8'
+                        }}>
+                        <div className="notificationIist">
+                          <div className="notiImg">
+                            {setUserImage(
+                              userMap[activity?.actionBy[activity?.actionBy?.length - 1]]
+                            )}
+                          </div>
+                          <div>
+                            <div
+                              className="lmNoti"
+                              dangerouslySetInnerHTML={{
+                                __html: convertTextToHTML(activity?.activityText)?.innerHTML
+                              }}></div>
+                            <div className="notiTime">{dayjs(activity?.updatedAt).fromNow()}</div>
+                          </div>
+                          <div>
+                            {/* <IconButton
                           onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                             setMenuAnchor(e.currentTarget)
                           }>
                           <MoreVertIcon />
                         </IconButton> */}
-                      </div>
+                          </div>
 
-                      <Menu
-                        open={Boolean(menuAnchor)}
-                        onClose={() => setMenuAnchor(null)}
-                        anchorEl={menuAnchor}
-                        className="menu-block">
-                        <div className="menu-block-item">Remove this notification</div>
-                        <div className="menu-block-item">Mute this notification</div>
-                      </Menu>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </InfiniteScroll>
-        ) : (
-          <div className="lmNoNotification">
-            <img src={noNotification} alt="default image" />
-            Oops! You do not have any no notifications yet.
+                          <Menu
+                            open={Boolean(menuAnchor)}
+                            onClose={() => setMenuAnchor(null)}
+                            anchorEl={menuAnchor}
+                            className="menu-block">
+                            <div className="menu-block-item">Remove this notification</div>
+                            <div className="menu-block-item">Mute this notification</div>
+                          </Menu>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </InfiniteScroll>
+            ) : (
+              <div className="lmNoNotification noNotifications">
+                <img src={noNotification} alt="default image" />
+                Oops! You do not have any no notifications yet.
+              </div>
+            )}
           </div>
-        )}
-      </Menu>
-    );
+        </Menu>
+      );
+    } else {
+      return (
+        <Menu
+          open={Boolean(notificationAnchor)}
+          anchorEl={notificationAnchor}
+          onClose={() => setNotificationAnchor(null)}
+          slotProps={{
+            paper: {
+              style: {
+                transform: 'translateX(-0%)'
+              }
+            }
+          }}
+          id="activityHolder">
+          <div className="lmNoNotification noNotifications">
+            <CircularProgress />
+          </div>
+        </Menu>
+      );
+    }
   }
+  // useEffect(() => {
+  //   getNotifications();
+  // }, []);
   return (
     <div className="headerWrapper">
       <div className="headerWrapper--notification">
@@ -250,7 +302,7 @@ const Header: React.FC<HeaderProps> = () => {
             onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               setNotificationAnchor(e.currentTarget);
               getNotifications();
-              setNotificationsCount(0);
+              // setNotificationsCount(0);
             }}>
             <Badge
               badgeContent={parseInt(notificationsCount.toString()) <= 0 ? 0 : notificationsCount}
@@ -265,7 +317,7 @@ const Header: React.FC<HeaderProps> = () => {
             onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               setNotificationAnchor(e.currentTarget);
               getNotifications();
-              setNotificationsCount(0);
+              // setNotificationsCount(0);
             }}>
             <NotificationsIcon />
           </IconButton>

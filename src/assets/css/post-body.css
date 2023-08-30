@@ -43,3 +43,7 @@
   height: 100%;
   width: auto;
 } */
+.react-pdf__Page__canvas{
+  width: 100% !important;
+  height: auto !important;
+}

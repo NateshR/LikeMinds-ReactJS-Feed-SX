@@ -1,12 +1,17 @@
 import photoIcon from '../assets/images/photo.svg';
 import videoIcon from '../assets/images/video.svg';
-import pollIcon from '../assets/images/poll.svg';
+import attachPDF from '../assets/images/attachmentPDF.png';
 import React from 'react';
 
 const PostOptions: React.FC<{
   setMediaAttachmentOnInitiation: React.Dispatch<boolean>;
   openCreatePostDialogBox: () => void;
-}> = ({ setMediaAttachmentOnInitiation, openCreatePostDialogBox }) => {
+  setDocumentAttachmentOnInitiation: React.Dispatch<boolean>;
+}> = ({
+  setMediaAttachmentOnInitiation,
+  openCreatePostDialogBox,
+  setDocumentAttachmentOnInitiation
+}) => {
   return (
     <div className="lmWrapper__feed__creatPost__options">
       <div className="lmWrapper__feed__creatPost__options__types">
@@ -30,6 +35,16 @@ const PostOptions: React.FC<{
               cursor: 'pointer'
             }}>
             <img src={videoIcon} alt="Video" /> <span>Video</span>
+          </li>
+          <li
+            onClick={() => {
+              setDocumentAttachmentOnInitiation(true);
+              openCreatePostDialogBox();
+            }}
+            style={{
+              cursor: 'pointer'
+            }}>
+            <img src={attachPDF} alt="Video" /> <span>Document</span>
           </li>
           {/* <li>
             <img src={pollIcon} alt="Poll" /> <span>Poll</span>
