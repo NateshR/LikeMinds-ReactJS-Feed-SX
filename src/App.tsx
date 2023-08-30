@@ -19,24 +19,6 @@ function App() {
           <Nav />
         </div>
         <BrowserRouter>
-          {/* <Routes>
-            <Route
-              path="/"
-              element={
-                <div className="main">
-                  <FeedComponent setCallBack={setCallBack} />
-                </div>
-              }
-            />
-            <Route
-              path="/post"
-              element={
-                <div className="main">
-                  <PostDetails callBack={callback} />
-                </div>
-              }
-            />
-          </Routes> */}
           <div className="main">
             <FeedComponent setCallBack={setCallBack} />
           </div>

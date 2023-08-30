@@ -62,7 +62,6 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     setPageCount(pageCount + 1);
     setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
     setUsersMap({ ...usersMap, ...feeds.users });
-    // feeds?.posts.
   };
   function feedModerationLocalHandler(action: string, index: number, value: any) {
     function reNewFeedArray(index: number, newFeedObject: IPost) {
@@ -72,7 +71,6 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     const newFeedArray = [...feedPostsArray];
     const newFeedObject = { ...newFeedArray[index] };
     switch (action) {
-      // For hadling likes/dislikes by user
       case LIKE_POST: {
         newFeedObject.isLiked = value;
         if (value) {
@@ -287,10 +285,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
 
   useEffect(() => {
     async function setUserState() {
-      const userResponse = await lmFeedClient.initiateUser(
-        '28f7f107-5916-4cce-bbb7-4ee48b35e64d',
-        false
-      );
+      const userResponse = await lmFeedClient.initiateUser('', false);
       const memberStateResponse: any = await lmFeedClient.getMemberState();
       setMemberStateRights(memberStateResponse.data);
       setUser(userResponse?.data?.user);
@@ -330,22 +325,6 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   });
   async function handleNotificationAction(e: any) {
     navigate(`/post/${e.detail}`);
-    // let postId = e.detail;
-    // try {
-    //   const resp: any = await lmFeedClient.getPostDetails(postId, 1);
-    //   const doesPostExistInArray = feedPostsArray.some((feed: IPost) => feed.Id === postId);
-    //   if (doesPostExistInArray) {
-    //     const index = feedPostsArray.findIndex((feed: IPost) => feed.Id === postId);
-    //     const post = { ...feedPostsArray[index] };
-    //     feedPostsArray.splice(index, 1);
-    //     setFeedPostsArray([post, ...feedPostsArray]);
-    //     return;
-    //   }
-    //   setFeedPostsArray([resp.data.post].concat([...feedPostsArray]));
-    //   setUsersMap({ ...usersMap, ...resp.data.users });
-    // } catch (error) {
-    //   console.log(error);
-    // }
   }
   if (!user) {
     return null;
