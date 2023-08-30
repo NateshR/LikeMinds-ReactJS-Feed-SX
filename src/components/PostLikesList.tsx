@@ -1,30 +1,77 @@
-import { IMember } from 'likeminds-sdk';
-import React, { useEffect, useState } from 'react';
+import { IMember } from '@likeminds.community/feed-js-beta';
+import React, { useContext, useEffect, useState } from 'react';
 import { lmFeedClient } from '..';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import UserContext from '../contexts/UserContext';
+import {
+  UPDATE_LIKES_COUNT_DECREMENT,
+  UPDATE_LIKES_COUNT_INCREMENT,
+  UPDATE_LIKES_COUNT_INCREMENT_POST
+} from '../services/feedModerationActions';
 interface PostLikesProps {
   postId: string;
   rightSidebarhandler: (action: string, value: any) => void;
   entityType: number;
   entityId: string | null;
   totalLikes: number;
+  initiateAction?: any;
 }
 function PostLikesList({
   postId,
   rightSidebarhandler,
   entityType,
   entityId,
-  totalLikes
+  totalLikes,
+  initiateAction
 }: PostLikesProps) {
   const [allMembersArray, setAllMembersArray] = useState<IMember[]>([]);
   const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [userMap, setUserMap] = useState<any>({});
+  const userContext = useContext(UserContext);
   useEffect(() => {
     getAllMembersThrice();
   }, [postId, entityId]);
+  useEffect(() => {
+    if (
+      initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT ||
+      initiateAction?.action === UPDATE_LIKES_COUNT_DECREMENT
+    ) {
+      const index = allMembersArray.findIndex(
+        (member: any) => member.uuid === userContext.user?.uuid
+      );
+      const newArr: any = [...allMembersArray];
+      if (initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT) {
+        newArr.push({
+          uuid: userContext.user?.uuid,
+          name: userContext.user?.name
+        });
+      } else {
+        newArr.splice(index, 1);
+      }
+      setAllMembersArray(newArr);
+
+      setUserMap({ ...userMap, [userContext.user?.uuid]: userContext.user });
+    } else {
+      const index = allMembersArray.findIndex(
+        (member: any) => member.uuid === userContext.user?.uuid
+      );
+      const newArr: any = [...allMembersArray];
+      if (initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT_POST) {
+        newArr.push({
+          uuid: userContext.user?.uuid,
+          name: userContext.user?.name
+        });
+      } else {
+        newArr.splice(index, 1);
+      }
+      setAllMembersArray(newArr);
+
+      setUserMap({ ...userMap, [userContext.user?.uuid]: userContext.user });
+    }
+  }, [initiateAction?.action, postId, entityId, entityType]);
   async function getAllMembersThrice() {
     try {
       let callResp: any;
@@ -41,9 +88,9 @@ function PostLikesList({
         setAllMembersArray([...membersArrayOne, ...membersArrayTwo, ...membersArrayThree]);
         setUserMap({ ...membersObjectOne, ...membersObjectTwo, ...membersObjectThree });
       } else {
-        let r1: any = await lmFeedClient.getCommentLikes(postId, pageCount, entityId!);
-        let r2: any = await lmFeedClient.getCommentLikes(postId, pageCount, entityId!);
-        let r3: any = await lmFeedClient.getCommentLikes(postId, pageCount, entityId!);
+        let r1: any = await lmFeedClient.getCommentLikes(postId, 1, entityId!);
+        let r2: any = await lmFeedClient.getCommentLikes(postId, 2, entityId!);
+        let r3: any = await lmFeedClient.getCommentLikes(postId, 3, entityId!);
         const membersArrayOne: IMember[] = r1?.data?.likes;
         const membersArrayTwo: IMember[] = r2?.data?.likes;
         const membersArrayThree: IMember[] = r3?.data?.likes;

@@ -6,9 +6,11 @@ import {
   LIKE_POST,
   SAVE_POST,
   SHOW_POST_LIKES_BAR,
-  SHOW_SNACKBAR
+  SHOW_SNACKBAR,
+  UPDATE_LIKES_COUNT_DECREMENT_POST,
+  UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../services/feedModerationActions';
-import { IComment, IMemberRight, IPost, IUser } from 'likeminds-sdk';
+import { IComment, IMemberRight, IPost, IUser } from '@likeminds.community/feed-js-beta';
 import SendIcon from '@mui/icons-material/Send';
 import nonSavedPost from '../assets/images/nonSavedPost.png';
 import savedPost from '../assets/images/savedPost.png';
@@ -62,7 +64,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
 
   const navigation = useNavigate();
   const location = useLocation();
-  // console.log(location);
+  // (location);
   useEffect(() => {
     setIsPostLiked(isLiked);
     setIsPostSaved(isSaved);
@@ -74,9 +76,22 @@ const PostFooter: React.FC<PostFooterProps> = ({
     setIsPostLiked(!isPostLiked);
     if (isPostLiked) {
       setPostLikesCount(postLikesCount - 1);
+      if (location.pathname.includes('/post')) {
+        rightSidebarHandler(UPDATE_LIKES_COUNT_DECREMENT_POST, {
+          postId: postId,
+          totalLikes: postLikesCount - 1
+        });
+      }
     } else {
       setPostLikesCount(postLikesCount + 1);
+      if (location.pathname.includes('/post')) {
+        rightSidebarHandler(UPDATE_LIKES_COUNT_INCREMENT_POST, {
+          postId: postId,
+          totalLikes: postLikesCount + 1
+        });
+      }
     }
+
     return lmFeedClient.likePost(postId);
   }
   function getPostLikes() {}
@@ -434,7 +449,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <div
               className="commentCountDiv"
               style={{
-                display: openCommentsSection && commentList && commentList.length ? 'block' : 'none'
+                display: commentList && commentList.length ? 'block' : 'none'
               }}>
               <span>
                 {postCommentsCount}{' '}
@@ -461,6 +476,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         user={postUsersMap[comment?.uuid]}
                         setParentCommentsCount={setPostCommentsCount}
                         parentCommentsCount={postCommentsCount}
+                        rightSidebarHandler={rightSidebarHandler}
                       />
                     );
                   })}
@@ -633,11 +649,20 @@ const PostFooter: React.FC<PostFooterProps> = ({
             <span
               onClick={() => {
                 if (postLikesCount) {
-                  rightSidebarHandler(SHOW_POST_LIKES_BAR, {
-                    postId: postId,
-                    entityType: 1,
-                    totalLikes: postLikesCount
-                  });
+                  if (!location.pathname.includes('/post')) {
+                    location.pathname;
+                    navigation(`/post/${postId}`, {
+                      state: {
+                        index: index
+                      }
+                    });
+                  } else {
+                    rightSidebarHandler(SHOW_POST_LIKES_BAR, {
+                      postId: postId,
+                      entityType: 1,
+                      totalLikes: postLikesCount
+                    });
+                  }
                 } else {
                   likePost();
                 }

@@ -8,7 +8,7 @@ import React from 'react';
 import PostHeader from './PostHeader';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
-import { IPost, IUser } from 'likeminds-sdk';
+import { IPost, IUser } from '@likeminds.community/feed-js-beta';
 
 interface PostProps {
   post: IPost;

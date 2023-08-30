@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
 import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
-import { IComment, IMenuItem, IUser } from 'likeminds-sdk';
+import { IComment, IMenuItem, IUser } from '@likeminds.community/feed-js-beta';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';
@@ -30,6 +30,11 @@ import SeePostLikes from './SeePostLikes';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import DeleteDialog from './DeleteDialog';
+import {
+  SHOW_COMMENTS_LIKES_BAR,
+  UPDATE_LIKES_COUNT_DECREMENT,
+  UPDATE_LIKES_COUNT_INCREMENT
+} from '../services/feedModerationActions';
 dayjs.extend(relativeTime);
 interface CommentProps {
   comment: IComment;
@@ -40,6 +45,7 @@ interface CommentProps {
   user?: IUser;
   setParentCommentsCount: React.Dispatch<number>;
   parentCommentsCount: number;
+  rightSidebarHandler: (action: string, value: any) => void;
 }
 const PostComents: React.FC<CommentProps> = ({
   comment,
@@ -49,7 +55,8 @@ const PostComents: React.FC<CommentProps> = ({
   setCommentArray,
   user,
   setParentCommentsCount,
-  parentCommentsCount
+  parentCommentsCount,
+  rightSidebarHandler
 }) => {
   const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
   const [openDialogBox, setOpenDialogBox] = useState<boolean>(false);
@@ -74,9 +81,20 @@ const PostComents: React.FC<CommentProps> = ({
     setIsLiked(!isLiked);
     likeAComment();
     if (isLiked) {
+      // rightSidebarHandler
       setLikesCount(likesCount - 1);
+      rightSidebarHandler(UPDATE_LIKES_COUNT_DECREMENT, {
+        postId: postId,
+        commentId: comment.Id,
+        totalLikes: likesCount - 1
+      });
     } else {
       setLikesCount(likesCount + 1);
+      rightSidebarHandler(UPDATE_LIKES_COUNT_INCREMENT, {
+        postId: postId,
+        commentId: comment.Id,
+        totalLikes: likesCount + 1
+      });
     }
   }
   function renderLikeButton() {
@@ -265,14 +283,14 @@ const PostComents: React.FC<CommentProps> = ({
     );
   }
   function findTag(str: string): TagInfo | undefined {
-    console.log(str);
+    str;
     if (str.length === 0) {
       return undefined;
     }
     const cursorPosition = getCaretPosition();
 
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
-    console.log(leftLimit);
+    leftLimit;
     if (leftLimit === -1) {
       // setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
@@ -457,7 +475,6 @@ const PostComents: React.FC<CommentProps> = ({
 
                 let tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
-                  console.log('here the tag string is, :', tagOp);
                   setTagString(tagOp?.tagString!);
                 }
               }}>
@@ -476,22 +493,22 @@ const PostComents: React.FC<CommentProps> = ({
                         if (focusNode === null) {
                           return;
                         }
-                        console.log('A');
+                        ('A');
                         let div = focusNode.parentElement;
                         let text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
-                        console.log('B');
+                        ('B');
                         let textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
-                        console.log('C');
+                        ('C');
                         let tagOp = findTag(textContentFocusNode);
-                        console.log('D');
+                        ('D');
                         if (tagOp === undefined) return;
-                        console.log('E');
+                        ('E');
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
 
@@ -551,7 +568,6 @@ const PostComents: React.FC<CommentProps> = ({
     if (tagString === undefined || tagString === null) {
       return;
     }
-    console.log('calling getTags');
     const tagListResponse = await lmFeedClient.getTaggingList(tagString);
 
     const memberList = tagListResponse?.data?.members;
@@ -572,7 +588,8 @@ const PostComents: React.FC<CommentProps> = ({
       while (contentEditableDiv.current?.firstChild) {
         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
       }
-      setOpenReplyBox(false);
+      // setOpenReplyBox(false);
+      setOpenCommentsSection(true);
       const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
       let newAddedComment: IComment = response.data.comment;
       if (repliesArray.length) {
@@ -621,8 +638,15 @@ const PostComents: React.FC<CommentProps> = ({
       setTaggingMemberList([]);
     }
   }, [tagString]);
+  useEffect(() => {
+    getComments();
+  }, []);
   return (
-    <div className="commentWrapper">
+    <div
+      className="commentWrapper"
+      style={{
+        borderBottom: comment.level > 0 ? 'none' : '1px solid #dde3ed'
+      }}>
       <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
         <DeleteDialog onClose={closeDeleteDialog} deleteComment={deleteComment} type={2} />
       </Dialog>
@@ -670,21 +694,17 @@ const PostComents: React.FC<CommentProps> = ({
               marginLeft: '8px',
               marginRight: '16px',
               cursor: 'pointer'
+            }}
+            sx={{
+              $hover: {
+                background: 'none'
+              }
             }}>
-            {/* <span
-              style={{
-                height: '24px',
-                width: '24px',
-                marginLeft: '8px',
-                marginRight: '16px',
-                cursor: 'pointer'
-              }}
-              onClick={openMenu}> */}
             <img
               src={overflowIcon}
               alt="overflow icon"
               style={{
-                margin: 'auto'
+                cursor: 'pointer'
               }}
             />
             {/* </span> */}
@@ -697,47 +717,68 @@ const PostComents: React.FC<CommentProps> = ({
           className="like"
           style={{
             height: '24px',
-            width: '24px'
+            width: '24px',
+            textAlign: 'center'
           }}
           onClick={likeComment}>
           {renderLikeButton()}
         </span>
         <span
           className="likes-count"
-          onClick={() => setOpenCommentsDialog(true)}
+          onClick={() => {
+            if (likesCount) {
+              rightSidebarHandler(SHOW_COMMENTS_LIKES_BAR, {
+                postId: postId,
+                entityType: 2,
+                totalLikes: likesCount,
+                commentId: comment.Id
+              });
+            } else {
+              likeComment();
+            }
+          }}
           style={{ cursor: 'pointer' }}>
-          {likesCount} {likesCount === 0 || likesCount > 1 ? 'Likes' : 'Like'}
+          {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
         </span>
-        <span className="replies">| </span>
+        {comment.level === 0 ? (
+          <>
+            {' '}
+            <span className="replies"> | </span>
+            <span className="replies">
+              <span
+                style={{
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  setOpenReplyBox(!openReplyBox);
+                  setOpenCommentsSection(true);
+                }}>
+                {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
+              </span>{' '}
+              <span
+                style={{
+                  cursor: 'pointer',
+                  color:
+                    openCommentsSection && commentsCount > 0 ? '#5046E5' : 'rgba(72, 79, 103, 0.7)'
+                }}
+                className="replyCount"
+                onClick={() => {
+                  if (commentsCount !== repliesArray.length) {
+                    getComments();
+                  }
+                  setOpenCommentsSection(!openCommentsSection);
+                  // if (commentsCount > 0) {
 
-        <span className="replies">
-          <span
-            style={{
-              cursor: 'pointer'
-            }}
-            onClick={() => setOpenReplyBox(!openReplyBox)}>
-            {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
-          </span>{' '}
-          <span
-            style={{
-              cursor: 'pointer',
-              color: '#5046E5'
-            }}
-            className="replyCount"
-            onClick={() => {
-              if (commentsCount !== repliesArray.length) {
-                getComments();
-              }
-              if (commentsCount > 0) {
-                setOpenCommentsSection(!openCommentsSection);
-              }
-            }}>
-            <span>
-              {commentsCount > 0 ? commentsCount + ' ' : null}
-              {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
+                  // }
+                }}>
+                <span>
+                  {commentsCount > 0 ? commentsCount + ' ' : null}
+                  {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
+                </span>
+              </span>
             </span>
-          </span>
-        </span>
+          </>
+        ) : null}
 
         <span
           className="replies"
@@ -752,7 +793,7 @@ const PostComents: React.FC<CommentProps> = ({
       <div
         style={{
           paddingLeft: '52px',
-          maxHeight: '300px',
+          maxHeight: '328.5px',
           overflowY: 'auto'
         }}
         id={comment.Id}>
@@ -775,6 +816,7 @@ const PostComents: React.FC<CommentProps> = ({
                     commentArray={commentArray}
                     setCommentArray={setRepliesArray}
                     user={usersMap[comment?.uuid]}
+                    rightSidebarHandler={rightSidebarHandler}
                   />
                 );
               })

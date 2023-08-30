@@ -6,7 +6,7 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost, IUser } from 'likeminds-sdk';
+import { IPost, IUser } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface CreatePostDialogProps {
@@ -77,17 +77,12 @@ export function returnCSSForTagging(refObject: React.MutableRefObject<HTMLDivEle
     selection.focusOffset - 1
   );
   const width = getCharacterWidth(leftSubstring!);
-  console.log('The width is :', width);
-  console.log('The s is :', (width % 462) + 260);
   if (width > 264) {
     resObject.left = '264px';
   } else {
     resObject.left = width;
   }
-
   resObject.position = 'absolute';
-  console.log('The CSS object is');
-  console.log(resObject);
   return resObject;
 }
 
@@ -287,15 +282,17 @@ const CreatePostDialog = ({
     }
     const cursorPosition = getCaretPosition();
 
-    // // console.log ("the cursor position is: ", cursorPosition)
+    // // ("the cursor position is: ", cursorPosition)
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
 
     if (leftLimit === -1) {
+      ('inside findTag inside left limit');
+      str;
       setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
     }
     const rightLimit = findSpaceAfterIndex(str, cursorPosition - 1);
-    // // console.log ("the right limit is :", rightLimit)
+    // // ("the right limit is :", rightLimit)
     const substr = str.substring(leftLimit, rightLimit + 1);
     setLimits({
       left: leftLimit,
@@ -331,10 +328,12 @@ const CreatePostDialog = ({
   async function postFeed() {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      textContent = textContent.trim();
       if (textContent === PLACE_HOLDER_TEXT) {
         textContent = '';
       }
-      textContent = textContent.trim();
+
+      textContent;
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
@@ -359,7 +358,7 @@ const CreatePostDialog = ({
       }
 
       const post: IPost = response?.data?.post;
-      console.log(post);
+      post;
       const newFeedArray = [{ ...post }].concat([...feedArray]);
 
       setFeedArray(newFeedArray);
@@ -369,10 +368,10 @@ const CreatePostDialog = ({
   }
   async function checkForOGTags(ogTagLinkArray: string[]) {
     try {
-      // console.log (ogTagLinkArray);
+      // (ogTagLinkArray);
       if (ogTagLinkArray.length) {
         const getOgTag: DecodeUrlModelSX = await lmFeedClient.decodeUrl(ogTagLinkArray[0]);
-        // console.log ('the og tag call is :', getOgTag);
+        // ('the og tag call is :', getOgTag);
         setPreviewOGTagData(getOgTag);
         if (!hasPreviewClosedOnce) {
           setShowOGTagPreview(true);
@@ -381,7 +380,7 @@ const CreatePostDialog = ({
         setPreviewOGTagData(null);
       }
     } catch (error) {
-      // console.log (error);
+      // (error);
     }
   }
   function closeDialogBox() {
@@ -537,10 +536,8 @@ const CreatePostDialog = ({
 
                     let tagOp = findTag(textContentFocusNode);
 
-                    // console.log ('the tag string is ', tagOp!.tagString);
+                    // ('the tag string is ', tagOp!.tagString);
                     if (tagOp === undefined) return;
-
-                    let substr = tagOp?.tagString;
 
                     const { limitLeft, limitRight } = tagOp;
 
@@ -680,8 +677,11 @@ const CreatePostDialog = ({
                     let textContentFocusNode = focusNode.textContent;
 
                     let tagOp = findTag(textContentFocusNode!);
+
                     if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                       setTagString(tagOp?.tagString!);
+                    } else {
+                      setTagString(null);
                     }
                   }}></div>
               </div>

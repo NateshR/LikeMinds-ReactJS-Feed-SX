@@ -1,4 +1,4 @@
-import { Attachment } from 'likeminds-sdk';
+import { Attachment } from '@likeminds.community/feed-js-beta';
 import React, { useEffect, useState } from 'react';
 import './image-media.css';
 
@@ -28,8 +28,7 @@ function ImageMedia({ attachment }: ImageMediaProps) {
     <div
       style={{
         backgroundColor: 'black'
-      }}
-      key={attachment.attachmentMeta.url + Math.random().toString()}>
+      }}>
       <img
         src={attachment.attachmentMeta.url}
         alt="Your Image"

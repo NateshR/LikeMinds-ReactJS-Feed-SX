@@ -6,17 +6,22 @@ import UserContext from '../../contexts/UserContext';
 import { lmFeedClient } from '../..';
 import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
-import { IPost, IUser, IMemberState } from 'likeminds-sdk';
+import { IPost, IUser, IMemberState } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
 import {
   DELETE_POST,
   EDIT_POST,
   LIKE_POST,
+  REFRESH_LIKES_LIST,
   SAVE_POST,
   SHOW_COMMENTS_LIKES_BAR,
   SHOW_POST_LIKES_BAR,
-  SHOW_SNACKBAR
+  SHOW_SNACKBAR,
+  UPDATE_LIKES_COUNT_DECREMENT,
+  UPDATE_LIKES_COUNT_DECREMENT_POST,
+  UPDATE_LIKES_COUNT_INCREMENT,
+  UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../../services/feedModerationActions';
 import Header from '../../components/Header';
 import EditPost from '../../components/dialog/editPost/EditPost';
@@ -109,7 +114,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     }
   }
   function rightSidebarhandler(action: string, value: any) {
-    console.log(action);
+    action;
     switch (action) {
       case SHOW_POST_LIKES_BAR: {
         setSideBar(
@@ -135,6 +140,66 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         );
         break;
       }
+      case UPDATE_LIKES_COUNT_INCREMENT: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_INCREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_DECREMENT: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={2}
+            entityId={value.commentId}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_DECREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_INCREMENT_POST: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_INCREMENT
+            }}
+          />
+        );
+        break;
+      }
+      case UPDATE_LIKES_COUNT_DECREMENT_POST: {
+        setSideBar(
+          <PostLikesList
+            postId={value.postId}
+            rightSidebarhandler={rightSidebarhandler}
+            entityType={1}
+            entityId={null}
+            totalLikes={value.totalLikes}
+            initiateAction={{
+              action: UPDATE_LIKES_COUNT_DECREMENT
+            }}
+          />
+        );
+        break;
+      }
       default:
         setSideBar(<AllMembers />);
     }
@@ -147,23 +212,21 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
           .fill(0)
           .map((val: number) => {
             return (
-              <>
-                <div className="skeletonPostContainer">
-                  <div className="skeletonHeader">
-                    <Skeleton variant="circular" width={40} height={40} />
-                    <Skeleton
-                      sx={{
-                        marginX: '16px'
-                      }}
-                      variant="text"
-                      width={'40%'}
-                    />
-                  </div>
-                  <div className="skeletonContent">
-                    <Skeleton variant="rounded" width={'100%'} height={150} />
-                  </div>
+              <div className="skeletonPostContainer" key={(Math.random() + val).toString()}>
+                <div className="skeletonHeader">
+                  <Skeleton variant="circular" width={40} height={40} />
+                  <Skeleton
+                    sx={{
+                      marginX: '16px'
+                    }}
+                    variant="text"
+                    width={'40%'}
+                  />
                 </div>
-              </>
+                <div className="skeletonContent">
+                  <Skeleton variant="rounded" width={'100%'} height={150} />
+                </div>
+              </div>
             );
           });
       default:

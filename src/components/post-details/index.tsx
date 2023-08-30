@@ -3,7 +3,7 @@ import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { IPost, IUser } from 'likeminds-sdk';
+import { IPost, IUser } from '@likeminds.community/feed-js-beta';
 import { lmFeedClient } from '../..';
 import AllMembers from '../AllMembers';
 import { SHOW_SNACKBAR } from '../../services/feedModerationActions';
@@ -35,10 +35,15 @@ function PostDetails({ callBack, feedArray, rightSidebarHandler, rightSideBar }:
         let newPost: any;
         setIndex(newPostIndex);
         const resp: any = await lmFeedClient.getPostDetails(params.postId!, 1);
+        if (resp?.data === null) {
+          navigate('/');
+          callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
+        }
         newPost = resp?.data?.post;
         setPost(newPost!);
         setUser(resp?.data?.users[newPost?.uuid]);
       } catch (error) {
+        alert('Post Doesnt Exist');
         navigate('/');
         callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
       }
@@ -46,14 +51,12 @@ function PostDetails({ callBack, feedArray, rightSidebarHandler, rightSideBar }:
     if (params?.postId) {
       setPostDetails();
     }
-    // console.log(location.pathname.split('/')[1]);
-    // if (location.pathname.split('/')[2] === params.postId) {
-
-    // }
+    return () => {
+      setPost(null);
+      setUser(null);
+    };
   }, [params.postId]);
-  // if (!post || !user) {
-  //   return <div className="progressContainer"></div>;
-  // }
+
   return (
     <div
       id="postDetailsContainer"

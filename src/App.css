@@ -506,6 +506,7 @@
   margin: 20px;
   overflow: hidden;
   position: relative;
+  /* padding: 20px; */
 } 
 
 .lmPdfViewer .pdfInfo{
@@ -551,7 +552,7 @@
   overflow-x: hidden;
 }
 .commentsWrapper:last-child{
-  padding-bottom: 1rem;
+  padding-bottom: 0;
 }
 
 .commentWrapper:last-child{
@@ -559,4 +560,10 @@
 }
 .postTaggingTile:hover{
   background: #E6EBF5;
+}
+.slide.selected{
+  background: black;
+}
+.slider-wrapper.axis-horizontal{
+  background-color: black;
 }
