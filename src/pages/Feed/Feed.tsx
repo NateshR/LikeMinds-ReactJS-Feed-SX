@@ -8,7 +8,7 @@ import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
 import { IPost, IUser, IMemberState } from 'likeminds-sdk';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { CircularProgress, Dialog, Snackbar } from '@mui/material';
+import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
 import {
   DELETE_POST,
   EDIT_POST,
@@ -25,6 +25,7 @@ import LMFeedClient from '@likeminds.community/feed-js-beta';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import PostDetails from '../../components/post-details';
 import PostLikesList from '../../components/PostLikesList';
+import '../../assets/css/skeleton-post.css';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
 }
@@ -90,7 +91,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         newFeedArray.splice(index, 1);
         setFeedPostsArray(newFeedArray);
         setOpenSnackBar(true);
-        setSnackBarMessage('Deleted Post');
+        setSnackBarMessage('Post Deleted');
         break;
       }
       case EDIT_POST: {
@@ -108,6 +109,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     }
   }
   function rightSidebarhandler(action: string, value: any) {
+    console.log(action);
     switch (action) {
       case SHOW_POST_LIKES_BAR: {
         setSideBar(
@@ -137,18 +139,49 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         setSideBar(<AllMembers />);
     }
   }
-  // function setHeader() {
-  //   switch (user) {
-  //     case null:
-  //       return null;
-  //     default:
-  //       return (
-  //         <div className="header">
-  //           <Header user={user} />
-  //         </div>
-  //       );
-  //   }
-  // }
+
+  function setFeedPosts() {
+    switch (feedPostsArray.length) {
+      case 0:
+        return Array(10)
+          .fill(0)
+          .map((val: number) => {
+            return (
+              <>
+                <div className="skeletonPostContainer">
+                  <div className="skeletonHeader">
+                    <Skeleton variant="circular" width={40} height={40} />
+                    <Skeleton
+                      sx={{
+                        marginX: '16px'
+                      }}
+                      variant="text"
+                      width={'40%'}
+                    />
+                  </div>
+                  <div className="skeletonContent">
+                    <Skeleton variant="rounded" width={'100%'} height={150} />
+                  </div>
+                </div>
+              </>
+            );
+          });
+      default:
+        return feedPostsArray.map((post: IPost, index: number) => {
+          return (
+            <Post
+              key={post.Id}
+              post={post}
+              user={usersMap[post.uuid]}
+              feedModerationHandler={feedModerationLocalHandler}
+              index={index}
+              rightSidebarHandler={rightSidebarhandler}
+            />
+          );
+        });
+    }
+  }
+
   useMemo(() => setCallBack(feedModerationLocalHandler), [feedModerationLocalHandler]);
   function setAppUserState(user: any) {
     switch (user) {
@@ -178,18 +211,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 {/* Filter */}
 
                 {/* Post */}
-                {feedPostsArray.map((post: IPost, index: number) => {
-                  return (
-                    <Post
-                      key={post.Id}
-                      post={post}
-                      user={usersMap[post.uuid]}
-                      feedModerationHandler={feedModerationLocalHandler}
-                      index={index}
-                      rightSidebarHandler={rightSidebarhandler}
-                    />
-                  );
-                })}
+                {setFeedPosts()}
                 {/* <Post /> */}
                 {/* Post */}
               </InfiniteScroll>
@@ -262,6 +284,9 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     //   console.log(error);
     // }
   }
+  if (!user) {
+    return null;
+  }
   return (
     <UserContext.Provider
       value={{
@@ -281,6 +306,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 callBack={feedModerationLocalHandler}
                 feedArray={feedPostsArray}
                 users={usersMap}
+                rightSideBar={sideBar}
               />
             </div>
           }

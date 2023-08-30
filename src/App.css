@@ -341,6 +341,7 @@
   font-size: 14px;
   line-height: 16px;
   font-weight: 400;
+  margin-bottom: 3px;
 }
 .lmWrapper__feed__post__footer__actions__right {
   display: flex;
@@ -372,8 +373,9 @@
 }
 .lmReport {
   background-color: #fff;
-  padding: '16px';
-  width: '400px';
+  padding: 16px;
+  width: 400px;
+  max-width: 400px;
 }
 
 .lmReport .lmReport-header {
@@ -383,7 +385,7 @@
   line-height: 24px;
   display: flex;
   justify-content: center;
-  margin: 20px 0 30px 0;
+  margin: 20px 0 36px 0;
   color: #484f67;
 }
 
@@ -444,6 +446,7 @@
   font-size: 1rem;
   border-radius: 8px;
   padding: 12px 15px;
+  cursor: pointer;
 }
 
 /* Member tagging */
@@ -453,8 +456,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   position: absolute;
-  top: 100%;
-  left: 0;
   box-shadow: 0px 1px 16px 0 #0000003D;
   border-radius: 8px;
   z-index: 9
@@ -555,4 +556,7 @@
 
 .commentWrapper:last-child{
   border-bottom: none;
+}
+.postTaggingTile:hover{
+  background: #E6EBF5;
 }

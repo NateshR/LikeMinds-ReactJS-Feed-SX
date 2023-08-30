@@ -25,23 +25,22 @@ function ImageMedia({ attachment }: ImageMediaProps) {
     }
   }, [dimensions]);
   return (
-    <img
-      src={attachment.attachmentMeta.url}
-      alt="Your Image"
+    <div
       style={{
-        width: '100%',
-        height: 'auto',
-        aspectRatio: ratio
+        backgroundColor: 'black'
       }}
-      onLoad={(e) => {
-        console.log(e.currentTarget.height);
-        console.log(e.currentTarget.width);
-        setDimensions({
-          height: e.currentTarget.height.toString(),
-          width: e.currentTarget.width.toString()
-        });
-      }}
-    />
+      key={attachment.attachmentMeta.url + Math.random().toString()}>
+      <img
+        src={attachment.attachmentMeta.url}
+        alt="Your Image"
+        style={{
+          width: 'auto',
+          height: 'auto',
+          maxWidth: '100%',
+          maxHeight: '576px'
+        }}
+      />
+    </div>
   );
 }
 

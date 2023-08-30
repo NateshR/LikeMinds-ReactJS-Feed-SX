@@ -83,6 +83,17 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           container.appendChild(linkNode);
         }
       }
+      const textParts = container.innerHTML.split('\n');
+      container.innerHTML = '';
+
+      for (let i = 0; i < textParts.length; i++) {
+        container.innerHTML += textParts[i];
+
+        if (i !== textParts.length - 1) {
+          const br = document.createElement('br');
+          container.appendChild(br);
+        }
+      }
     }
     return container;
   }
@@ -105,28 +116,27 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
       case 1: {
         const img = new Image();
         img.src = attachment?.attachmentMeta?.url!;
-        return (
-          //   <img
-          //     className="postMediaAttachment--image"
-          //     src={attachment.attachmentMeta.url}
-          //     alt="post"
-          //     key={attachment.attachmentMeta.url + Math.random().toString()}
-          //     loading="lazy"
-          //   />
-          // );
-          <ImageMedia attachment={attachment} />
-        );
+        return <ImageMedia attachment={attachment} />;
       }
       case 2:
         return (
-          <>
+          <div
+            style={{
+              background: 'black'
+            }}>
             <video
               className="postMediaAttachment--video"
               src={attachment.attachmentMeta.url}
               key={attachment.attachmentMeta.url + Math.random().toString()}
               controls
+              style={{
+                maxHeight: '576px',
+                maxWidth: '100%',
+                height: 'auto',
+                width: 'auto'
+              }}
             />
-          </>
+          </div>
         );
       case 3:
         return (

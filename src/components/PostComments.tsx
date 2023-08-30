@@ -19,7 +19,8 @@ import {
   TagInfo,
   checkAtSymbol,
   findSpaceAfterIndex,
-  getCaretPosition
+  getCaretPosition,
+  setCursorAtEnd
 } from './dialog/createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import UserContext from '../contexts/UserContext';
@@ -238,12 +239,15 @@ const PostComents: React.FC<CommentProps> = ({
         transformOrigin={{
           vertical: 'top',
           horizontal: 'right'
+        }}
+        sx={{
+          paddingY: '0px'
         }}>
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8) return null;
           return (
             <div
-              // className="lmOverflowMenuTitle"
+              className="lmOverflowMenuTitle"
               id={item.id.toString()}
               key={item.id.toString()}
               onClick={handleMenuClick}
@@ -261,12 +265,14 @@ const PostComents: React.FC<CommentProps> = ({
     );
   }
   function findTag(str: string): TagInfo | undefined {
+    console.log(str);
     if (str.length === 0) {
       return undefined;
     }
     const cursorPosition = getCaretPosition();
 
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
+    console.log(leftLimit);
     if (leftLimit === -1) {
       // setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
@@ -371,12 +377,13 @@ const PostComents: React.FC<CommentProps> = ({
       );
     } else {
       return (
-        <span
+        <div
           style={{
+            minWidth: '36px',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            display: 'inline-flex',
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#5046e5',
@@ -388,7 +395,7 @@ const PostComents: React.FC<CommentProps> = ({
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
-        </span>
+        </div>
       );
     }
   }
@@ -469,22 +476,25 @@ const PostComents: React.FC<CommentProps> = ({
                         if (focusNode === null) {
                           return;
                         }
+                        console.log('A');
                         let div = focusNode.parentElement;
                         let text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
+                        console.log('B');
                         let textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
+                        console.log('C');
                         let tagOp = findTag(textContentFocusNode);
+                        console.log('D');
                         if (tagOp === undefined) return;
+                        console.log('E');
                         let substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
-                        if (!substr || substr.length === 0) {
-                          return;
-                        }
+
                         let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                         let textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
@@ -499,17 +509,27 @@ const PostComents: React.FC<CommentProps> = ({
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(dummyNode, anchorNode);
+
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
+                        setCursorAtEnd(contentEditableDiv);
                       }}>
-                      {setTagUserImage(item)}
-                      <span
+                      <div
                         style={{
-                          padding: '0px 0.5rem',
-                          textTransform: 'capitalize'
+                          display: 'flex',
+                          alignItems: 'center'
                         }}>
-                        {item?.name}
-                      </span>
+                        {setTagUserImage(item)}
+                        <div
+                          style={{
+                            padding: '0px 0.5rem',
+                            textTransform: 'capitalize',
+                            overflowY: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}>
+                          {item?.name}
+                        </div>
+                      </div>
                     </button>
                   );
                 })}

@@ -17,6 +17,8 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
   const [showMediaAttachmentOnInitiation, setShowMediaAttachmentOnInitiation] =
     useState<boolean>(false);
+  const [showDocumentAttachmentOnInitiation, setShowDocumentAttachmentOnInitiation] =
+    useState<boolean>(false);
   function closeCreatePostDialog() {
     setOpenCreatePostDialog(false);
     setShowMediaAttachmentOnInitiation(false);
@@ -84,6 +86,8 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
           setShowMediaAttachmentOnInitiation={setShowMediaAttachmentOnInitiation}
           setFeedArray={setFeedArray}
           feedArray={feedArray}
+          showDocumentAttachmentOnInitiation={showDocumentAttachmentOnInitiation}
+          setShowDocumentAttachmentOnInitiation={setShowDocumentAttachmentOnInitiation}
         />
       </Dialog>
       <div className="lmWrapper__feed__creatPost">
@@ -111,6 +115,7 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
         <PostOptions
           setMediaAttachmentOnInitiation={setShowMediaAttachmentOnInitiation}
           openCreatePostDialogBox={openCreatePostDialogBox}
+          setDocumentAttachmentOnInitiation={setShowDocumentAttachmentOnInitiation}
         />
       </div>
     </>

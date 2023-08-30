@@ -26,6 +26,7 @@ interface AttachmentsHolderProps {
   hasPreviewClosedOnce: boolean;
   setHasPreviewClosedOnce: React.Dispatch<React.SetStateAction<boolean>>;
   showMediaAttachmentOnInitiation: boolean;
+  showDocumentAttachmentOnInitiation: boolean;
   // setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const AttachmentsHolder = ({
@@ -45,7 +46,8 @@ const AttachmentsHolder = ({
   setPreviewOGTagData,
   hasPreviewClosedOnce,
   setHasPreviewClosedOnce,
-  showMediaAttachmentOnInitiation
+  showMediaAttachmentOnInitiation,
+  showDocumentAttachmentOnInitiation
 }: AttachmentsHolderProps) => {
   function setAttachmentTypeImage() {
     setShowMediaUploadBar(false);
@@ -61,6 +63,8 @@ const AttachmentsHolder = ({
   useEffect(() => {
     if (showMediaAttachmentOnInitiation) {
       setAttachmentTypeImage();
+    } else if (showDocumentAttachmentOnInitiation) {
+      setAttachmentTypeDocument();
     }
   }, []);
 
@@ -104,43 +108,7 @@ const AttachmentsHolder = ({
                 />
               </svg>
             </span>
-            {/* q/a upload icon */}
-            {/* <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M14.2509 9.58201C14.2509 13.1067 11.2846 15.9641 7.62544 15.9641C6.45964 15.9641 5.36418 15.674 4.41255 15.1648L1.9439 16.2235L2.71942 13.8713C1.65107 12.7381 1 11.2333 1 9.58201C1 6.0573 3.96631 3.19995 7.62544 3.19995C11.2846 3.19995 14.2509 6.0573 14.2509 9.58201ZM7.81514 11.428C7.70258 11.4484 7.58503 11.4585 7.4625 11.4585C7.19883 11.4585 6.95664 11.4107 6.73594 11.315C6.51719 11.2193 6.32773 11.0816 6.16758 10.9019C6.00742 10.7222 5.8834 10.5044 5.79551 10.2486C5.70762 9.99077 5.66367 9.70073 5.66367 9.37847V9.15874C5.66367 8.83452 5.70664 8.54448 5.79258 8.28862C5.88047 8.03276 6.00352 7.81499 6.16172 7.6353C6.32188 7.45366 6.51133 7.31499 6.73008 7.21929C6.95078 7.12358 7.19297 7.07573 7.45664 7.07573C7.72227 7.07573 7.96445 7.12358 8.1832 7.21929C8.40391 7.31499 8.59336 7.45366 8.75156 7.6353C8.91172 7.81499 9.03477 8.03276 9.1207 8.28862C9.20859 8.54448 9.25254 8.83452 9.25254 9.15874V9.37847C9.25254 9.70073 9.20957 9.99077 9.12363 10.2486C9.03769 10.5044 8.91465 10.7222 8.75449 10.9019C8.67974 10.9868 8.59822 11.0623 8.50994 11.1285L9.23203 11.7017L8.71641 12.15L7.81514 11.428ZM8.43809 9.15288V9.37847C8.43809 9.60894 8.4166 9.81304 8.37363 9.99077C8.33066 10.1685 8.26719 10.3189 8.1832 10.4419C8.10117 10.563 7.99961 10.6548 7.87852 10.7173C7.75742 10.7798 7.61875 10.8111 7.4625 10.8111C7.3082 10.8111 7.16953 10.7798 7.04648 10.7173C6.92539 10.6548 6.82188 10.563 6.73594 10.4419C6.65195 10.3189 6.5875 10.1685 6.54258 9.99077C6.49961 9.81304 6.47813 9.60894 6.47813 9.37847V9.15288C6.47813 8.92046 6.49961 8.71636 6.54258 8.54058C6.5875 8.36284 6.65195 8.21343 6.73594 8.09233C6.81992 7.97124 6.92246 7.88042 7.04355 7.81987C7.16465 7.75737 7.30234 7.72612 7.45664 7.72612C7.61289 7.72612 7.75156 7.75737 7.87266 7.81987C7.99375 7.88042 8.09629 7.97124 8.18027 8.09233C8.26621 8.21343 8.33066 8.36284 8.37363 8.54058C8.4166 8.71636 8.43809 8.92046 8.43809 9.15288Z"
-                fill="#F2994A"
-              />
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M22.9999 14.1584C22.9999 10.6337 20.0336 7.77637 16.3745 7.77637C15.7714 7.77637 15.1872 7.85398 14.6319 7.99941C15.1674 9.88522 15.005 14.1515 10.0713 16.1301C10.9336 18.6899 13.4297 20.5405 16.3745 20.5405C17.5403 20.5405 18.6358 20.2504 19.5874 19.7412L22.056 20.7999L21.2805 18.4477C22.3489 17.3146 22.9999 15.8097 22.9999 14.1584ZM16.3737 11.5343H16.5729L18.1755 15.7999H17.32L16.9995 14.8507H15.4065L15.0876 15.7999H14.235L15.8288 11.5343H16.0251H16.3737ZM15.6202 14.2149H16.7848L16.2011 12.4862L15.6202 14.2149Z"
-                fill="#F2994A"
-              />
-            </svg>
-          </span> */}
-            {/* poll upload icon */}
-            {/* <span className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M12.0002 3.19995C11.4167 3.19995 10.8571 3.43174 10.4446 3.84432C10.032 4.2569 9.80019 4.81647 9.80019 5.39995V18.5999C9.80019 19.1834 10.032 19.743 10.4446 20.1556C10.8571 20.5682 11.4167 20.7999 12.0002 20.7999C12.5837 20.7999 13.1432 20.5682 13.5558 20.1556C13.9684 19.743 14.2002 19.1834 14.2002 18.5999V5.39995C14.2002 4.81647 13.9684 4.2569 13.5558 3.84432C13.1432 3.43174 12.5837 3.19995 12.0002 3.19995ZM5.4002 12C4.81672 12 4.25714 12.2317 3.84456 12.6443C3.43198 13.0569 3.2002 13.6165 3.2002 14.2V18.5999C3.2002 19.1834 3.43198 19.743 3.84456 20.1556C4.25714 20.5682 4.81672 20.7999 5.4002 20.7999C5.98367 20.7999 6.54325 20.5682 6.95583 20.1556C7.36841 19.743 7.60019 19.1834 7.60019 18.5999V14.2C7.60019 13.6165 7.36841 13.0569 6.95583 12.6443C6.54325 12.2317 5.98367 12 5.4002 12ZM18.6002 7.59995C18.0167 7.59995 17.4571 7.83174 17.0446 8.24432C16.632 8.6569 16.4002 9.21647 16.4002 9.79995V18.5999C16.4002 19.1834 16.632 19.743 17.0446 20.1556C17.4571 20.5682 18.0167 20.7999 18.6002 20.7999C19.1837 20.7999 19.7432 20.5682 20.1558 20.1556C20.5684 19.743 20.8002 19.1834 20.8002 18.5999V9.79995C20.8002 9.21647 20.5684 8.6569 20.1558 8.24432C19.7432 7.83174 19.1837 7.59995 18.6002 7.59995Z"
-                fill="#F75266"
-              />
-            </svg>
-          </span> */}
-            {/* document type uppload icon */}
+
             <span
               className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
               onClick={setAttachmentTypeDocument}>
@@ -329,67 +297,8 @@ function DocumentUploadAttachmentContainer({
   );
 }
 
-const MaxTwoImage = ({ imageOrVideoUploadArray }: any) => {
-  return (
-    <>
-      <div className="attachmentHolder__imgBlock">
-        <img
-          style={{
-            height: '100%',
-            width: 'auto'
-          }}
-          src={URL.createObjectURL(imageOrVideoUploadArray[0])}
-          alt="sampleImg"
-        />
-      </div>
-      <div className="attachmentHolder__imgBlock">
-        <img
-          style={{
-            height: '100%',
-            width: 'auto'
-          }}
-          src={URL.createObjectURL(imageOrVideoUploadArray[1])}
-          alt="sampleImg"
-        />
-      </div>
-    </>
-  );
-};
-
-const MinThreeImage = () => {
-  return (
-    <>
-      <div className="attachmentHolder__imgBlock">
-        <img src={phoneImageSample} alt="sampleImg" />
-      </div>
-      <div className="attachmentHolder__imgBlock_tw0">
-        <img src={phoneImageSample} alt="sampleImg" />
-      </div>
-    </>
-  );
-};
 type SingleImageProps = {
   imageOrVideoUploadArray: File[] | null;
-};
-
-const SingleImage = ({ imageOrVideoUploadArray }: SingleImageProps) => {
-  function fetchImageUrl() {
-    return imageOrVideoUploadArray![0];
-  }
-  fetchImageUrl();
-  if (imageOrVideoUploadArray?.length === 1)
-    return (
-      <img
-        src={URL.createObjectURL(fetchImageUrl())}
-        style={{
-          height: '100%',
-          width: 'auto'
-        }}
-        alt="sampleImg"
-      />
-    );
-
-  return null;
 };
 
 type InitiateUploadViewProps = {
@@ -536,32 +445,45 @@ function renderMediaItem(attachment: File) {
   switch (attachment.type.split('/')[0]) {
     case 'image':
       return (
-        <img
-          className="postMediaAttachment--image"
-          src={URL.createObjectURL(attachment)}
-          alt="post"
-          key={attachment.name + Math.random().toString()}
-          loading="lazy"
+        <div
           style={{
-            height: '100%',
-            width: '100%'
-          }}
-        />
+            background: 'black',
+            height: '100%'
+          }}>
+          <img
+            // className="postMediaAttachment--image"
+            src={URL.createObjectURL(attachment)}
+            alt="post"
+            key={attachment.name + Math.random().toString()}
+            loading="lazy"
+            style={{
+              maxHeight: '468px',
+              maxWidth: '100%',
+              height: 'auto',
+              width: 'auto'
+            }}
+          />
+        </div>
       );
     case 'video':
       return (
-        <>
+        <div
+          style={{
+            background: 'black'
+          }}>
           <video
             className="postMediaAttachment--video"
             src={URL.createObjectURL(attachment)}
             key={attachment.name + Math.random().toString()}
             controls
             style={{
-              height: '100%',
+              maxHeight: '468px',
+              maxWidth: '100%',
+              height: 'auto',
               width: 'auto'
             }}
           />
-        </>
+        </div>
       );
     default:
       return (
@@ -576,14 +498,6 @@ function renderMediaItem(attachment: File) {
           </p>
         </object>
       );
-    // default:
-    //   return (
-    //     <img
-    //       src={attachment.attachmentMeta.url}
-    //       alt="post"
-    //       key={attachment.attachmentMeta.url + Math.random().toString()}
-    //     />
-    //   );
   }
 }
 function ImageVideoAttachmentView({
@@ -640,6 +554,7 @@ function ImageVideoAttachmentView({
           className="postMediaAttachment"
           showThumbs={false}
           showStatus={false}
+          dynamicHeight={false}
           onChange={(index: number) => {
             setSelectedSlide(index);
           }}>
@@ -657,7 +572,7 @@ function ImageVideoAttachmentView({
     <div
       className="attachmentHolder__singleBlock"
       style={{
-        height: 'auto'
+        height: '100%'
       }}>
       <label>
         <span

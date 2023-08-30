@@ -2,6 +2,8 @@
   margin: 0 0 20px 0;
   display: flex; 
   width: 100%;
+  height: auto;
+  max-height: 194px;
 }
 .attachmentHolder__imgBlock {
   border-radius: 0.5rem;
@@ -137,6 +139,8 @@ input[type='file'] {
 }
 
 .attachedDocumentWrapper--attachmentBody {
+  max-width: 75%;
+  overflow-x: hidden;
   flex-grow: 1;
   padding: 1rem 0px;
 }
@@ -147,6 +151,9 @@ input[type='file'] {
   line-height: 20px;
   color: #484f67;
   margin: 0px 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .attachedDocumentWrapper__attachmentBody--headingSub{
   margin: 0px;
@@ -199,6 +206,7 @@ border-radius: 0.5rem;
 .postMediaAttachment{
   /* height: 300px; */
   width: 100%;
+  height: auto
 }
 .postMediaAttachment--image {
   object-position: center;

@@ -16,6 +16,8 @@ interface CreatePostDialogProps {
   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
   feedArray: IPost[];
+  showDocumentAttachmentOnInitiation: boolean;
+  setShowDocumentAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface Limits {
   left: number;
@@ -26,7 +28,19 @@ export interface TagInfo {
   limitLeft: number;
   limitRight: number;
 }
-
+export function getCharacterWidth(character: string): number {
+  let font: string = 'Roboto',
+    fontSize: number = 16;
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (context) {
+    context.font = `${fontSize}px ${font}`;
+    const metrics = context.measureText(character);
+    return metrics.width;
+  } else {
+    return 0;
+  }
+}
 export const getCaretPosition = (): number => {
   const selection = window.getSelection();
   const editableDiv = selection?.focusNode as Node;
@@ -42,6 +56,40 @@ export const getCaretPosition = (): number => {
   }
   return caretPos;
 };
+
+export function returnCSSForTagging(refObject: React.MutableRefObject<HTMLDivElement | null>) {
+  const selection = window.getSelection();
+  const resObject: any = {};
+  if (selection === null) {
+    return {};
+  }
+  const boundingsForDiv = refObject.current?.getBoundingClientRect();
+  const focusNodeParentBoundings = selection.focusNode?.parentElement?.getBoundingClientRect();
+  resObject.top = (
+    focusNodeParentBoundings?.top! -
+    refObject.current?.getBoundingClientRect()!.top! +
+    30
+  )
+    .toString()
+    .concat('px');
+  const leftSubstring = selection.focusNode?.parentElement?.textContent?.substring(
+    0,
+    selection.focusOffset - 1
+  );
+  const width = getCharacterWidth(leftSubstring!);
+  console.log('The width is :', width);
+  console.log('The s is :', (width % 462) + 260);
+  if (width > 264) {
+    resObject.left = '264px';
+  } else {
+    resObject.left = width;
+  }
+
+  resObject.position = 'absolute';
+  console.log('The CSS object is');
+  console.log(resObject);
+  return resObject;
+}
 
 export function findSpaceAfterIndex(str: string, index: number): number {
   if (index < 0 || index >= str.length) {
@@ -65,8 +113,6 @@ export function findSpaceAfterIndex(str: string, index: number): number {
 }
 
 export function checkAtSymbol(str: string, index: number): number {
-  console.log('The index is ,', index);
-  console.log('the string is, ', str);
   if (index < 0 || index >= str.length) {
     return -1;
   }
@@ -77,7 +123,6 @@ export function checkAtSymbol(str: string, index: number): number {
       break;
     }
   }
-  console.log('the pos is, ', pos);
   if (pos === -1) {
     return -1;
   } else if (pos === 0) {
@@ -89,12 +134,33 @@ export function checkAtSymbol(str: string, index: number): number {
   }
 }
 
+export function setCursorAtEnd(
+  contentEditableDiv: React.MutableRefObject<HTMLDivElement | null>
+): void {
+  if (!contentEditableDiv.current) return;
+
+  const range = document.createRange();
+  const selection = window.getSelection();
+
+  range.selectNodeContents(contentEditableDiv.current);
+  range.collapse(false);
+
+  if (selection) {
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  contentEditableDiv.current.focus();
+}
+
 const CreatePostDialog = ({
   closeCreatePostDialog,
   showMediaAttachmentOnInitiation,
   setShowMediaAttachmentOnInitiation,
   setFeedArray,
-  feedArray
+  feedArray,
+  showDocumentAttachmentOnInitiation,
+  setShowDocumentAttachmentOnInitiation
 }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
 
@@ -118,6 +184,7 @@ const CreatePostDialog = ({
   const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
   const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const attachmentProps = {
     showMediaUploadBar,
     setShowMediaUploadBar,
@@ -135,7 +202,8 @@ const CreatePostDialog = ({
     setPreviewOGTagData,
     hasPreviewClosedOnce,
     setHasPreviewClosedOnce,
-    showMediaAttachmentOnInitiation
+    showMediaAttachmentOnInitiation,
+    showDocumentAttachmentOnInitiation
   };
   const setCloseDialog = () => {};
   function setUserImage() {
@@ -176,7 +244,7 @@ const CreatePostDialog = ({
     }
   }
   function setTagUserImage(user: any) {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = user?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
@@ -191,12 +259,13 @@ const CreatePostDialog = ({
       );
     } else {
       return (
-        <span
+        <div
           style={{
+            minWidth: '36px',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            display: 'inline-flex',
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#5046e5',
@@ -205,10 +274,10 @@ const CreatePostDialog = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
-        </span>
+        </div>
       );
     }
   }
@@ -256,14 +325,16 @@ const CreatePostDialog = ({
     setAttachmentType(null);
     setShowInitiateUploadComponent(false);
     setShowMediaAttachmentOnInitiation(false);
+    setShowDocumentAttachmentOnInitiation(false);
   }
 
   async function postFeed() {
     try {
-      let textContent = extractTextFromNode(contentEditableDiv.current);
+      let textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent === PLACE_HOLDER_TEXT) {
         textContent = '';
       }
+      textContent = textContent.trim();
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
@@ -327,6 +398,9 @@ const CreatePostDialog = ({
         textContent = textContent.substring(1);
         const id = node.getAttribute('id');
         return `<<${textContent}|route://user_profile/${id}>>`;
+      } else if (node.nodeName === 'BR') {
+        // Handle <br> tag
+        return '\n'; // Add a new line
       } else {
         let text = '';
         const childNodes = node.childNodes;
@@ -335,7 +409,7 @@ const CreatePostDialog = ({
           text += extractTextFromNode(childNode);
         }
 
-        return text;
+        return '\n' + text;
       }
     } else {
       return '';
@@ -368,26 +442,13 @@ const CreatePostDialog = ({
     const tagListResponse = await lmFeedClient.getTaggingList(tagString, taggingPageCount);
     const memberList = tagListResponse?.data?.members;
     if (memberList && memberList.length > 0) {
-      setTaggingMemberList([...taggingMemberList].concat([...memberList]));
-      setTaggingPageCount(taggingPageCount + 1);
-    }
-  }
-  function setToEndOfContent(element: HTMLDivElement): void {
-    if (element.contentEditable === 'true') {
-      const range = document.createRange();
-      const selection = window.getSelection();
-
-      if (selection) {
-        const lastChild = element.lastChild;
-        const lastNode =
-          lastChild instanceof Text ? lastChild : element.appendChild(document.createTextNode(''));
-
-        range.setStart(lastNode, lastNode.length);
-        range.collapse(true);
-
-        selection.removeAllRanges();
-        selection.addRange(range);
+      if (taggingPageCount === 1) {
+        setTaggingMemberList([...memberList]);
+      } else {
+        setTaggingMemberList([...taggingMemberList].concat([...memberList]));
       }
+
+      setTaggingPageCount(taggingPageCount + 1);
     }
   }
   useEffect(() => {
@@ -404,6 +465,9 @@ const CreatePostDialog = ({
       getTags();
     }, 500);
     return () => {
+      setTaggingMemberList([]);
+      setTaggingPageCount(1);
+      setLoadMoreTaggingUsers(true);
       clearTimeout(timeout);
     };
   }, [tagString]);
@@ -431,191 +495,203 @@ const CreatePostDialog = ({
     };
   }, [contentEditableDiv]);
 
-  // useEffect(() => {
-  //   if (contentEditableDiv && contentEditableDiv.current) {
-  //     if (contentEditableDiv.current.children.length === 0) {
-  //       if (contentEditableDiv.current.firstChild) {
-  //         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
-  //       }
-
-  //       contentEditableDiv.current.appendChild(document.createElement('span'));
-  //     }
-  //   }
-  // });
-
   return (
-    // <div className="create-post-feed-dialog-wrapper">
-    <div>
-      <div className="create-post-feed-dialog-wrapper--container">
+    <div
+      style={{
+        position: 'relative'
+      }}>
+      {taggingMemberList && taggingMemberList?.length > 0 ? (
+        <div
+          className="taggingBox"
+          id="scrollableTaggingContainer"
+          style={returnCSSForTagging(containerRef)}>
+          <InfiniteScroll
+            loader={null}
+            hasMore={loadMoreTaggingUsers}
+            next={getTags}
+            dataLength={taggingMemberList.length}
+            scrollableTarget="scrollableTaggingContainer">
+            {taggingMemberList?.map!((item: any) => {
+              return (
+                <button
+                  key={item?.id.toString() + Math.random().toString()}
+                  className="taggingTile"
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    let focusNode = window.getSelection()!.focusNode;
+                    if (focusNode === null) {
+                      return;
+                    }
+
+                    let div = focusNode.parentElement;
+                    let text = div!.childNodes;
+                    if (focusNode === null || text.length === 0) {
+                      return;
+                    }
+
+                    let textContentFocusNode = focusNode.textContent;
+                    if (textContentFocusNode === null) {
+                      return;
+                    }
+
+                    let tagOp = findTag(textContentFocusNode);
+
+                    // console.log ('the tag string is ', tagOp!.tagString);
+                    if (tagOp === undefined) return;
+
+                    let substr = tagOp?.tagString;
+
+                    const { limitLeft, limitRight } = tagOp;
+
+                    let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+
+                    let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+
+                    let textNode1 = document.createTextNode(textNode1Text);
+                    let anchorNode = document.createElement('a');
+                    anchorNode.id = item?.id;
+                    anchorNode.href = '#';
+                    anchorNode.textContent = `@${item?.name.trim()}`;
+                    anchorNode.contentEditable = 'false';
+                    let textNode2 = document.createTextNode(textNode2Text);
+                    const dummyNode = document.createElement('span');
+                    div!.replaceChild(textNode2, focusNode);
+
+                    div!.insertBefore(anchorNode, textNode2);
+                    div!.insertBefore(dummyNode, anchorNode);
+                    div!.insertBefore(textNode1, dummyNode);
+                    setTaggingMemberList([]);
+                    setCursorAtEnd(contentEditableDiv);
+                  }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                    {setTagUserImage(item)}
+                    <div
+                      style={{
+                        padding: '0px 0.5rem',
+                        textTransform: 'capitalize',
+                        overflowY: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                      {item?.name}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </InfiniteScroll>
+        </div>
+      ) : null}
+      <div className="create-post-feed-dialog-wrapper--container" ref={containerRef}>
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
           onClick={closeDialogBox}>
           <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M3.47755 20.5254C3.89943 20.9356 4.59084 20.9356 4.98927 20.5254L11.9971 13.5176L19.0049 20.5254C19.4151 20.9356 20.1065 20.9473 20.5166 20.5254C20.9268 20.1035 20.9385 19.4121 20.5283 19.002L13.5205 11.9942L20.5283 4.99806C20.9385 4.58791 20.9385 3.88478 20.5166 3.47462C20.0947 3.06447 19.4151 3.06447 19.0049 3.47462L11.9971 10.4824L4.98927 3.47462C4.59084 3.06447 3.88771 3.05275 3.47755 3.47462C3.0674 3.8965 3.0674 4.58791 3.47755 4.99806L10.4736 11.9942L3.47755 19.002C3.0674 19.4121 3.05568 20.1152 3.47755 20.5254Z"
-              fill="#000000"
+              d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
+              fill="#484F67"
             />
           </svg>
         </span>
         <div className="create-post-feed-dialog-wrapper_container--post-wrapper">
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
-            <span>Create Post</span>
+            <p>Create Post</p>
           </div>
-          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
-              {setUserImage()}
-            </div>
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-              {userContext?.user?.name}
-            </div>
-          </div>
-          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
-            <div
-              ref={contentEditableDiv}
-              contentEditable={true}
-              suppressContentEditableWarning
-              tabIndex={0}
-              autoFocus={true}
-              id="editableDiv"
-              style={{
-                width: '100%',
-                height: 'auto',
-                resize: 'none',
-                border: 'none',
-                fontWeight: '400',
-                fontSize: '1rem',
-                fontFamily: 'Roboto',
-                overflowY: 'auto'
-              }}
-              onBlur={() => {
-                if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim().length === 0) {
-                    contentEditableDiv.current.textContent = `Write something here...`;
-                  }
-                }
-              }}
-              onFocus={() => {
-                if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim() === '') {
-                    while (contentEditableDiv.current?.firstChild) {
-                      contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
-                    }
-                  }
-                }
-              }}
-              onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
-                const selection = window.getSelection();
-                setText(event.currentTarget.textContent!);
-                console.log(selection?.focusNode);
-                if (selection === null) return;
-                let focusNode = selection.focusNode;
-                if (focusNode === null) {
-                  return;
-                }
-                let div = focusNode.parentElement;
-                if (div === null) {
-                  return;
-                }
-                let text = div.childNodes;
-                if (focusNode === null || text.length === 0) {
-                  return;
-                }
-                let textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
-                if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
-                  setTagString(tagOp?.tagString!);
-                }
-              }}></div>
-            {taggingMemberList && taggingMemberList?.length > 0 ? (
-              <div className="taggingBox" id="scrollableTaggingContainer">
-                <InfiniteScroll
-                  loader={null}
-                  hasMore={loadMoreTaggingUsers}
-                  next={getTags}
-                  dataLength={taggingMemberList.length}
-                  scrollableTarget="scrollableTaggingContainer">
-                  {taggingMemberList?.map!((item: any) => {
-                    return (
-                      <button
-                        key={item?.id.toString() + Math.random().toString()}
-                        className="taggingTile"
-                        onClick={(e) => {
-                          e.preventDefault();
-
-                          let focusNode = window.getSelection()!.focusNode;
-                          if (focusNode === null) {
-                            return;
-                          }
-
-                          let div = focusNode.parentElement;
-                          let text = div!.childNodes;
-                          if (focusNode === null || text.length === 0) {
-                            return;
-                          }
-
-                          let textContentFocusNode = focusNode.textContent;
-                          if (textContentFocusNode === null) {
-                            return;
-                          }
-
-                          let tagOp = findTag(textContentFocusNode);
-
-                          // console.log ('the tag string is ', tagOp!.tagString);
-                          if (tagOp === undefined) return;
-
-                          let substr = tagOp?.tagString;
-
-                          const { limitLeft, limitRight } = tagOp;
-
-                          // if (!substr || substr.length === 0) {
-                          //   return;
-                          // }
-
-                          let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-
-                          let textNode2Text = textContentFocusNode.substring(limitRight + 1);
-
-                          let textNode1 = document.createTextNode(textNode1Text);
-                          let anchorNode = document.createElement('a');
-                          anchorNode.id = item?.id;
-                          anchorNode.href = '#';
-                          anchorNode.textContent = `@${item?.name.trim()}`;
-                          anchorNode.contentEditable = 'false';
-                          let textNode2 = document.createTextNode(textNode2Text);
-                          const dummyNode = document.createElement('span');
-                          div!.replaceChild(textNode2, focusNode);
-
-                          div!.insertBefore(anchorNode, textNode2);
-                          div!.insertBefore(dummyNode, anchorNode);
-                          div!.insertBefore(textNode1, dummyNode);
-                          setTaggingMemberList([]);
-                        }}>
-                        {setTagUserImage(item)}
-                        <span
-                          style={{
-                            padding: '0px 0.5rem',
-                            textTransform: 'capitalize'
-                          }}>
-                          {item?.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </InfiniteScroll>
+          <div style={{}}>
+            <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
+              <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
+                {setUserImage()}
               </div>
-            ) : null}
-          </div>
-          <AttachmentsHolder {...attachmentProps} />
-          <div
-            className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            onClick={postFeed}>
-            Post
+              <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
+                {userContext?.user?.name}
+              </div>
+            </div>
+            <div
+              style={{
+                maxHeight: '324px',
+                overflowY: 'auto',
+                height: 'auto'
+              }}>
+              <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
+                <div
+                  ref={contentEditableDiv}
+                  contentEditable={true}
+                  suppressContentEditableWarning
+                  tabIndex={0}
+                  autoFocus={true}
+                  id="editableDiv"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    resize: 'none',
+                    border: 'none',
+                    fontWeight: '400',
+                    fontSize: '1rem',
+                    fontFamily: 'Roboto',
+                    overflowY: 'auto',
+                    minHeight: '76px',
+                    paddingLeft: '3px',
+                    paddingRight: '3px'
+                  }}
+                  onBlur={() => {
+                    if (contentEditableDiv && contentEditableDiv.current) {
+                      if (text.trim().length === 0) {
+                        contentEditableDiv.current.textContent = `Write something here...`;
+                      }
+                    }
+                  }}
+                  onFocus={() => {
+                    if (contentEditableDiv && contentEditableDiv.current) {
+                      if (text.trim() === '') {
+                        while (contentEditableDiv.current?.firstChild) {
+                          contentEditableDiv.current.removeChild(
+                            contentEditableDiv.current.firstChild
+                          );
+                        }
+                      }
+                    }
+                  }}
+                  onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
+                    const selection = window.getSelection();
+                    setText(event.currentTarget.textContent!);
+                    if (selection === null) return;
+                    let focusNode = selection.focusNode;
+                    if (focusNode === null) {
+                      return;
+                    }
+                    let div = focusNode.parentElement;
+                    if (div === null) {
+                      return;
+                    }
+                    let text = div.childNodes;
+                    if (focusNode === null || text.length === 0) {
+                      return;
+                    }
+                    let textContentFocusNode = focusNode.textContent;
+
+                    let tagOp = findTag(textContentFocusNode!);
+                    if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
+                      setTagString(tagOp?.tagString!);
+                    }
+                  }}></div>
+              </div>
+              <AttachmentsHolder {...attachmentProps} />
+            </div>
+            <div
+              className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
+              onClick={postFeed}>
+              Post
+            </div>
           </div>
         </div>
       </div>

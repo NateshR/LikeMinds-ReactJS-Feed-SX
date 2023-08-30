@@ -49,3 +49,6 @@
   font-weight: 500;
   color: #484f67;
 }
+.lmOverflowMenuTitle:hover{
+  background-color: rgba(230, 235, 245, 1);
+}

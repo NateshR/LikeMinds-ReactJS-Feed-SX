@@ -5,6 +5,7 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
 import { Attachment, AttachmentMeta, IPost } from 'likeminds-sdk';
+import { setCursorAtEnd } from '../createPost/CreatePostDialog';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -502,12 +503,13 @@ const EditPost = ({
       );
     } else {
       return (
-        <span
+        <div
           style={{
+            minWidth: '36px',
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            display: 'inline-flex',
+            display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#5046e5',
@@ -519,7 +521,7 @@ const EditPost = ({
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
-        </span>
+        </div>
       );
     }
   }
@@ -655,14 +657,24 @@ const EditPost = ({
                         div!.insertBefore(dummyNode, anchorNode);
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
+                        setCursorAtEnd(contentEditableDiv);
                       }}>
-                      {setTagUserImage(item)}
-                      <span
+                      <div
                         style={{
-                          padding: '0px 0.5rem'
+                          display: 'flex',
+                          alignItems: 'center'
                         }}>
-                        {item?.name}
-                      </span>
+                        {setTagUserImage(item)}
+                        <div
+                          style={{
+                            padding: '0px 0.5rem',
+                            textTransform: 'capitalize',
+                            overflowY: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}>
+                          {item?.name}
+                        </div>
+                      </div>
                     </button>
                   );
                 })}

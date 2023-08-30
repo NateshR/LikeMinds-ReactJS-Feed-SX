@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { lmFeedClient } from '..';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { Skeleton } from '@mui/material';
 
 function AllMembers() {
   const [allMembersArray, setAllMembersArray] = useState<IMember[]>([]);
   const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [totalMembers, setTotalMembers] = useState<number>(0);
+
   useEffect(() => {
     getAllMembersThrice();
   }, []);
@@ -93,13 +95,41 @@ function AllMembers() {
       );
     });
   }
+  function renderComponent() {
+    switch (allMembersArray.length) {
+      case 0:
+        return Array(30)
+          .fill(0)
+          .map((value: number, index: number) => {
+            return (
+              <div className="noMemberSkeletonContainer" key={(Math.random() + index).toString()}>
+                <Skeleton variant="circular" width={40} height={40} />
+                <div className="textContentSkeleton">
+                  <Skeleton variant="text" width={'80%'} />
+                </div>
+              </div>
+            );
+          });
+      default:
+        return renderMembersList();
+    }
+  }
   return (
     <div className="allMembers">
-      <div className="allMembers__header">
-        Members {'('}
-        {totalMembers}
-        {')'}
-      </div>
+      {allMembersArray.length ? (
+        <div className="allMembers__header">
+          Members {'('}
+          {totalMembers}
+          {')'}
+        </div>
+      ) : (
+        <div className="noMemberSkeletonContainer">
+          <Skeleton variant="circular" width={40} height={40} />
+          <div className="textContentSkeleton">
+            <Skeleton variant="text" width={'80%'} />
+          </div>
+        </div>
+      )}
       <div className="allMembers__list" id="allMembersScrollWrapper">
         <InfiniteScroll
           loader={null}
@@ -107,7 +137,7 @@ function AllMembers() {
           dataLength={allMembersArray.length}
           next={getAllMembers}
           scrollableTarget="allMembersScrollWrapper">
-          {renderMembersList()}
+          {renderComponent()}
         </InfiniteScroll>
       </div>
     </div>

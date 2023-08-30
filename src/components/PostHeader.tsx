@@ -223,7 +223,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             horizontal: 'right'
           }}
           sx={{
-            // width: '196px',
+            paddingY: '0px',
             boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
           }}
           onClose={handleCloseMoreOptionsMenu}>
