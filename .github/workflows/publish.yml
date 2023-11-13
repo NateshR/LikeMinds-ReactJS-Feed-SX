@@ -10,9 +10,7 @@ permissions: write-all
 jobs:
   create_tag:
     name: Create Git Tag
-    needs: publish
     runs-on: ubuntu-latest
-    permissions: write-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -54,7 +52,6 @@ jobs:
     name: Create GitHub Release
     runs-on: ubuntu-latest
     needs: create_tag
-    permissions: write-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
