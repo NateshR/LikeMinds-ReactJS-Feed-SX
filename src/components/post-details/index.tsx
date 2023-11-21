@@ -3,7 +3,7 @@ import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { IPost, IUser } from '@likeminds.community/feed-js';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
 import { lmFeedClient } from '../..';
 import AllMembers from '../AllMembers';
 import { SHOW_SNACKBAR } from '../../services/feedModerationActions';
@@ -14,13 +14,20 @@ interface PostDetailsProps {
   users: { [key: string]: IUser };
   rightSidebarHandler: (action: string, value: any) => void;
   rightSideBar: any;
+  topics: Record<string, LMFeedTopics>;
 }
 interface UseParamsProps {
   index: number;
   user: IUser;
   post: IPost;
 }
-function PostDetails({ callBack, feedArray, rightSidebarHandler, rightSideBar }: PostDetailsProps) {
+function PostDetails({
+  callBack,
+  feedArray,
+  rightSidebarHandler,
+  rightSideBar,
+  topics
+}: PostDetailsProps) {
   const location = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -48,14 +55,15 @@ function PostDetails({ callBack, feedArray, rightSidebarHandler, rightSideBar }:
         callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
       }
     }
-    if (params?.postId) {
+
+    if (params?.postId && feedArray.length) {
       setPostDetails();
     }
     return () => {
       setPost(null);
       setUser(null);
     };
-  }, [params.postId]);
+  }, [params.postId, feedArray]);
 
   return (
     <div
@@ -91,6 +99,7 @@ function PostDetails({ callBack, feedArray, rightSidebarHandler, rightSideBar }:
                   post={post!}
                   user={user!}
                   rightSidebarHandler={rightSidebarHandler}
+                  topics={topics}
                 />
               </div>
             </div>

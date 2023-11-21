@@ -4,11 +4,12 @@ import comment from '../assets/images/comment.svg';
 import bookmark from '../assets/images/bookmark.svg';
 import share from '../assets/images/share.svg';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PostHeader from './PostHeader';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
-import { IPost, IUser } from '@likeminds.community/feed-js';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import PostTopicBlock from './topic-feed/post-topic-block';
 
 interface PostProps {
   post: IPost;
@@ -16,6 +17,7 @@ interface PostProps {
   feedModerationHandler: (action: string, index: number, value: any) => void;
   index: number;
   rightSidebarHandler: (action: string, value: any) => void;
+  topics: Record<string, LMFeedTopics>;
 }
 const pattern = /<<.*?>>/g;
 
@@ -24,11 +26,20 @@ const Post: React.FC<PostProps> = ({
   user,
   feedModerationHandler,
   index,
-  rightSidebarHandler
+  rightSidebarHandler,
+  topics
 }) => {
+  const [topicsForPost, setTopicsForPost] = useState<LMFeedTopics[]>([]);
+  useEffect(() => {
+    const selectedPostTopics = post.topics.map((topicId) => {
+      return topics[topicId];
+    });
+    setTopicsForPost(selectedPostTopics);
+  }, [topics, post]);
   if (!user) {
     return null;
   }
+
   return (
     <div>
       {/* Post */}
@@ -48,6 +59,7 @@ const Post: React.FC<PostProps> = ({
           isPinned={post.isPinned}
           isEdited={post.isEdited}
         />
+        <PostTopicBlock topics={topicsForPost} />
         {/* post */}
         <PostBody
           answer={post.text}

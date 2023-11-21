@@ -7,7 +7,7 @@ import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 import { lmFeedClient } from '..';
 import { Dialog } from '@mui/material';
 import UserContext from '../contexts/UserContext';
-import { IPost } from '@likeminds.community/feed-js';
+import { IPost } from '@likeminds.community/feed-js-beta';
 interface CreateFeedProps {
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
   feedArray: IPost[];
@@ -79,6 +79,11 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
         onClose={(e: any) => {
           closeCreatePostDialog();
           e.preventDefault();
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '16px'
+          }
         }}>
         <CreatePostDialog
           closeCreatePostDialog={closeCreatePostDialog}
