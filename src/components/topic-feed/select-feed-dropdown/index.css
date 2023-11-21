@@ -1,0 +1,81 @@
+.displaySelectedTopicsContainer {
+    width: 100%;
+    display: flex;
+}
+
+.topicTagsContainer {
+    flex: 1;
+}
+
+.clearButton {
+    display: flex;
+    align-items: start;
+    cursor: pointer;
+}
+
+.clearButton>span {
+    font-size: 16px;
+    font-family: Roboto;
+    line-height: 20px;
+    font-weight: 400;
+    color: #5046E5;
+
+}
+
+.postCreationAllTopicButton {
+    width: 120px;
+    height: 24px;
+    display: flex;
+    padding: 2px 8px;
+    align-items: center;
+    color: #5046E5;
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    border-radius: 4px;
+    border: none;
+    background: rgba(80, 70, 229, 0.10);
+    cursor: pointer;
+
+}
+
+.editTopicsIcon {
+    width: 36px;
+    height: 24px;
+    display: inline-flex;
+    padding: 2px 8px;
+    margin-top: 4px;
+    border-radius: 4px;
+    background: rgba(80, 70, 229, 0.10);
+    transform: translateY(5px);
+    cursor: pointer;
+}
+
+.topicSearchBoxContainer {
+    position: relative;
+    margin: 16px 0px 8px 0px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 8px;
+    top: 10.11px
+}
+
+.topicSearchBox {
+    height: 36px;
+    padding: 7px 8px;
+    padding-left: 30px;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(118, 118, 128, 0.12);
+    width: 100%;
+    color: rgba(0, 0, 0, 0.87);
+
+}
+
+.topicSearchBox:focus-visible {
+    outline: none;
+}
