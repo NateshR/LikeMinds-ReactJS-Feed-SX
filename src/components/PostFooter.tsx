@@ -10,7 +10,7 @@ import {
   UPDATE_LIKES_COUNT_DECREMENT_POST,
   UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../services/feedModerationActions';
-import { IComment, IMemberRight, IPost, IUser } from '@likeminds.community/feed-js';
+import { IComment, IMemberRight, IPost, IUser } from '@likeminds.community/feed-js-beta';
 import SendIcon from '@mui/icons-material/Send';
 import nonSavedPost from '../assets/images/nonSavedPost.png';
 import savedPost from '../assets/images/savedPost.png';

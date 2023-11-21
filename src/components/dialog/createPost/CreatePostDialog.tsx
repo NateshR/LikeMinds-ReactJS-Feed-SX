@@ -6,8 +6,9 @@ import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { IPost, IUser } from '@likeminds.community/feed-js';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -179,6 +180,18 @@ const CreatePostDialog = ({
   const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
   const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
+  const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
+  function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
+    const newSelectedTopics = topics?.map((topic) => {
+      return topic.Id;
+    });
+    console.log(newSelectedTopics);
+    if (newSelectedTopics && newSelectedTopics.length) {
+      setSelectedTopics(newSelectedTopics);
+    } else {
+      setSelectedTopics(null);
+    }
+  }
   const containerRef = useRef<HTMLDivElement | null>(null);
   const attachmentProps = {
     showMediaUploadBar,
@@ -339,22 +352,24 @@ const CreatePostDialog = ({
       if (imageOrVideoUploadArray?.length) {
         response = await lmFeedClient.addPostWithImageAttachments(
           textContent,
+          selectedTopics,
           imageOrVideoUploadArray,
           userContext?.user?.sdkClientInfo.userUniqueId
         );
       } else if (documentUploadArray?.length) {
         response = await lmFeedClient.addPostWithDocumentAttachments(
           textContent,
+          selectedTopics,
           documentUploadArray,
           userContext?.user?.sdkClientInfo.userUniqueId
         );
       } else if (previewOGTagData !== null) {
-        response = await lmFeedClient.addPostWithOGTags(text, previewOGTagData);
+        response = await lmFeedClient.addPostWithOGTags(text, selectedTopics, previewOGTagData);
       } else {
         if (textContent === '') {
           return;
         }
-        response = await lmFeedClient.addPost(textContent);
+        response = await lmFeedClient.addPost(textContent, selectedTopics);
       }
 
       const post: IPost = response?.data?.post;
@@ -605,7 +620,7 @@ const CreatePostDialog = ({
           </div>
 
           <div style={{}}>
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
+            <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info margin-bottom-16">
               <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
                 {setUserImage()}
               </div>
@@ -613,6 +628,10 @@ const CreatePostDialog = ({
                 {userContext?.user?.name}
               </div>
             </div>
+            <TopicFeedDropdownSelector
+              setTopicsForTopicFeed={setTopicsForTopicFeed}
+              isCreateMode={true}
+            />
             <div
               style={{
                 maxHeight: '324px',

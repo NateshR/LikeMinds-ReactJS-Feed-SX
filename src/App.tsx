@@ -15,9 +15,9 @@ function App() {
         <Header />
       </div>
       <section className="mainBlock">
-        <div className="nav">
+        {/* <div className="nav">
           <Nav />
-        </div>
+        </div> */}
         <BrowserRouter>
           <div className="main">
             <FeedComponent setCallBack={setCallBack} />

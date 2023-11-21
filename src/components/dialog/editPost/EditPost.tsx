@@ -4,9 +4,11 @@ import '../createPost/createPostDialog.css';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { Attachment, AttachmentMeta, IPost } from '@likeminds.community/feed-js';
+import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js-beta';
 import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
+import { Snackbar } from '@mui/material';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -16,6 +18,7 @@ interface CreatePostDialogProps {
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
   feedArray: IPost[];
   post: IPost | null;
+  topics: Record<string, LMFeedTopics>;
 }
 interface Limits {
   left: number;
@@ -88,10 +91,10 @@ export function checkAtSymbol(str: string, index: number): number {
 
 const EditPost = ({
   closeCreatePostDialog,
-
   setFeedArray,
   feedArray,
-  post
+  post,
+  topics
 }: CreatePostDialogProps) => {
   const userContext = useContext(UserContext);
   function setUserImage() {
@@ -145,6 +148,21 @@ const EditPost = ({
     left: 0,
     right: 0
   });
+  const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
+  const [existingSelectedTopics, setExistingSelectedTopics] = useState<LMFeedTopics[]>([]);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
+    const newSelectedTopics = topics?.map((topic) => {
+      return topic.Id;
+    });
+    console.log(newSelectedTopics);
+    if (newSelectedTopics && newSelectedTopics.length) {
+      setSelectedTopics(newSelectedTopics);
+    } else {
+      setSelectedTopics(null);
+    }
+  }
   function setToEndOfContent(element: HTMLDivElement): void {
     if (element.contentEditable === 'true') {
       const range = document.createRange();
@@ -234,12 +252,12 @@ const EditPost = ({
   }
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
-    const matches = text.match(regex) || [];
-    const splits = text.split(regex);
+    const matches = text?.match(regex) || [];
+    const splits = text?.split(regex);
 
     const container = document.createElement('div');
 
-    for (let i = 0; i < splits.length; i++) {
+    for (let i = 0; i < splits?.length; i++) {
       const splitNode = document.createTextNode(splits[i]);
       container.appendChild(splitNode);
 
@@ -349,7 +367,6 @@ const EditPost = ({
         textContent = '';
       }
 
-      closeDialogBox();
       let response: any;
 
       if (textContent === '') {
@@ -368,11 +385,31 @@ const EditPost = ({
         }
         return item;
       });
-      response = await lmFeedClient.editPost(post?.Id!, textContent, [
-        ...imageOrVideoUploadArray,
-        ...documentUploadArray,
-        ...previewOGTagData
-      ]);
+      const disabledTopicList: string[] = [];
+      selectedTopics?.forEach((topicId: string) => {
+        const tempTopic = topics[topicId];
+        console.log(tempTopic.isEnabled);
+        if (!tempTopic.isEnabled) {
+          disabledTopicList.push(tempTopic.name);
+        }
+      });
+      console.log('The Disabled Topic List is');
+      console.log(disabledTopicList);
+      if (disabledTopicList.length) {
+        setOpenSnackbar(true);
+        setSnackbarMessage(`
+        The following topics have been disabled. Please remove them:
+        ${disabledTopicList.join(',')}
+        `);
+        return;
+      }
+      closeDialogBox();
+      response = await lmFeedClient.editPost(
+        post?.Id!,
+        textContent,
+        [...imageOrVideoUploadArray, ...documentUploadArray, ...previewOGTagData],
+        selectedTopics
+      );
       const newpost: IPost = response?.data?.post;
       const newFeedArray = [...feedArray];
       const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
@@ -507,6 +544,15 @@ const EditPost = ({
       setToEndOfContent(contentEditableDiv.current);
     }
   }, [contentEditableDiv.current]);
+  useEffect(() => {
+    const postTopics: any = post?.topics;
+    const selectedTopicsList = postTopics?.map((topicId: string) => {
+      return topics[topicId];
+    });
+    console.log('The selected topics list is');
+    console.log(selectedTopicsList);
+    setExistingSelectedTopics(selectedTopicsList);
+  }, [topics, post]);
   function setTagUserImage(user: any) {
     const imageLink = user?.imageUrl;
     if (imageLink !== '') {
@@ -641,14 +687,14 @@ const EditPost = ({
           className="create-post-feed-dialog-wrapper_container--closeicon"
           onClick={closeDialogBox}>
           <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M3.47755 20.5254C3.89943 20.9356 4.59084 20.9356 4.98927 20.5254L11.9971 13.5176L19.0049 20.5254C19.4151 20.9356 20.1065 20.9473 20.5166 20.5254C20.9268 20.1035 20.9385 19.4121 20.5283 19.002L13.5205 11.9942L20.5283 4.99806C20.9385 4.58791 20.9385 3.88478 20.5166 3.47462C20.0947 3.06447 19.4151 3.06447 19.0049 3.47462L11.9971 10.4824L4.98927 3.47462C4.59084 3.06447 3.88771 3.05275 3.47755 3.47462C3.0674 3.8965 3.0674 4.58791 3.47755 4.99806L10.4736 11.9942L3.47755 19.002C3.0674 19.4121 3.05568 20.1152 3.47755 20.5254Z"
-              fill="#000000"
+              d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
+              fill="#484F67"
             />
           </svg>
         </span>
@@ -664,6 +710,11 @@ const EditPost = ({
               {userContext?.user?.name}
             </div>
           </div>
+          <TopicFeedDropdownSelector
+            setTopicsForTopicFeed={setTopicsForTopicFeed}
+            isCreateMode={true}
+            existingSelectedTopics={existingSelectedTopics}
+          />
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
             <div
               ref={contentEditableDiv}
@@ -691,7 +742,7 @@ const EditPost = ({
               }}
               onFocus={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim() === '') {
+                  if (text?.trim() === '') {
                     contentEditableDiv.current.textContent = ``;
                   }
                 }
@@ -729,6 +780,14 @@ const EditPost = ({
           </div>
         </div>
       </div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={5000}
+        message={snackbarMessage}
+        onClose={() => {
+          setOpenSnackbar(false);
+        }}
+      />
     </div>
   );
 };
