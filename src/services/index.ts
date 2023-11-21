@@ -1,4 +1,5 @@
-import LMFeedClient, {
+import {
+  LMFeedClient,
   InitiateUserRequest,
   GetFeedRequest,
   GetFeedResponse,
@@ -47,7 +48,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
-          .setUUID(userUniqueId)
+          // .setUUID(userUniqueId)
+          .setUUID('7780210b-dddb-43ab-8c7c-1caa1d4e16ab')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
           .build()
@@ -64,6 +66,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         AddPostRequest.builder()
           .setText(text)
           .setAttachments(attachmentArr ? attachmentArr : [])
+          .setTempId(Date.now().toString())
           .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);
@@ -82,7 +85,11 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       );
 
       const apiCallResponse = await this.client.addPost(
-        AddPostRequest.builder().setText(text).setAttachments(attachmentArr).build()
+        AddPostRequest.builder()
+          .setText(text)
+          .setAttachments(attachmentArr)
+          .setTempId(Date.now().toString())
+          .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);
     } catch (error) {
@@ -147,7 +154,11 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       }
 
       const apiCallResponse: UploadMediaModel = await this.client.addPost(
-        AddPostRequest.builder().setText(text).setAttachments(attachmentResponseArray).build()
+        AddPostRequest.builder()
+          .setText(text)
+          .setAttachments(attachmentResponseArray)
+          .setTempId(Date.now().toString())
+          .build()
       );
       return apiCallResponse;
     } catch (error) {
@@ -174,7 +185,11 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       );
     }
     const apiCallResponse: UploadMediaModel = await this.client.addPost(
-      AddPostRequest.builder().setText(text).setAttachments(attachmentResponseArray).build()
+      AddPostRequest.builder()
+        .setText(text)
+        .setAttachments(attachmentResponseArray)
+        .setTempId(Date.now().toString())
+        .build()
     );
     return apiCallResponse;
   }
