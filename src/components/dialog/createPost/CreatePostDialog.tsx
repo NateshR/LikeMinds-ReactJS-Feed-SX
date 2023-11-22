@@ -5,7 +5,7 @@ import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
-import { DecodeUrlModelSX } from '../../../services/models';
+import { DecodeUrlModelSX, OgTags } from '../../../services/models';
 import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
@@ -337,7 +337,85 @@ const CreatePostDialog = ({
     setShowMediaAttachmentOnInitiation(false);
     setShowDocumentAttachmentOnInitiation(false);
   }
-
+  function makeTempPost(
+    text: string,
+    imageAttachmentArray: File[],
+    pdfAttachmentArray: File[],
+    ogTagAttachmentArray: any[],
+    topics: any
+  ) {
+    const timeStamp = Date.now();
+    const post = {
+      Id: timeStamp,
+      attachments: [],
+      commentsCount: 0,
+      communityId: 50489,
+      createdAt: timeStamp,
+      heading: '',
+      isEdited: false,
+      isLiked: false,
+      isPinned: false,
+      isSaved: false,
+      likesCount: 0,
+      menuItems: [
+        {
+          id: 5,
+          title: 'Edit Post'
+        },
+        {
+          id: 1,
+          title: 'Delete Post'
+        }
+      ],
+      replies: [],
+      text: '',
+      topics: [],
+      updatedAt: timeStamp,
+      userId: userContext.user?.uuid,
+      uuid: userContext.user?.uuid
+    };
+    post.topics = topics;
+    post.text = text;
+    const attachments: any = [];
+    if (imageAttachmentArray.length) {
+      imageAttachmentArray.map((attachment: File) => {
+        const attachmentType = attachment.type.split('/')[0] === 'image' ? 1 : 2;
+        attachments.push({
+          attachmentType: attachmentType,
+          attachmentMeta: {
+            url: URL.createObjectURL(attachment),
+            name: attachment.name,
+            size: attachment.size,
+            format: attachmentType === 2 ? 'video/mp4' : undefined
+          }
+        });
+      });
+    } else if (pdfAttachmentArray.length) {
+      pdfAttachmentArray.map((attachment: File) => {
+        attachments.push({
+          attachmentType: 3,
+          attachmentMeta: {
+            url: URL.createObjectURL(attachment),
+            name: attachment.name,
+            size: attachment.size,
+            format: 'pdf'
+          }
+        });
+      });
+    } else if (ogTagAttachmentArray.length) {
+      ogTagAttachmentArray.map((attachment: OgTags) => {
+        attachments.push({
+          attachmentType: 4,
+          attachmentMeta: {
+            ogTags: attachment
+          }
+        });
+      });
+    }
+    // post.
+    post.attachments = attachments;
+    return post as any;
+  }
   async function postFeed() {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
@@ -346,7 +424,6 @@ const CreatePostDialog = ({
         textContent = '';
       }
 
-      textContent;
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
