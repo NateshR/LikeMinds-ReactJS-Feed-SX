@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import '../createPost/createPostDialog.css';
-import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
 import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js-beta';
@@ -9,6 +8,9 @@ import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDia
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
 import { Snackbar } from '@mui/material';
+import { FeedPost } from '../../../models/feedPost';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -16,7 +18,7 @@ interface CreatePostDialogProps {
   //   showMediaAttachmentOnInitiation: boolean;
   //   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
   setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: IPost[];
+  feedArray: FeedPost[];
   post: IPost | null;
   topics: Record<string, LMFeedTopics>;
 }
@@ -96,14 +98,16 @@ const EditPost = ({
   post,
   topics
 }: CreatePostDialogProps) => {
-  const userContext = useContext(UserContext);
+  // redux managed state
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -127,7 +131,7 @@ const EditPost = ({
             letterSpacing: '1px',
             borderRadius: '50%'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -410,11 +414,11 @@ const EditPost = ({
         [...imageOrVideoUploadArray, ...documentUploadArray, ...previewOGTagData],
         selectedTopics
       );
-      const newpost: IPost = response?.data?.post;
+      const newpost: FeedPost = response?.data?.post;
       const newFeedArray = [...feedArray];
-      const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
+      const thisFeedIndex = newFeedArray.findIndex((item: FeedPost) => item.Id === post?.Id!);
       newFeedArray[thisFeedIndex] = { ...newpost };
-      setFeedArray(newFeedArray);
+      setFeedArray(newFeedArray as any);
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -559,7 +563,7 @@ const EditPost = ({
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -707,7 +711,7 @@ const EditPost = ({
               {setUserImage()}
             </div>
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-              {userContext?.user?.name}
+              {currentUser?.name}
             </div>
           </div>
           <TopicFeedDropdownSelector

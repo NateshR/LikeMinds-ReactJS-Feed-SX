@@ -9,7 +9,6 @@ const PostTopicBlock = ({ topics }: PostTopicBlockProps) => {
   return (
     <div className="postTopicBlockContainer">
       {topics?.map((topic: LMFeedTopics) => {
-        console.log(topic);
         return (
           <TopicBlock isCreateMode={true} onDeleteClick={null} key={topic?.Id} topic={topic} />
         );

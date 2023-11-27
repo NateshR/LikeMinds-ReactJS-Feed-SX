@@ -23,7 +23,6 @@ import {
   setCursorAtEnd
 } from './dialog/createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import UserContext from '../contexts/UserContext';
 import ReportPostDialogBox from './ReportPost';
 import { truncateSync } from 'fs';
 import SeePostLikes from './SeePostLikes';
@@ -35,6 +34,8 @@ import {
   UPDATE_LIKES_COUNT_DECREMENT,
   UPDATE_LIKES_COUNT_INCREMENT
 } from '../services/feedModerationActions';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 dayjs.extend(relativeTime);
 interface CommentProps {
   comment: IComment;
@@ -58,6 +59,10 @@ const PostComents: React.FC<CommentProps> = ({
   parentCommentsCount,
   rightSidebarHandler
 }) => {
+  // Redux Managed State
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+
+  // Local states
   const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
   const [openDialogBox, setOpenDialogBox] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(comment.isLiked);
@@ -167,15 +172,14 @@ const PostComents: React.FC<CommentProps> = ({
       console.log(error);
     }
   }
-  const userContext = useContext(UserContext);
 
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -199,7 +203,7 @@ const PostComents: React.FC<CommentProps> = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -385,7 +389,7 @@ const PostComents: React.FC<CommentProps> = ({
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',

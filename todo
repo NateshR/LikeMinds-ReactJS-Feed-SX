@@ -1,0 +1,4 @@
+Add a logger to indicate the api call fail in a snackbar using an interceptor
+Add constants and Enums
+Add husky for linting
+Use useCallbacks , memo, Usememos whenever necessary

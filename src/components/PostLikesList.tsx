@@ -3,12 +3,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { lmFeedClient } from '..';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import UserContext from '../contexts/UserContext';
 import {
   UPDATE_LIKES_COUNT_DECREMENT,
   UPDATE_LIKES_COUNT_INCREMENT,
   UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../services/feedModerationActions';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 interface PostLikesProps {
   postId: string;
   rightSidebarhandler: (action: string, value: any) => void;
@@ -25,12 +26,14 @@ function PostLikesList({
   totalLikes,
   initiateAction
 }: PostLikesProps) {
+  // redux managed state
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
   const [allMembersArray, setAllMembersArray] = useState<IMember[]>([]);
   const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [userMap, setUserMap] = useState<any>({});
-  const userContext = useContext(UserContext);
+
   useEffect(() => {
     getAllMembersThrice();
   }, [postId, entityId]);
@@ -39,37 +42,33 @@ function PostLikesList({
       initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT ||
       initiateAction?.action === UPDATE_LIKES_COUNT_DECREMENT
     ) {
-      const index = allMembersArray.findIndex(
-        (member: any) => member.uuid === userContext.user?.uuid
-      );
+      const index = allMembersArray.findIndex((member: any) => member.uuid === currentUser?.uuid);
       const newArr: any = [...allMembersArray];
       if (initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT) {
         newArr.push({
-          uuid: userContext.user?.uuid,
-          name: userContext.user?.name
+          uuid: currentUser?.uuid,
+          name: currentUser?.uuid
         });
       } else {
         newArr.splice(index, 1);
       }
       setAllMembersArray(newArr);
 
-      setUserMap({ ...userMap, [userContext.user?.uuid]: userContext.user });
+      setUserMap({ ...userMap, [currentUser?.uuid!]: currentUser?.uuid });
     } else {
-      const index = allMembersArray.findIndex(
-        (member: any) => member.uuid === userContext.user?.uuid
-      );
+      const index = allMembersArray.findIndex((member: any) => member.uuid === currentUser?.uuid);
       const newArr: any = [...allMembersArray];
       if (initiateAction?.action === UPDATE_LIKES_COUNT_INCREMENT_POST) {
         newArr.push({
-          uuid: userContext.user?.uuid,
-          name: userContext.user?.name
+          uuid: currentUser?.uuid,
+          name: currentUser?.name
         });
       } else {
         newArr.splice(index, 1);
       }
       setAllMembersArray(newArr);
 
-      setUserMap({ ...userMap, [userContext.user?.uuid]: userContext.user });
+      setUserMap({ ...userMap, [currentUser?.uuid!]: currentUser });
     }
   }, [initiateAction?.action, postId, entityId, entityType]);
   async function getAllMembersThrice() {
