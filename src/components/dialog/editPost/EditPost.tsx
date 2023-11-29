@@ -700,12 +700,12 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
             <p>Edit Post</p>
           </div>
-          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
+          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info margin-bottom-16">
+            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image ">
               {setUserImage()}
             </div>
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-              {currentUser?.name}
+              {currentUser?.name.toUpperCase()}
             </div>
           </div>
           <TopicFeedDropdownSelector
@@ -713,6 +713,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             isCreateMode={true}
             existingSelectedTopics={existingSelectedTopics}
           />
+          <div className="separator"></div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
             <div
               ref={contentEditableDiv}

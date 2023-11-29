@@ -729,14 +729,14 @@ const CreatePostDialog = ({
                 {setUserImage()}
               </div>
               <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-                {currentUser?.name}
+                {currentUser?.name.toUpperCase()}
               </div>
             </div>
             <TopicFeedDropdownSelector
               setTopicsForTopicFeed={setTopicsForTopicFeed}
               isCreateMode={true}
             />
-
+            <div className="separator"></div>
             <div
               style={{
                 maxHeight: '324px',
