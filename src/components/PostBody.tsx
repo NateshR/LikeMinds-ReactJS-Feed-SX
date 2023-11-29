@@ -100,8 +100,8 @@ const PostBody: React.FC = () => {
         (attachment: Attachment) =>
           attachment.attachmentType === 1 ||
           attachment.attachmentType === 2 ||
-          attachment.attachmentType === 3 ||
-          attachment.attachmentType === 4
+          attachment.attachmentType === 3
+        // attachment.attachmentType === 4
       )
       .map((attachment: Attachment) => {
         return renderMediaItem(attachment);
@@ -205,7 +205,6 @@ const PostBody: React.FC = () => {
           return (
             <div
               style={{
-                float: 'left',
                 background: 'white'
               }}
               key={attachment.attachmentMeta?.ogTags?.url?.toString()}>
@@ -256,6 +255,11 @@ const PostBody: React.FC = () => {
           showIndicators={false}>
           {renderedData}
         </Carousel>
+        {attachments
+          .filter((attachment: Attachment) => attachment.attachmentType === 4)
+          .map((attachment: Attachment) => {
+            return renderMediaItem(attachment);
+          })}
       </div>
     </div>
   );

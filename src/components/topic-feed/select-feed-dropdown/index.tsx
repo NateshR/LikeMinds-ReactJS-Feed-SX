@@ -7,6 +7,8 @@ import TopicList from '../topic-list';
 import TopicListItem from '../topic-list';
 import TopicBlock from '../topic';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 
 interface TopicFeedDropdownSelectorProps {
   setTopicsForTopicFeed: any;
@@ -19,11 +21,17 @@ const TopicFeedDropdownSelector = ({
   isCreateMode,
   existingSelectedTopics
 }: TopicFeedDropdownSelectorProps) => {
+  const extras = useSelector((state: RootState) => state.extras);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [topicList, setTopicList] = useState<LMFeedTopics[]>([]);
-  const [checkedTopicList, setCheckedTopicList] = useState<LMFeedTopics[]>([]);
+  const [shouldHide, setShouldHide] = useState<boolean>(true);
+  const [checkedTopicList, setCheckedTopicList] = useState<LMFeedTopics[]>(
+    isCreateMode ? [] : extras.selectedTopics
+  );
   const [page, setPage] = useState<number>(1);
-  const [showFilter, setShowFilter] = useState<boolean>(true);
+  const [showFilter, setShowFilter] = useState<boolean>(
+    extras.selectedTopics.length ? false : true
+  );
   const [searchKey, setSearchKey] = useState<string>('');
   const [hasMoreTopics, setHasMoreTopics] = useState<boolean>(true);
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -170,7 +178,8 @@ const TopicFeedDropdownSelector = ({
                   role="option"
                   key={Math.random()}
                   sx={{
-                    padding: '0px'
+                    padding: '0px',
+                    borderBottom: '1px solid rgba(208, 216, 226, 0.40)'
                   }}>
                   <TopicListItem
                     clickHandler={handleSelectAll}
@@ -182,6 +191,7 @@ const TopicFeedDropdownSelector = ({
                     checkedList={checkedTopicList}
                   />
                 </MenuItem>
+
                 {menuList}
               </InfiniteScroll>
             </Menu>
@@ -211,6 +221,9 @@ const TopicFeedDropdownSelector = ({
           <div>
             <button onClick={handleButtonClick} className="postCreationAllTopicButton">
               <svg
+                style={{
+                  marginRight: '4px'
+                }}
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
@@ -356,6 +369,9 @@ const TopicFeedDropdownSelector = ({
           setPage(2);
           console.log('triggering with pageNo as argument');
           setTopicList(newTopicList);
+          if (newTopicList.length && searchKey === '') {
+            setShouldHide(false);
+          }
         } else {
           console.log('triggering without pageNo as argument');
           setPage(page + 1);
@@ -398,9 +414,9 @@ const TopicFeedDropdownSelector = ({
       return (
         <MenuItem
           disableRipple={true}
-          value={topic.Id}
+          value={topic?.Id}
           role="option"
-          key={topic.Id}
+          key={topic?.Id}
           sx={{
             padding: '0px'
           }}>
@@ -450,6 +466,9 @@ const TopicFeedDropdownSelector = ({
       setSearchKey('');
     };
   }, [menuAnchor]);
+  if (shouldHide) {
+    return null;
+  }
   return setView();
 };
 

@@ -41,7 +41,8 @@ import { addNewUsers } from '../../store/users/usersSlice';
 import { FeedPost } from '../../models/feedPost';
 import { PostContext } from '../../contexts/postContext';
 import { Topic } from '../../models/topics';
-import { handleEditDialogState } from '../../store/snackbar/snackbarSlice';
+import { handleEditDialogState, hideSnackbar } from '../../store/snackbar/snackbarSlice';
+import { setSelectedTopicsArray } from '../../store/extrasSlice/extraSlice';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
 }
@@ -71,8 +72,10 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     });
     if (newSelectedTopics && newSelectedTopics.length) {
       setSelectedTopics(newSelectedTopics);
+      dispatch(setSelectedTopicsArray(topics!));
     } else {
       setSelectedTopics(null);
+      dispatch(setSelectedTopicsArray([]));
     }
     dispatch(clearPosts());
     setPageCount(1);
@@ -382,12 +385,14 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
 
     return () => document.removeEventListener('NOTIFICATION', handleNotificationAction);
   });
+
   async function handleNotificationAction(e: any) {
     navigate(`/post/${e.detail}`);
   }
   if (!user) {
     return null;
   }
+
   return (
     <>
       {/* {setHeader()} */}
@@ -410,6 +415,14 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         }}
         autoHideDuration={3000}
         message={snackBarMessage}
+      />
+      <Snackbar
+        open={snackbarState.showSnackbar}
+        onClose={() => {
+          dispatch(hideSnackbar());
+        }}
+        autoHideDuration={3000}
+        message={snackbarState.message}
       />
       <Dialog
         open={snackbarState.openEditDialogBox}

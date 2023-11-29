@@ -357,6 +357,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
       let response: any;
 
       if (textContent === '') {
+        dispatch(showSnackbar('Please Add Text to create a post'));
         return;
       }
       let newArr: any[] = [];

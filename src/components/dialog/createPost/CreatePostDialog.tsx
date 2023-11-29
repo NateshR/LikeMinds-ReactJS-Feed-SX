@@ -22,6 +22,7 @@ import { RootState } from '../../../store/store';
 import { addNewLocalPost, replaceLocalPost } from '../../../store/feedPosts/feedsSlice';
 import { addNewTopics } from '../../../store/topics/topicsSlice';
 import { Topic } from '../../../models/topics';
+import { showSnackbar } from '../../../store/snackbar/snackbarSlice';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -820,6 +821,7 @@ const CreatePostDialog = ({
                   textContent = '';
                 }
                 if (!textContent.length) {
+                  dispatch(showSnackbar('Please Add Text to create a post'));
                   return;
                 }
                 const timeStamp = Date.now().toString();
@@ -831,10 +833,7 @@ const CreatePostDialog = ({
                   selectedTopics,
                   timeStamp
                 );
-                console.log('The Temp post is');
-                console.log(tempPost);
-                console.log('The topics are: ');
-                console.log(topics);
+
                 feedModerationHandler(ADD_POST_LOCALLY, null, {
                   post: tempPost,
                   topics: topics
