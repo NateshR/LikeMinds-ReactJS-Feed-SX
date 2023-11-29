@@ -52,7 +52,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
           // .setUUID(userUniqueId)
-          .setUUID('7780210b-dddb-43ab-8c7c-1caa1d4e16ab')
+          .setUUID('')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
           .build()
