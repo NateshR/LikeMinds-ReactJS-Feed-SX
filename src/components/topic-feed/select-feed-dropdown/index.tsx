@@ -47,7 +47,15 @@ const TopicFeedDropdownSelector = ({
           const idIndex = checkedTopicList.findIndex((element) => element.Id === topic.Id);
           const newCheckedList = [...checkedTopicList];
           newCheckedList.splice(idIndex, 1);
+          console.log('checking for newCheckedList');
+          console.log(newCheckedList);
           setCheckedTopicList(newCheckedList);
+          // emptying the existing selected prop to [] when create mode is on
+          // if (isCreateMode && newCheckedList.length === 0) {
+          //   setShowFilter(true);
+          //   setMenuAnchor(null);
+          //   // existingSelectedTopics = [];
+          // }
           return;
         }
         case false: {
@@ -67,6 +75,9 @@ const TopicFeedDropdownSelector = ({
 
     if (!newCheckedList.length) {
       setTopicsForTopicFeed(newCheckedList);
+      existingSelectedTopics = [];
+      console.log('The existing selected topic list after emptying');
+
       setShowFilter(true);
     }
     // setTopicsForTopicFeed(newCheckedList);
@@ -113,6 +124,9 @@ const TopicFeedDropdownSelector = ({
             <button onClick={handleButtonClick} className="allTopicButton">
               All Topics{' '}
               <svg
+                style={{
+                  marginLeft: '2px'
+                }}
                 width="12"
                 height="16"
                 viewBox="0 0 12 16"
@@ -236,6 +250,7 @@ const TopicFeedDropdownSelector = ({
                 dataLength={topicList.length}
                 scrollableTarget={'scrollerTopics'}>
                 {searchBox}
+                {/* {menuListOfSelectedTopics} */}
                 {menuList}
               </InfiniteScroll>
             </Menu>
@@ -272,6 +287,7 @@ const TopicFeedDropdownSelector = ({
                 dataLength={topicList.length}
                 scrollableTarget={'scrollerTopics'}>
                 {searchBox}
+                {menuListOfSelectedTopics}
                 {menuList}
               </InfiniteScroll>
             </Menu>
@@ -327,7 +343,15 @@ const TopicFeedDropdownSelector = ({
           10,
           isCreateMode ? true : null
         );
-        const newTopicList: LMFeedTopics[] = call.data.topics;
+        const existingAddedTopicList = existingSelectedTopics?.map((topic) => topic.Id);
+        console.log('The existing topics list');
+        console.log(existingAddedTopicList);
+        let newTopicList: LMFeedTopics[] = call.data.topics;
+        newTopicList = newTopicList.filter((topic) => {
+          if (!existingAddedTopicList?.includes(topic.Id)) {
+            return true;
+          }
+        });
         if (pageNo) {
           setPage(2);
           console.log('triggering with pageNo as argument');
@@ -347,7 +371,7 @@ const TopicFeedDropdownSelector = ({
         console.log(error);
       }
     },
-    [page, searchKey, topicList]
+    [page, searchKey, topicList, existingSelectedTopics, isCreateMode]
   );
   const menuList = useMemo(() => {
     return topicList.map((topic: LMFeedTopics) => {
@@ -369,7 +393,35 @@ const TopicFeedDropdownSelector = ({
       );
     });
   }, [topicList, checkedTopicList, isCreateMode]);
-
+  const menuListOfSelectedTopics = useMemo(() => {
+    return existingSelectedTopics?.map((topic: LMFeedTopics) => {
+      return (
+        <MenuItem
+          disableRipple={true}
+          value={topic.Id}
+          role="option"
+          key={topic.Id}
+          sx={{
+            padding: '0px'
+          }}>
+          <TopicListItem
+            clickHandler={menuButtonClickHandler}
+            topic={topic}
+            checkedList={checkedTopicList}
+          />
+        </MenuItem>
+      );
+    });
+  }, [topicList, checkedTopicList, isCreateMode, existingSelectedTopics]);
+  // useEffect(() => {
+  //   if (isCreateMode) {
+  //     if (searchKey?.trim()?.length === 0) {
+  //       console.log('The existing selected positcs are');
+  //       console.log(existingSelectedTopics);
+  //       setTopicList([...existingSelectedTopics!]);
+  //     }
+  //   }
+  // }, [searchKey, existingSelectedTopics, isCreateMode]);
   useEffect(() => {
     if (existingSelectedTopics && existingSelectedTopics.length) {
       setCheckedTopicList(existingSelectedTopics);
@@ -379,11 +431,18 @@ const TopicFeedDropdownSelector = ({
   useEffect(() => {
     const debouncedSearch = setTimeout(() => getFeedTopics(1), 500);
     return () => clearTimeout(debouncedSearch);
-  }, [searchKey]);
+  }, [searchKey, existingSelectedTopics]);
   useEffect(() => {
     if (showFilter) {
       return;
     }
+    if (isCreateMode && checkedTopicList.length === 0) {
+      setShowFilter(true);
+      setMenuAnchor(null);
+      // existingSelectedTopics = [];
+    }
+    console.log('Checkeching for checkedTOpicList');
+    console.log(checkedTopicList);
     setTopicsForTopicFeed(checkedTopicList);
   }, [checkedTopicList, showFilter]);
   useEffect(() => {

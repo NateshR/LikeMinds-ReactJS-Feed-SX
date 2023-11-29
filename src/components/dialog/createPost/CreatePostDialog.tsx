@@ -1,24 +1,36 @@
-import React, { KeyboardEventHandler, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  KeyboardEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 
 import './createPostDialog.css';
 import defaultUserImage from '../../../assets/images/defaultUserImage.png';
-import UserContext from '../../../contexts/UserContext';
+
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
-import { DecodeUrlModelSX } from '../../../services/models';
+import { DecodeUrlModelSX, OgTags } from '../../../services/models';
 import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
+import { ADD_NEW_POST, ADD_POST_LOCALLY } from '../../../services/feedModerationActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { addNewLocalPost, replaceLocalPost } from '../../../store/feedPosts/feedsSlice';
+import { addNewTopics } from '../../../store/topics/topicsSlice';
+import { Topic } from '../../../models/topics';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
   closeCreatePostDialog: () => void;
   showMediaAttachmentOnInitiation: boolean;
   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
-  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: IPost[];
   showDocumentAttachmentOnInitiation: boolean;
   setShowDocumentAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
+  feedModerationHandler?: any;
 }
 interface Limits {
   left: number;
@@ -153,13 +165,13 @@ const CreatePostDialog = ({
   closeCreatePostDialog,
   showMediaAttachmentOnInitiation,
   setShowMediaAttachmentOnInitiation,
-  setFeedArray,
-  feedArray,
   showDocumentAttachmentOnInitiation,
-  setShowDocumentAttachmentOnInitiation
+  setShowDocumentAttachmentOnInitiation,
+  feedModerationHandler
 }: CreatePostDialogProps) => {
-  const userContext = useContext(UserContext);
-
+  // redux managed state
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+  const dispatch = useDispatch();
   const PLACE_HOLDER_TEXT = 'Write something here...';
   const [text, setText] = useState<string>('');
   const [showMediaUploadBar, setShowMediaUploadBar] = useState<null | boolean>(true);
@@ -181,10 +193,12 @@ const CreatePostDialog = ({
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
   const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
   const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
+  const [topics, setTopics] = useState<any[]>([]);
   function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
     const newSelectedTopics = topics?.map((topic) => {
       return topic.Id;
     });
+    setTopics(topics);
     console.log(newSelectedTopics);
     if (newSelectedTopics && newSelectedTopics.length) {
       setSelectedTopics(newSelectedTopics);
@@ -215,12 +229,12 @@ const CreatePostDialog = ({
   };
   const setCloseDialog = () => {};
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -244,7 +258,7 @@ const CreatePostDialog = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser!.name!.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -257,7 +271,7 @@ const CreatePostDialog = ({
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -299,8 +313,6 @@ const CreatePostDialog = ({
     const leftLimit = checkAtSymbol(str, cursorPosition - 1);
 
     if (leftLimit === -1) {
-      ('inside findTag inside left limit');
-      str;
       setCloseDialog(); // Assuming this function is defined somewhere else and handled separately.
       return undefined;
     }
@@ -337,8 +349,85 @@ const CreatePostDialog = ({
     setShowMediaAttachmentOnInitiation(false);
     setShowDocumentAttachmentOnInitiation(false);
   }
-
-  async function postFeed() {
+  function makeTempPost(
+    text: string,
+    imageAttachmentArray: File[] | null,
+    pdfAttachmentArray: File[] | null,
+    ogTagAttachmentArray: any,
+    topics: any,
+    timeStamp: string
+  ) {
+    console.log(timeStamp);
+    const post = {
+      Id: timeStamp,
+      attachments: [],
+      commentsCount: 0,
+      communityId: 50489,
+      createdAt: parseInt(timeStamp),
+      heading: '',
+      isEdited: false,
+      isLiked: false,
+      isPinned: false,
+      isSaved: false,
+      likesCount: 0,
+      menuItems: [
+        {
+          id: 5,
+          title: 'Edit Post'
+        },
+        {
+          id: 1,
+          title: 'Delete Post'
+        }
+      ],
+      replies: [],
+      text: '',
+      topics: [],
+      updatedAt: timeStamp,
+      userId: currentUser?.uuid,
+      uuid: currentUser?.uuid
+    };
+    post.topics = topics;
+    post.text = text;
+    const attachments: any = [];
+    if (imageAttachmentArray?.length) {
+      imageAttachmentArray.map((attachment: File) => {
+        const attachmentType = attachment.type.split('/')[0] === 'image' ? 1 : 2;
+        attachments.push({
+          attachmentType: attachmentType,
+          attachmentMeta: {
+            url: URL.createObjectURL(attachment),
+            name: attachment.name,
+            size: attachment.size,
+            format: attachmentType === 2 ? 'video/mp4' : undefined
+          }
+        });
+      });
+    } else if (pdfAttachmentArray?.length) {
+      pdfAttachmentArray.map((attachment: File) => {
+        attachments.push({
+          attachmentType: 3,
+          attachmentMeta: {
+            url: URL.createObjectURL(attachment),
+            name: attachment.name,
+            size: attachment.size,
+            format: 'pdf'
+          }
+        });
+      });
+    } else if (previewOGTagData !== null) {
+      attachments.push({
+        attachmentType: 4,
+        attachmentMeta: {
+          ogTags: ogTagAttachmentArray
+        }
+      });
+    }
+    // post.
+    post.attachments = attachments;
+    return post as any;
+  }
+  const postFeed = async function (timeStamp: string) {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
       textContent = textContent.trim();
@@ -346,7 +435,6 @@ const CreatePostDialog = ({
         textContent = '';
       }
 
-      textContent;
       closeDialogBox();
       let response: any;
       if (imageOrVideoUploadArray?.length) {
@@ -354,33 +442,47 @@ const CreatePostDialog = ({
           textContent,
           selectedTopics,
           imageOrVideoUploadArray,
-          userContext?.user?.sdkClientInfo.userUniqueId
+          currentUser?.sdkClientInfo.uuid,
+          timeStamp
         );
       } else if (documentUploadArray?.length) {
         response = await lmFeedClient.addPostWithDocumentAttachments(
           textContent,
           selectedTopics,
           documentUploadArray,
-          userContext?.user?.sdkClientInfo.userUniqueId
+          currentUser?.sdkClientInfo.uuid,
+          timeStamp
         );
       } else if (previewOGTagData !== null) {
-        response = await lmFeedClient.addPostWithOGTags(text, selectedTopics, previewOGTagData);
+        response = await lmFeedClient.addPostWithOGTags(
+          text,
+          selectedTopics,
+          previewOGTagData,
+          timeStamp
+        );
       } else {
         if (textContent === '') {
           return;
         }
-        response = await lmFeedClient.addPost(textContent, selectedTopics);
+        response = await lmFeedClient.addPost(textContent, selectedTopics, null, timeStamp);
       }
-
-      const post: IPost = response?.data?.post;
-      post;
-      const newFeedArray = [{ ...post }].concat([...feedArray]);
-
-      setFeedArray(newFeedArray);
+      // feedModerationHandler(ADD_NEW_POST, null, {
+      //   topics: topics,
+      //   post: response?.data?.post
+      // });
+      document.dispatchEvent(
+        new CustomEvent(ADD_NEW_POST, {
+          detail: {
+            topics: topics,
+            post: response?.data?.post
+          }
+        })
+      );
+      return response?.data?.post;
     } catch (error) {
       lmFeedClient.logError(error);
     }
-  }
+  };
   async function checkForOGTags(ogTagLinkArray: string[]) {
     try {
       // (ogTagLinkArray);
@@ -508,7 +610,9 @@ const CreatePostDialog = ({
       document.removeEventListener('click', handleClickOutside);
     };
   }, [contentEditableDiv]);
-
+  useEffect(() => {
+    console.log('component rerendered');
+  });
   return (
     <div
       style={{
@@ -625,13 +729,14 @@ const CreatePostDialog = ({
                 {setUserImage()}
               </div>
               <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-                {userContext?.user?.name}
+                {currentUser?.name.toUpperCase()}
               </div>
             </div>
             <TopicFeedDropdownSelector
               setTopicsForTopicFeed={setTopicsForTopicFeed}
               isCreateMode={true}
             />
+            <div className="separator"></div>
             <div
               style={{
                 maxHeight: '324px',
@@ -708,7 +813,42 @@ const CreatePostDialog = ({
             </div>
             <div
               className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-              onClick={postFeed}>
+              onClick={() => {
+                let textContent: string = extractTextFromNode(contentEditableDiv.current);
+                textContent = textContent.trim();
+                if (textContent === PLACE_HOLDER_TEXT) {
+                  textContent = '';
+                }
+                if (!textContent.length) {
+                  return;
+                }
+                const timeStamp = Date.now().toString();
+                const tempPost = makeTempPost(
+                  textContent,
+                  imageOrVideoUploadArray,
+                  documentUploadArray,
+                  previewOGTagData,
+                  selectedTopics,
+                  timeStamp
+                );
+                console.log('The Temp post is');
+                console.log(tempPost);
+                console.log('The topics are: ');
+                console.log(topics);
+                feedModerationHandler(ADD_POST_LOCALLY, null, {
+                  post: tempPost,
+                  topics: topics
+                });
+                dispatch(addNewLocalPost(tempPost));
+                const topicMap: Record<string, Topic> = {};
+                for (let topic of topics) {
+                  topicMap[topic.Id] = { ...topic };
+                }
+                dispatch(addNewTopics(topicMap));
+                postFeed(timeStamp).then((res: any) => {
+                  dispatch(replaceLocalPost(res));
+                });
+              }}>
               Post
             </div>
           </div>

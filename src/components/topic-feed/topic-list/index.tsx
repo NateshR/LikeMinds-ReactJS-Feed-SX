@@ -22,7 +22,8 @@ const TopicListItem = ({ topic, checkedList, clickHandler }: TopicListProps) => 
           },
           ':hover': {
             background: 'white'
-          }
+          },
+          paddingX: '0px'
         }}
         checked={
           topic.name === 'All Topics'
@@ -30,7 +31,7 @@ const TopicListItem = ({ topic, checkedList, clickHandler }: TopicListProps) => 
             : checkedList.some((el) => el.Id === topic.Id)
         }
       />
-      <span>{topic.name}</span>
+      <span className="topicNameContainer">{topic.name}</span>
     </div>
   );
 };

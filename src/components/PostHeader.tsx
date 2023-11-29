@@ -4,45 +4,33 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
+import { Dialog, IconButton, Menu } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { lmFeedClient } from '..';
 import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
-import UserContext from '../contexts/UserContext';
 import EditPost from './dialog/editPost/EditPost';
 import { IPost, IMenuItem } from '@likeminds.community/feed-js-beta';
 import ReportPostDialogBox from './ReportPost';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DeleteDialog from './DeleteDialog';
-interface PostHeaderProps {
-  imgUrl: string;
-  username: string;
-  customTitle: string;
-  createdAt: number;
-  menuOptions: IMenuItem[];
-  postId: string;
-  index: number;
-  feedModerationHandler: (action: string, index: number, value: any) => void;
-  uuid: any;
-  isPinned: boolean;
-  isEdited: boolean;
-}
-const PostHeader: React.FC<PostHeaderProps> = ({
-  username,
-  customTitle,
-  imgUrl,
-  createdAt,
-  menuOptions,
-  postId,
-  feedModerationHandler,
-  index,
-  uuid,
-  isPinned,
-  isEdited
-}) => {
+import { PostContext } from '../contexts/postContext';
+import { MenuItem } from '../models/menuItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { deleteAPost } from '../store/feedPosts/feedsSlice';
+import { handleEditDialogState, setTemporaryPost } from '../store/snackbar/snackbarSlice';
+
+const PostHeader: React.FC = () => {
+  const { post, topics, index, user } = useContext(PostContext);
+  const { createdAt, menuItems, Id, isEdited, isPinned, uuid } = post!;
+  const { name, customTitle, imageUrl } = user![uuid.toString()];
+
+  const currentUser = useSelector((state: RootState) => state?.currentUser.user);
+  const dispatch = useDispatch();
+
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
-  const [postMenuOptions, setPostMenuOptions] = useState([...menuOptions]);
+  const [postMenuOptions, setPostMenuOptions] = useState<MenuItem[]>([...menuItems]);
   const [isPostPinned, setIsPostPinned] = useState<boolean>(isPinned);
   const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState<boolean>(false);
   function closeDeleteDialog() {
@@ -66,15 +54,16 @@ const PostHeader: React.FC<PostHeaderProps> = ({
   }
   async function pinPost() {
     setIsPostPinned(!isPostPinned);
-    return await lmFeedClient.pinPost(postId);
+    return await lmFeedClient.pinPost(Id);
   }
   async function unpinPost() {
     setIsPostPinned(!isPostPinned);
-    return await lmFeedClient.pinPost(postId);
+    return await lmFeedClient.pinPost(Id);
   }
   async function deletePost() {
-    feedModerationHandler(DELETE_POST, index, null);
-    await lmFeedClient.deletePost(postId);
+    dispatch(deleteAPost(Id));
+    await lmFeedClient.deletePost(Id);
+
     if (location.pathname.includes('/post')) {
       navigate('/');
     } else {
@@ -87,7 +76,9 @@ const PostHeader: React.FC<PostHeaderProps> = ({
     setOpenDialog(false);
   }
   async function editPost() {
-    feedModerationHandler(EDIT_POST, index, null);
+    dispatch(handleEditDialogState(true));
+    dispatch(setTemporaryPost(post!));
+    // feedModerationHandler(EDIT_POST, index, null);
   }
   async function openReport() {
     setOpenDialog(true);
@@ -111,18 +102,17 @@ const PostHeader: React.FC<PostHeaderProps> = ({
         await openReport();
         break;
     }
-    const postDetailsCall: any = await lmFeedClient.getPostDetails(postId, 1);
+    const postDetailsCall: any = await lmFeedClient.getPostDetails(Id, 1);
     setPostMenuOptions(postDetailsCall?.data?.post?.menuItems);
   }
-  const userContext = useContext(UserContext);
 
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={currentUser?.name}
           style={{
             width: '100%',
             height: '100%',
@@ -146,7 +136,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {username?.split(' ').map((part: string) => {
+          {name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -186,7 +176,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({
       <div className="lmWrapper__feed__post__header--profile">{setUserImage()}</div>
       <div className="lmWrapper__feed__post__header--info">
         <div className="title">
-          {transformUsername(username)}
+          {transformUsername(name)}
           {customTitle.length ? <span>Admin</span> : null}
         </div>
         {isEdited ? (
@@ -245,11 +235,11 @@ const PostHeader: React.FC<PostHeaderProps> = ({
             setOpenDialog(false);
           }}>
           <ReportPostDialogBox
-            uuid={uuid}
+            uuid={user?.uuid}
             closeBox={() => {
               setOpenDialog(false);
             }}
-            reportedPostId={postId}
+            reportedPostId={Id}
           />
         </Dialog>
       </div>

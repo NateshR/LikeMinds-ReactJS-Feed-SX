@@ -25,7 +25,8 @@ import {
   GetAllMembersRequest,
   GetPostLikesRequest,
   GetCommentLikesRequest,
-  GetTopicsRequest
+  GetTopicsRequest,
+  EditCommentRequest
 } from '@likeminds.community/feed-js-beta';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -41,7 +42,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     this.client = LMFeedClient.Builder()
       .setApiKey(process.env.REACT_APP_API_KEY!)
       .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
-      .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
+      // .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
+      .setVersionCode(1)
       .build();
   }
 
@@ -50,7 +52,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
           // .setUUID(userUniqueId)
-          .setUUID('354a1d54-70a2-4412-9d01-9510d43b5285')
+          .setUUID('7780210b-dddb-43ab-8c7c-1caa1d4e16ab')
           .setIsGuest(isGuestMember)
           .setUserName(username!)
           .build()
@@ -61,12 +63,13 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     }
   }
 
-  async addPost(text: string, topicIds: string[] | null, attachmentArr?: any) {
+  async addPost(text: string, topicIds: string[] | null, attachmentArr?: any, tempId?: string) {
     try {
       const apiCallResponse = await this.client.addPost(
         AddPostRequest.builder()
           .setText(text)
           .setAttachments(attachmentArr ? attachmentArr : [])
+          .setTempId(tempId!)
           .setTopicIds(topicIds)
           .build()
       );
@@ -75,7 +78,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       console.log(error);
     }
   }
-  async addPostWithOGTags(text: string, topicIds: string[] | null, ogTags: any) {
+  async addPostWithOGTags(text: string, topicIds: string[] | null, ogTags: any, tempId?: string) {
     try {
       let attachmentArr: Attachment[] = [];
       attachmentArr.push(
@@ -89,6 +92,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         AddPostRequest.builder()
           .setText(text)
           .setAttachments(attachmentArr)
+          .setTempId(tempId!)
           .setTopicIds(topicIds)
           .build()
       );
@@ -119,7 +123,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     text: any,
     topicIds: string[] | null,
     mediaArray: any[],
-    uniqueUserId: any
+    uniqueUserId: any,
+    tempId?: string
   ) {
     try {
       const attachmentResponseArray: Attachment[] = [];
@@ -163,6 +168,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
         AddPostRequest.builder()
           .setText(text)
           .setAttachments(attachmentResponseArray)
+          .setTempId(tempId!)
           .setTopicIds(topicIds)
           .build()
       );
@@ -175,7 +181,8 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     text: any,
     topicIds: string[] | null,
     mediaArray: any[],
-    uniqueUserId: any
+    uniqueUserId: any,
+    tempId?: string
   ) {
     const attachmentResponseArray: Attachment[] = [];
     for (let index = 0; index < mediaArray.length; index++) {
@@ -199,6 +206,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       AddPostRequest.builder()
         .setText(text)
         .setAttachments(attachmentResponseArray)
+        .setTempId(tempId!)
         .setTopicIds(topicIds)
         .build()
     );
@@ -330,7 +338,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return apiCallResponse;
     } catch (error) {
       console.log(error);
-      return error;
+      return false;
     }
   }
 
@@ -342,7 +350,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return apiCallResponse;
     } catch (error) {
       console.log(error);
-      return error;
+      return false;
     }
   }
   async getPostDetails(postId: string, pageNo: number) {
@@ -376,10 +384,10 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return error;
     }
   }
-  async addComment(postId: string, text: string) {
+  async addComment(postId: string, text: string, timeStamp: string) {
     try {
       const apiCallResponse = await this.client.addComment(
-        AddCommentRequest.builder().setpostId(postId).settext(text).build()
+        AddCommentRequest.builder().setpostId(postId).settext(text).setTempId(timeStamp).build()
       );
       return apiCallResponse;
     } catch (error) {
@@ -387,14 +395,33 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return error;
     }
   }
-  async replyComment(postId: string, commentId: string, text: string) {
+  async replyComment(postId: string, commentId: string, text: string, tempId: string) {
     try {
-      const apiCallResponse = await this.client.replyComment(
+      const apiCallResponse: any = await this.client.replyComment(
         ReplyCommentRequest.builder()
           .setPostId(postId)
           .setCommentId(commentId)
           .setText(text)
+          .setTempId(tempId)
           .build()
+      );
+      return {
+        status: true,
+        comment: apiCallResponse?.data?.comment
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: false,
+        comment: undefined
+      };
+    }
+  }
+
+  async editComment(postId: string, commentId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.editComment(
+        EditCommentRequest.builder().setpostId(postId).setcommentId(commentId).settext(text).build()
       );
       return apiCallResponse;
     } catch (error) {

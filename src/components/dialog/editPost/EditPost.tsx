@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import '../createPost/createPostDialog.css';
-import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
 import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js-beta';
@@ -9,16 +8,23 @@ import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDia
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
 import { Snackbar } from '@mui/material';
+import { FeedPost } from '../../../models/feedPost';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { replaceEditedMessage } from '../../../store/feedPosts/feedsSlice';
+import { addNewTopics } from '../../../store/topics/topicsSlice';
+import { addNewUsers } from '../../../store/users/usersSlice';
+import { showSnackbar } from '../../../store/snackbar/snackbarSlice';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
   closeCreatePostDialog: () => void;
   //   showMediaAttachmentOnInitiation: boolean;
   //   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
-  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: IPost[];
-  post: IPost | null;
-  topics: Record<string, LMFeedTopics>;
+  // setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
+  // feedArray: FeedPost[];
+  // post: IPost | null;
+  // topics: Record<string, LMFeedTopics>;
 }
 interface Limits {
   left: number;
@@ -89,21 +95,20 @@ export function checkAtSymbol(str: string, index: number): number {
   }
 }
 
-const EditPost = ({
-  closeCreatePostDialog,
-  setFeedArray,
-  feedArray,
-  post,
-  topics
-}: CreatePostDialogProps) => {
-  const userContext = useContext(UserContext);
+const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
+  // redux managed state
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+  const post = useSelector((state: RootState) => state.snackbar).temporaryPost;
+  const feedArray = useSelector((state: RootState) => state.posts);
+  const topics = useSelector((state: RootState) => state.topics);
+  const dispatch = useDispatch();
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -127,7 +132,7 @@ const EditPost = ({
             letterSpacing: '1px',
             borderRadius: '50%'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -153,6 +158,7 @@ const EditPost = ({
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
+    console.log('Called');
     const newSelectedTopics = topics?.map((topic) => {
       return topic.Id;
     });
@@ -160,7 +166,7 @@ const EditPost = ({
     if (newSelectedTopics && newSelectedTopics.length) {
       setSelectedTopics(newSelectedTopics);
     } else {
-      setSelectedTopics(null);
+      setSelectedTopics([]);
     }
   }
   function setToEndOfContent(element: HTMLDivElement): void {
@@ -295,25 +301,6 @@ const EditPost = ({
 
     return container;
   }
-  const attachmentProps = {
-    showMediaUploadBar,
-    setShowMediaUploadBar,
-    imageOrVideoUploadArray,
-    setImageOrVideoUploadArray,
-    documentUploadArray,
-    setDocumentUploadArray,
-    attachmentType,
-    setAttachmentType,
-    showInitiateUploadComponent,
-    setShowInitiateUploadComponent,
-    showOGTagPreview,
-    setShowOGTagPreview,
-    previewOGTagData,
-    setPreviewOGTagData,
-    hasPreviewClosedOnce,
-    setHasPreviewClosedOnce
-    // showMediaAttachmentOnInitiation
-  };
 
   const setCloseDialog = () => {};
   function findTag(str: string): TagInfo | undefined {
@@ -386,19 +373,27 @@ const EditPost = ({
         return item;
       });
       const disabledTopicList: string[] = [];
+      console.log('the selected topicIds are');
+      console.log(selectedTopics);
       selectedTopics?.forEach((topicId: string) => {
         const tempTopic = topics[topicId];
-        console.log(tempTopic.isEnabled);
-        if (!tempTopic.isEnabled) {
-          disabledTopicList.push(tempTopic.name);
+        console.log(tempTopic?.isEnabled);
+        if (tempTopic && !tempTopic?.isEnabled) {
+          disabledTopicList.push(tempTopic?.name);
         }
       });
       console.log('The Disabled Topic List is');
       console.log(disabledTopicList);
       if (disabledTopicList.length) {
+        // dispatch(
+        //   showSnackbar(`
+        //   The following topics have been disabled. Please remove them to save the post.
+        //   ${disabledTopicList.join(',')}
+        //   `)
+        // );
         setOpenSnackbar(true);
         setSnackbarMessage(`
-        The following topics have been disabled. Please remove them:
+        The following topics have been disabled. Please remove them to save the post.
         ${disabledTopicList.join(',')}
         `);
         return;
@@ -410,11 +405,11 @@ const EditPost = ({
         [...imageOrVideoUploadArray, ...documentUploadArray, ...previewOGTagData],
         selectedTopics
       );
-      const newpost: IPost = response?.data?.post;
-      const newFeedArray = [...feedArray];
-      const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
-      newFeedArray[thisFeedIndex] = { ...newpost };
-      setFeedArray(newFeedArray);
+      const newpost: FeedPost = response?.data?.post;
+
+      dispatch(replaceEditedMessage(newpost));
+      dispatch(addNewTopics(response.data.topics));
+      dispatch(addNewUsers(response.data.users));
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -469,6 +464,9 @@ const EditPost = ({
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
+      if (!text.trim().length) {
+        return;
+      }
       const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
       if (!text.includes(ogTagLinkArray[0])) {
         ogTagLinkArray.splice(0, 1);
@@ -559,7 +557,7 @@ const EditPost = ({
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -702,12 +700,12 @@ const EditPost = ({
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
             <p>Edit Post</p>
           </div>
-          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
+          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info margin-bottom-16">
+            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image ">
               {setUserImage()}
             </div>
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-              {userContext?.user?.name}
+              {currentUser?.name.toUpperCase()}
             </div>
           </div>
           <TopicFeedDropdownSelector
@@ -715,6 +713,7 @@ const EditPost = ({
             isCreateMode={true}
             existingSelectedTopics={existingSelectedTopics}
           />
+          <div className="separator"></div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
             <div
               ref={contentEditableDiv}

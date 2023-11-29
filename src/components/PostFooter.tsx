@@ -1,19 +1,14 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostComents from './PostComments';
 import { lmFeedClient } from '..';
-import { Dialog, IconButton } from '@mui/material';
+import { Dialog } from '@mui/material';
 import {
-  LIKE_POST,
-  SAVE_POST,
   SHOW_POST_LIKES_BAR,
-  SHOW_SNACKBAR,
   UPDATE_LIKES_COUNT_DECREMENT_POST,
   UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../services/feedModerationActions';
-import { IComment, IMemberRight, IPost, IUser } from '@likeminds.community/feed-js-beta';
-import SendIcon from '@mui/icons-material/Send';
-import nonSavedPost from '../assets/images/nonSavedPost.png';
-import savedPost from '../assets/images/savedPost.png';
+import { IComment, IMemberRight, IUser } from '@likeminds.community/feed-js-beta';
+
 import {
   TagInfo,
   checkAtSymbol,
@@ -24,34 +19,24 @@ import {
 
 import './../assets/css/post-footer.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import UserContext from '../contexts/UserContext';
+
 import SeePostLikes from './SeePostLikes';
 import { useLocation, useNavigate, useNavigation } from 'react-router-dom';
+import { PostContext } from '../contexts/postContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { MEMBER_STATE } from '../enums/memberState';
+import { Comment } from '../models/comment';
 interface PostFooterProps {
-  postId: string;
-  isEdited: boolean;
-  isLiked: boolean;
-  isPinned: boolean;
-  isSaved: boolean;
-  likesCount: number;
-  feedModerationHandler: (action: string, index: number, value: any) => void;
-  index: number;
-  commentsCount: number;
   rightSidebarHandler: (action: string, value: any) => void;
 }
-const PostFooter: React.FC<PostFooterProps> = ({
-  postId,
-  isEdited,
-  isLiked,
-  isPinned,
-  isSaved,
-  likesCount,
-  index,
-  feedModerationHandler,
-  commentsCount,
-  rightSidebarHandler
-}) => {
-  const [commentList, setCommentList] = useState<IComment[]>([]);
+const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
+  const { post, topics, index, user } = useContext(PostContext);
+  const { Id, isEdited, isLiked, isSaved, likesCount, commentsCount } = post!;
+
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+  const memberStateRights = useSelector((state: RootState) => state.currentUser.memberState);
+  const [commentList, setCommentList] = useState<Comment[]>([]);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(isLiked);
   const [isPostSaved, setIsPostSaved] = useState<boolean>(isSaved);
   const [postLikesCount, setPostLikesCount] = useState<number>(likesCount);
@@ -61,7 +46,11 @@ const PostFooter: React.FC<PostFooterProps> = ({
   const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
   const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
   const [openSeeLikesDialog, setOpenSeeLikesDialog] = useState(false);
-
+  function updateCommentsArray(index: number, comment: Comment) {
+    const newArr = [...commentList];
+    newArr[index] = comment;
+    setCommentList(newArr);
+  }
   const navigation = useNavigate();
   const location = useLocation();
   // (location);
@@ -73,48 +62,41 @@ const PostFooter: React.FC<PostFooterProps> = ({
   }, [isLiked, isSaved, likesCount, commentsCount]);
   // Utility function
   async function likePost() {
-    setIsPostLiked(!isPostLiked);
-    if (isPostLiked) {
-      setPostLikesCount(postLikesCount - 1);
-      if (location.pathname.includes('/post')) {
-        rightSidebarHandler(UPDATE_LIKES_COUNT_DECREMENT_POST, {
-          postId: postId,
-          totalLikes: postLikesCount - 1
-        });
+    switch (isPostLiked) {
+      case true: {
+        setIsPostLiked(false);
+        setPostLikesCount((currentCount) => currentCount - 1);
+        break;
       }
-    } else {
-      setPostLikesCount(postLikesCount + 1);
-      if (location.pathname.includes('/post')) {
-        rightSidebarHandler(UPDATE_LIKES_COUNT_INCREMENT_POST, {
-          postId: postId,
-          totalLikes: postLikesCount + 1
-        });
+      case false: {
+        setIsPostLiked(true);
+        setPostLikesCount((currentCount) => currentCount + 1);
+        break;
       }
     }
-
-    return lmFeedClient.likePost(postId);
+    lmFeedClient.likePost(Id);
   }
   function getPostLikes() {}
   function sharePOst() {}
   function savePost() {
     setIsPostSaved(!isPostSaved);
-    feedModerationHandler(
-      SHOW_SNACKBAR,
-      index,
-      isPostSaved ? 'Post removed from Saved Posts' : 'Post added to Saved Posts'
-    );
-    return lmFeedClient.savePost(postId);
+    // feedModerationHandler(
+    //   SHOW_SNACKBAR,
+    //   index,
+    //   isPostSaved ? 'Post removed from Saved Posts' : 'Post added to Saved Posts'
+    // );
+    return lmFeedClient.savePost(Id);
   }
   async function getPostComments() {
-    let response: any = await lmFeedClient.getPostDetails(postId, pageCount);
+    let response: any = await lmFeedClient.getPostDetails(Id, pageCount);
     setPageCount(pageCount + 1);
     let commentArray = response?.data?.post?.replies;
 
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
     if (pageCount === 1) {
       const tempArr: { [key: string]: number } = {};
-      commentList.forEach((item: IComment) => (tempArr[item.Id] = 1));
-      let newResponseReplies = commentArray.filter((item: IComment) => {
+      commentList.forEach((item: Comment) => (tempArr[item.Id] = 1));
+      let newResponseReplies = commentArray?.filter((item: Comment) => {
         if (tempArr[item.Id] != 1) {
           return item;
         }
@@ -208,15 +190,13 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   }
 
-  const userContext = useContext(UserContext);
-
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={currentUser?.name}
           style={{
             width: '100%',
             height: '100%',
@@ -240,7 +220,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -253,7 +233,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -286,17 +266,43 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   }
 
+  function makeTempComment(timeStamp: string, text: string) {
+    const tempComment: Comment = {
+      Id: timeStamp,
+      commentsCount: 0,
+      communityId: 0,
+      createdAt: parseInt(timeStamp),
+      isEdited: false,
+      isLiked: false,
+      level: 0,
+      likesCount: 0,
+      menuItems: [
+        {
+          id: 8,
+          title: 'Edit'
+        },
+        {
+          id: 6,
+          title: 'Delete'
+        }
+      ],
+      postId: '',
+      replies: [],
+      tempId: null,
+      text: text,
+      updatedAt: 1701118115396,
+      userId: '',
+      uuid: currentUser?.uuid!
+    };
+    return tempComment;
+  }
+
   function showCommentBox() {
-    const memberState = userContext.memberStateRights?.state;
-    let isCommentingAllowed: any = false;
+    const memberState = memberStateRights?.state;
+    let isCommentingAllowed: any = memberState === MEMBER_STATE.STATE_ADMIN ? true : false;
     if (memberState == 4) {
-      isCommentingAllowed = userContext.memberStateRights?.memberRights.some(
+      isCommentingAllowed = memberStateRights?.memberRights.some(
         (item: IMemberRight) => item.id === 10 && item.isSelected
-      );
-    } else {
-      const rights: any = userContext?.memberStateRights;
-      isCommentingAllowed = rights.managerRights.some(
-        (item: any) => item.id === 7 && item.isSelected
       );
     }
     if (isCommentingAllowed) {
@@ -329,10 +335,32 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   }
                 }
               }}
-              onKeyDown={(e: React.KeyboardEvent) => {
+              onKeyDown={async (e: React.KeyboardEvent) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  postComment();
+                  let textContent: string = extractTextFromNode(contentEditableDiv.current);
+                  if (textContent.length === 0) {
+                    return;
+                  }
+
+                  const timeStamp = Date.now().toString();
+                  const tempComment = makeTempComment(timeStamp, textContent);
+                  setCommentList([{ ...tempComment }].concat(commentList));
+
+                  setPostCommentsCount(postCommentsCount + 1);
+                  setOpenCommentsSection(true);
+                  const commentCall = await postComment(timeStamp);
+                  console.log('The comment call is');
+                  console.log(commentCall);
+                  if (commentCall?.status && commentCall?.post) {
+                    const newCommentList = [{ ...commentCall.post }, ...commentList];
+                    console.log('the new comment list is');
+                    console.log(newCommentList);
+                    setCommentList([{ ...commentCall.post }].concat(commentList));
+                  } else {
+                    setCommentList([...commentList]);
+                    setPostCommentsCount(postCommentsCount);
+                  }
                 }
               }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -464,12 +492,12 @@ const PostFooter: React.FC<PostFooterProps> = ({
                   next={getPostComments}
                   hasMore={hasMoreComments}
                   scrollableTarget={'postDetailsContainer'}>
-                  {commentList.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                  {commentList.map((comment: Comment, index: number, commentArray: Comment[]) => {
                     return (
                       <PostComents
                         comment={comment}
                         key={comment.Id!.toString()}
-                        postId={postId}
+                        postId={Id}
                         commentArray={commentArray}
                         setCommentArray={setCommentList}
                         index={index}
@@ -477,6 +505,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
                         setParentCommentsCount={setPostCommentsCount}
                         parentCommentsCount={postCommentsCount}
                         rightSidebarHandler={rightSidebarHandler}
+                        updateReplies={updateCommentsArray}
                       />
                     );
                   })}
@@ -484,7 +513,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               ) : null}
               <Dialog open={openSeeLikesDialog} onClose={() => setOpenSeeLikesDialog(false)}>
                 <SeePostLikes
-                  entityId={postId}
+                  entityId={Id}
                   onClose={() => setOpenSeeLikesDialog(false)}
                   likesCount={postLikesCount}
                   entityType={1}
@@ -562,7 +591,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
     }
   }
   // function renamed to post comments
-  async function postComment() {
+  async function postComment(timeStamp: string) {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
@@ -572,15 +601,23 @@ const PostFooter: React.FC<PostFooterProps> = ({
       while (contentEditableDiv.current?.firstChild) {
         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
       }
-      const response: any = await lmFeedClient.addComment(postId, textContent);
+      const response: any = await lmFeedClient.addComment(Id, textContent, timeStamp);
       const comment = response?.data?.comment;
       const user = response?.data?.users;
-      setCommentList([{ ...comment }].concat(commentList));
       setPostUsersMap({ ...postUsersMap, ...user });
-      setPostCommentsCount(postCommentsCount + 1);
-      setOpenCommentsSection(true);
+      // setCommentList([{ ...comment }].concat(commentList));
+
+      // setPostCommentsCount(postCommentsCount + 1);
+      // setOpenCommentsSection(true);
+      return {
+        status: true,
+        post: comment
+      };
     } catch (error) {
-      lmFeedClient.logError(error);
+      return {
+        status: false,
+        post: null
+      };
     }
   }
   async function getTags() {
@@ -651,18 +688,19 @@ const PostFooter: React.FC<PostFooterProps> = ({
                 if (postLikesCount) {
                   if (!location.pathname.includes('/post')) {
                     location.pathname;
-                    navigation(`/post/${postId}`, {
+                    navigation(`/post/${Id}`, {
                       state: {
                         index: index
                       }
                     });
                   } else {
                     rightSidebarHandler(SHOW_POST_LIKES_BAR, {
-                      postId: postId,
+                      postId: Id,
                       entityType: 1,
                       totalLikes: postLikesCount
                     });
                   }
+                  // setOpenSeeLikesDialog(true);
                 } else {
                   likePost();
                 }
@@ -678,7 +716,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               }}
               onClick={() => {
                 if (location.pathname !== '/post') {
-                  navigation(`/post/${postId}`, {
+                  navigation(`/post/${Id}`, {
                     state: {
                       index: index
                     }
@@ -711,7 +749,7 @@ const PostFooter: React.FC<PostFooterProps> = ({
               }}
               onClick={() => {
                 if (location.pathname !== '/post') {
-                  navigation(`/post/${postId}`, {
+                  navigation(`/post/${Id}`, {
                     state: {
                       index: index
                     }
@@ -749,6 +787,15 @@ const PostFooter: React.FC<PostFooterProps> = ({
       {/* Comments */}
       {showPostScreenSection(location.pathname.includes('/post') ? true : false)}
       {/* Comments */}
+
+      {/* <Dialog open={openSeeLikesDialog} onClose={() => setOpenSeeLikesDialog(false)}>
+        <SeePostLikes
+          entityId={post?.Id!}
+          onClose={() => setOpenSeeLikesDialog(false)}
+          likesCount={postLikesCount}
+          entityType={1}
+        />
+      </Dialog> */}
     </div>
   );
 };

@@ -1,69 +1,67 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { useNavigate, useParams } from 'react-router-dom';
 import { lmFeedClient } from '../..';
 import AllMembers from '../AllMembers';
-import { SHOW_SNACKBAR } from '../../services/feedModerationActions';
+import { POST_DOESNT_EXISTS, SHOW_SNACKBAR } from '../../services/feedModerationActions';
 import { CircularProgress } from '@mui/material';
+import { User } from '../../models/User';
+import { FeedPost } from '../../models/feedPost';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { showSnackbar } from '../../store/snackbar/snackbarSlice';
+import { Topic } from '../../models/topics';
+import { PostContext } from '../../contexts/postContext';
+import SeePostLikes from '../SeePostLikes';
 interface PostDetailsProps {
-  callBack: ((action: string, index: number, value: any) => void) | null;
-  feedArray: IPost[];
-  users: { [key: string]: IUser };
   rightSidebarHandler: (action: string, value: any) => void;
   rightSideBar: any;
-  topics: Record<string, LMFeedTopics>;
 }
-interface UseParamsProps {
-  index: number;
-  user: IUser;
-  post: IPost;
-}
-function PostDetails({
-  callBack,
-  feedArray,
-  rightSidebarHandler,
-  rightSideBar,
-  topics
-}: PostDetailsProps) {
-  const location = useLocation();
+
+function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
   const params = useParams();
   const navigate = useNavigate();
-
-  const [post, setPost] = useState<IPost | null>(null);
-  const [user, setUser] = useState<null | IUser>(null);
+  const feedPosts = useSelector((state: RootState) => state.posts);
+  // const users = useSelector((state: RootState) => state.users);
+  // const topics = useSelector((state: RootState) => state.topics);
+  const dispatch = useDispatch();
+  const [post, setPost] = useState<FeedPost | null>(null);
+  const [user, setUser] = useState<null | Record<string, User>>(null);
+  const [topics, setTopics] = useState<Record<string, Topic> | null>(null);
   const [index, setIndex] = useState<number | null>(null);
   useEffect(() => {
     async function setPostDetails() {
       try {
-        let newPostIndex: any = feedArray.findIndex((post: IPost) => post.Id === params.postId);
-        let newPost: any;
-        setIndex(newPostIndex);
+        const postIndex = feedPosts.findIndex((feed: FeedPost) => {
+          feed.Id.toString() === params?.postId?.toString();
+        });
+        // setting the index of the current post if it exists in the locally saved posts array.
+        setIndex(postIndex === -1 ? null : postIndex);
         const resp: any = await lmFeedClient.getPostDetails(params.postId!, 1);
         if (resp?.data === null) {
+          dispatch(showSnackbar(POST_DOESNT_EXISTS));
           navigate('/');
-          callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
         }
-        newPost = resp?.data?.post;
+        const newPost = resp?.data?.post;
         setPost(newPost!);
-        setUser(resp?.data?.users[newPost?.uuid]);
+        setUser(resp?.data?.users);
+        setTopics(resp?.data?.topics);
       } catch (error) {
-        alert('Post Doesnt Exist');
+        dispatch(showSnackbar(POST_DOESNT_EXISTS));
         navigate('/');
-        callBack!(SHOW_SNACKBAR, 0, 'The Post does not exists anymore');
       }
     }
 
-    if (params?.postId && feedArray.length) {
+    if (params?.postId && feedPosts.length) {
       setPostDetails();
     }
     return () => {
       setPost(null);
       setUser(null);
     };
-  }, [params.postId, feedArray]);
+  }, [params.postId, feedPosts]);
 
   return (
     <div
@@ -93,14 +91,15 @@ function PostDetails({
           {post && user ? (
             <div className="lmWrapper__feed">
               <div className="postDetailsContentWrapper">
-                <Post
-                  index={index!}
-                  feedModerationHandler={callBack!}
-                  post={post!}
-                  user={user!}
-                  rightSidebarHandler={rightSidebarHandler}
-                  topics={topics}
-                />
+                <PostContext.Provider
+                  value={{
+                    post,
+                    user,
+                    topics,
+                    index
+                  }}>
+                  <Post rightSidebarHandler={rightSidebarHandler} />
+                </PostContext.Provider>
               </div>
             </div>
           ) : (
@@ -109,6 +108,7 @@ function PostDetails({
             </div>
           )}
         </div>
+
         <div className="lmWrapper__allMembers">{rightSideBar}</div>
       </div>
       {/* </div> */}

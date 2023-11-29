@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CreatePost from '../../components/CreatePost';
 import FeedFilter from '../../components/FeedFilter';
 import Post from '../../components/Post';
-import UserContext from '../../contexts/UserContext';
 import { lmFeedClient } from '../..';
 import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
@@ -11,6 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
 import {
   ADD_NEW_POST,
+  ADD_POST_LOCALLY,
   DELETE_POST,
   EDIT_POST,
   LIKE_POST,
@@ -32,20 +32,36 @@ import PostDetails from '../../components/post-details';
 import PostLikesList from '../../components/PostLikesList';
 import '../../assets/css/skeleton-post.css';
 import TopicFeedDropdownSelector from '../../components/topic-feed/select-feed-dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { setMemberState, setUser } from '../../store/currentUser/currentUserSlice';
+import { addNewPosts, clearPosts, setNewFeedPosts } from '../../store/feedPosts/feedsSlice';
+import { addNewTopics } from '../../store/topics/topicsSlice';
+import { addNewUsers } from '../../store/users/usersSlice';
+import { FeedPost } from '../../models/feedPost';
+import { PostContext } from '../../contexts/postContext';
+import { Topic } from '../../models/topics';
+import { handleEditDialogState } from '../../store/snackbar/snackbarSlice';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
 }
 const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
-  const [user, setUser] = useState(null);
-  const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
-  const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
-  const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
-  const [topics, setTopics] = useState<Record<string, LMFeedTopics>>({});
+  const user = useSelector((state: RootState) => state.currentUser.user);
+  const memberStateRights = useSelector((state: RootState) => state.currentUser.memberState);
+  const feedPosts = useSelector((state: RootState) => state.posts);
+  const users = useSelector((state: RootState) => state.users);
+  const topics = useSelector((state: RootState) => state.topics);
+  const snackbarState = useSelector((state: RootState) => state.snackbar);
+  const dispatch = useDispatch();
+  // const [user, setUser] = useState(null);
+  // const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
+  // const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
+  // const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
   const [hasMoreFeed, setHasMoreFeed] = useState<boolean>(true);
   const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
   const [snackBarMessage, setSnackBarMessage] = useState<string>('');
   const [openDialogBox, setOpenDialogBox] = useState(false);
-  const [tempPost, setTempPost] = useState<IPost | null>(null);
+  const [tempPost, setTempPost] = useState<FeedPost | null>(null);
   const [pageCount, setPageCount] = useState<number>(1);
   const [sideBar, setSideBar] = useState<any>(null);
   const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
@@ -58,7 +74,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     } else {
       setSelectedTopics(null);
     }
-    setFeedPostsArray([]);
+    dispatch(clearPosts());
     setPageCount(1);
   }
   useEffect(() => {
@@ -80,16 +96,21 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
       setHasMoreFeed(false);
     }
     setPageCount(pageCount + 1);
-    setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
-    setTopics({ ...topics, ...feeds.topics });
-    setUsersMap({ ...usersMap, ...feeds.users });
+    // setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
+    // setTopics({ ...topics, ...feeds.topics });
+    // setUsersMap({ ...usersMap, ...feeds.users });
+    console.log('The feeds are');
+    console.log(feeds);
+    dispatch(addNewPosts(feeds?.posts!));
+    dispatch(addNewTopics(feeds.topics));
+    dispatch(addNewUsers(feeds.users));
   };
-  function feedModerationLocalHandler(action: string, index: number, value: any) {
-    function reNewFeedArray(index: number, newFeedObject: IPost) {
+  const feedModerationLocalHandler = (action: string, index: number, value: any) => {
+    function reNewFeedArray(index: number, newFeedObject: FeedPost) {
       newFeedArray[index] = newFeedObject;
-      setFeedPostsArray(newFeedArray);
+      dispatch(setNewFeedPosts(newFeedArray));
     }
-    const newFeedArray = [...feedPostsArray];
+    const newFeedArray = [...feedPosts];
     const newFeedObject = { ...newFeedArray[index] };
     switch (action) {
       case LIKE_POST: {
@@ -113,7 +134,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
       }
       case DELETE_POST: {
         newFeedArray.splice(index, 1);
-        setFeedPostsArray(newFeedArray);
+        dispatch(setNewFeedPosts(newFeedArray));
         setOpenSnackBar(true);
         setSnackBarMessage('Post Deleted');
         break;
@@ -121,7 +142,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
       case EDIT_POST: {
         setOpenDialogBox(true);
         console.log(index);
-        setTempPost(feedPostsArray[index]);
+        setTempPost(feedPosts[index]);
         break;
       }
       case SHOW_SNACKBAR: {
@@ -131,16 +152,30 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
       }
       // add in CH
       case ADD_NEW_POST: {
-        const newFeedsArray = [{ ...value.post }].concat([...feedPostsArray]);
-        const newTopics = { ...value.topics, ...topics };
-        setFeedPostsArray(newFeedArray);
-        setTopics(newTopics);
+        // const { post } = value;
+        // const newFeedArray = [...feedPostsArray];
+        // console.log(feedPostsArray);
+        // const tempPost = newFeedArray.findIndex(
+        //   (postObject) => postObject?.Id?.toString() === post?.tempId?.toString(0)
+        // );
+        // const newFeedsArray = [{ ...value.post }].concat([...feedPostsArray]);
+        // const newTopics = { ...value.topics, ...topics };
+        // setFeedPostsArray(newFeedsArray);
+        // setTopics(newTopics);
+        break;
+      }
+      case ADD_POST_LOCALLY: {
+        // console.log('locallyb adding: ', value.post);
+        // const newFeedsArray = [{ ...value.post }].concat([...feedPostsArray]);
+        // const newTopics = { ...value.topics, ...topics };
+        // setFeedPostsArray(newFeedsArray);
+        // setTopics(newTopics);
         break;
       }
       default:
         return null;
     }
-  }
+  };
   function rightSidebarhandler(action: string, value: any) {
     action;
     switch (action) {
@@ -234,7 +269,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   }
 
   function setFeedPosts() {
-    switch (feedPostsArray.length) {
+    switch (feedPosts.length) {
       case 0:
         return Array(10)
           .fill(0)
@@ -258,17 +293,22 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
             );
           });
       default:
-        return feedPostsArray.map((post: IPost, index: number) => {
+        return feedPosts.map((post: FeedPost, index: number) => {
+          const postTopics: Record<string, Topic> = {};
+          post?.topics?.forEach((topicId: string) => {
+            postTopics[topicId] = topics[topicId];
+          });
           return (
-            <Post
+            <PostContext.Provider
               key={post.Id}
-              post={post}
-              topics={topics}
-              user={usersMap[post.uuid]}
-              feedModerationHandler={feedModerationLocalHandler}
-              index={index}
-              rightSidebarHandler={rightSidebarhandler}
-            />
+              value={{
+                post,
+                topics: postTopics,
+                user: users,
+                index: index
+              }}>
+              <Post rightSidebarHandler={rightSidebarhandler} />
+            </PostContext.Provider>
           );
         });
     }
@@ -285,7 +325,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
             <div className="lmWrapper__feed">
               {/* Create Post */}
               <InfiniteScroll
-                dataLength={feedPostsArray.length + 2}
+                dataLength={feedPosts.length + 2}
                 scrollThreshold={0.8}
                 hasMore={hasMoreFeed}
                 loader={(() => {
@@ -294,7 +334,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 next={() => {
                   getFeeds();
                 }}>
-                <CreatePost setFeedArray={setFeedPostsArray} feedArray={feedPostsArray} />
+                <CreatePost feedModerationHandler={feedModerationLocalHandler} />
                 {/* Create Post */}
 
                 {/* Filter */}
@@ -320,8 +360,8 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     async function setUserState() {
       const userResponse = await lmFeedClient.initiateUser('', false);
       const memberStateResponse: any = await lmFeedClient.getMemberState();
-      setMemberStateRights(memberStateResponse.data);
-      setUser(userResponse?.data?.user);
+      dispatch(setMemberState(memberStateResponse.data));
+      dispatch(setUser(userResponse?.data?.user));
       const event = new CustomEvent('USER_INITIATED', {
         detail: userResponse?.data?.user
       });
@@ -333,9 +373,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     if (!user) {
       return;
     }
-    console.log('The feed post array is');
-    console.log(feedPostsArray);
-    console.log(pageCount);
+
     // setFeedPostsArray([]);
     getFeeds();
   }, [user, selectedTopics]);
@@ -351,12 +389,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
     return null;
   }
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        setUser,
-        memberStateRights
-      }}>
+    <>
       {/* {setHeader()} */}
       <Routes>
         <Route path="/" element={<>{setAppUserState(user)}</>} />
@@ -364,14 +397,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
           path="/post/:postId"
           element={
             <div className="main">
-              <PostDetails
-                rightSidebarHandler={rightSidebarhandler}
-                callBack={feedModerationLocalHandler}
-                feedArray={feedPostsArray}
-                users={usersMap}
-                rightSideBar={sideBar}
-                topics={topics}
-              />
+              <PostDetails rightSidebarHandler={rightSidebarhandler} rightSideBar={sideBar} />
             </div>
           }
         />
@@ -386,22 +412,16 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         message={snackBarMessage}
       />
       <Dialog
-        open={openDialogBox}
-        onClose={() => setOpenDialogBox(false)}
+        open={snackbarState.openEditDialogBox}
+        onClose={() => dispatch(handleEditDialogState(false))}
         PaperProps={{
           sx: {
             borderRadius: '16px'
           }
         }}>
-        <EditPost
-          feedArray={feedPostsArray}
-          setFeedArray={setFeedPostsArray}
-          closeCreatePostDialog={() => setOpenDialogBox(false)}
-          post={tempPost}
-          topics={topics}
-        />
+        <EditPost closeCreatePostDialog={() => dispatch(handleEditDialogState(false))} />
       </Dialog>
-    </UserContext.Provider>
+    </>
   );
 };
 
