@@ -36,7 +36,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
 
   const currentUser = useSelector((state: RootState) => state.currentUser.user);
   const memberStateRights = useSelector((state: RootState) => state.currentUser.memberState);
-  const [commentList, setCommentList] = useState<IComment[]>([]);
+  const [commentList, setCommentList] = useState<Comment[]>([]);
   const [isPostLiked, setIsPostLiked] = useState<boolean>(isLiked);
   const [isPostSaved, setIsPostSaved] = useState<boolean>(isSaved);
   const [postLikesCount, setPostLikesCount] = useState<number>(likesCount);
@@ -46,7 +46,11 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
   const [hasMoreComments, setHasMoreComments] = useState<boolean>(true);
   const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
   const [openSeeLikesDialog, setOpenSeeLikesDialog] = useState(false);
-
+  function updateCommentsArray(index: number, comment: Comment) {
+    const newArr = [...commentList];
+    newArr[index] = comment;
+    setCommentList(newArr);
+  }
   const navigation = useNavigate();
   const location = useLocation();
   // (location);
@@ -91,8 +95,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
     if (pageCount === 1) {
       const tempArr: { [key: string]: number } = {};
-      commentList.forEach((item: IComment) => (tempArr[item.Id] = 1));
-      let newResponseReplies = commentArray?.filter((item: IComment) => {
+      commentList.forEach((item: Comment) => (tempArr[item.Id] = 1));
+      let newResponseReplies = commentArray?.filter((item: Comment) => {
         if (tempArr[item.Id] != 1) {
           return item;
         }
@@ -285,11 +289,12 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
       postId: '',
       replies: [],
       tempId: null,
-      text: 'hello',
+      text: text,
       updatedAt: 1701118115396,
-      userId: '7780210b-dddb-43ab-8c7c-1caa1d4e16ab',
-      uuid: '7780210b-dddb-43ab-8c7c-1caa1d4e16ab'
+      userId: '',
+      uuid: currentUser?.uuid!
     };
+    return tempComment;
   }
 
   function showCommentBox() {
@@ -330,10 +335,32 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                   }
                 }
               }}
-              onKeyDown={(e: React.KeyboardEvent) => {
+              onKeyDown={async (e: React.KeyboardEvent) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  postComment();
+                  let textContent: string = extractTextFromNode(contentEditableDiv.current);
+                  if (textContent.length === 0) {
+                    return;
+                  }
+
+                  const timeStamp = Date.now().toString();
+                  const tempComment = makeTempComment(timeStamp, textContent);
+                  setCommentList([{ ...tempComment }].concat(commentList));
+
+                  setPostCommentsCount(postCommentsCount + 1);
+                  setOpenCommentsSection(true);
+                  const commentCall = await postComment(timeStamp);
+                  console.log('The comment call is');
+                  console.log(commentCall);
+                  if (commentCall?.status && commentCall?.post) {
+                    const newCommentList = [{ ...commentCall.post }, ...commentList];
+                    console.log('the new comment list is');
+                    console.log(newCommentList);
+                    setCommentList([{ ...commentCall.post }].concat(commentList));
+                  } else {
+                    setCommentList([...commentList]);
+                    setPostCommentsCount(postCommentsCount);
+                  }
                 }
               }}
               onInput={(event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -465,7 +492,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                   next={getPostComments}
                   hasMore={hasMoreComments}
                   scrollableTarget={'postDetailsContainer'}>
-                  {commentList.map((comment: IComment, index: number, commentArray: IComment[]) => {
+                  {commentList.map((comment: Comment, index: number, commentArray: Comment[]) => {
                     return (
                       <PostComents
                         comment={comment}
@@ -478,6 +505,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                         setParentCommentsCount={setPostCommentsCount}
                         parentCommentsCount={postCommentsCount}
                         rightSidebarHandler={rightSidebarHandler}
+                        updateReplies={updateCommentsArray}
                       />
                     );
                   })}
@@ -563,7 +591,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
     }
   }
   // function renamed to post comments
-  async function postComment() {
+  async function postComment(timeStamp: string) {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
@@ -573,15 +601,23 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
       while (contentEditableDiv.current?.firstChild) {
         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
       }
-      const response: any = await lmFeedClient.addComment(Id, textContent);
+      const response: any = await lmFeedClient.addComment(Id, textContent, timeStamp);
       const comment = response?.data?.comment;
       const user = response?.data?.users;
-      setCommentList([{ ...comment }].concat(commentList));
       setPostUsersMap({ ...postUsersMap, ...user });
-      setPostCommentsCount(postCommentsCount + 1);
-      setOpenCommentsSection(true);
+      // setCommentList([{ ...comment }].concat(commentList));
+
+      // setPostCommentsCount(postCommentsCount + 1);
+      // setOpenCommentsSection(true);
+      return {
+        status: true,
+        post: comment
+      };
     } catch (error) {
-      lmFeedClient.logError(error);
+      return {
+        status: false,
+        post: null
+      };
     }
   }
   async function getTags() {
@@ -664,6 +700,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                       totalLikes: postLikesCount
                     });
                   }
+                  // setOpenSeeLikesDialog(true);
                 } else {
                   likePost();
                 }
@@ -750,6 +787,15 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
       {/* Comments */}
       {showPostScreenSection(location.pathname.includes('/post') ? true : false)}
       {/* Comments */}
+
+      {/* <Dialog open={openSeeLikesDialog} onClose={() => setOpenSeeLikesDialog(false)}>
+        <SeePostLikes
+          entityId={post?.Id!}
+          onClose={() => setOpenSeeLikesDialog(false)}
+          likesCount={postLikesCount}
+          entityType={1}
+        />
+      </Dialog> */}
     </div>
   );
 };

@@ -14,6 +14,7 @@ import { RootState } from '../../store/store';
 import { showSnackbar } from '../../store/snackbar/snackbarSlice';
 import { Topic } from '../../models/topics';
 import { PostContext } from '../../contexts/postContext';
+import SeePostLikes from '../SeePostLikes';
 interface PostDetailsProps {
   rightSidebarHandler: (action: string, value: any) => void;
   rightSideBar: any;
@@ -106,6 +107,7 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
             </div>
           )}
         </div>
+
         <div className="lmWrapper__allMembers">{rightSideBar}</div>
       </div>
       {/* </div> */}

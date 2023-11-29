@@ -9,18 +9,22 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
 import { Snackbar } from '@mui/material';
 import { FeedPost } from '../../../models/feedPost';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
+import { replaceEditedMessage } from '../../../store/feedPosts/feedsSlice';
+import { addNewTopics } from '../../../store/topics/topicsSlice';
+import { addNewUsers } from '../../../store/users/usersSlice';
+import { showSnackbar } from '../../../store/snackbar/snackbarSlice';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
   closeCreatePostDialog: () => void;
   //   showMediaAttachmentOnInitiation: boolean;
   //   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
-  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: FeedPost[];
-  post: IPost | null;
-  topics: Record<string, LMFeedTopics>;
+  // setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
+  // feedArray: FeedPost[];
+  // post: IPost | null;
+  // topics: Record<string, LMFeedTopics>;
 }
 interface Limits {
   left: number;
@@ -91,16 +95,13 @@ export function checkAtSymbol(str: string, index: number): number {
   }
 }
 
-const EditPost = ({
-  closeCreatePostDialog,
-  setFeedArray,
-  feedArray,
-  post,
-  topics
-}: CreatePostDialogProps) => {
+const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
   // redux managed state
   const currentUser = useSelector((state: RootState) => state.currentUser.user);
-
+  const post = useSelector((state: RootState) => state.snackbar).temporaryPost;
+  const feedArray = useSelector((state: RootState) => state.posts);
+  const topics = useSelector((state: RootState) => state.topics);
+  const dispatch = useDispatch();
   function setUserImage() {
     const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
@@ -157,6 +158,7 @@ const EditPost = ({
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
+    console.log('Called');
     const newSelectedTopics = topics?.map((topic) => {
       return topic.Id;
     });
@@ -164,7 +166,7 @@ const EditPost = ({
     if (newSelectedTopics && newSelectedTopics.length) {
       setSelectedTopics(newSelectedTopics);
     } else {
-      setSelectedTopics(null);
+      setSelectedTopics([]);
     }
   }
   function setToEndOfContent(element: HTMLDivElement): void {
@@ -299,25 +301,6 @@ const EditPost = ({
 
     return container;
   }
-  const attachmentProps = {
-    showMediaUploadBar,
-    setShowMediaUploadBar,
-    imageOrVideoUploadArray,
-    setImageOrVideoUploadArray,
-    documentUploadArray,
-    setDocumentUploadArray,
-    attachmentType,
-    setAttachmentType,
-    showInitiateUploadComponent,
-    setShowInitiateUploadComponent,
-    showOGTagPreview,
-    setShowOGTagPreview,
-    previewOGTagData,
-    setPreviewOGTagData,
-    hasPreviewClosedOnce,
-    setHasPreviewClosedOnce
-    // showMediaAttachmentOnInitiation
-  };
 
   const setCloseDialog = () => {};
   function findTag(str: string): TagInfo | undefined {
@@ -390,19 +373,27 @@ const EditPost = ({
         return item;
       });
       const disabledTopicList: string[] = [];
+      console.log('the selected topicIds are');
+      console.log(selectedTopics);
       selectedTopics?.forEach((topicId: string) => {
         const tempTopic = topics[topicId];
-        console.log(tempTopic.isEnabled);
-        if (!tempTopic.isEnabled) {
-          disabledTopicList.push(tempTopic.name);
+        console.log(tempTopic?.isEnabled);
+        if (tempTopic && !tempTopic?.isEnabled) {
+          disabledTopicList.push(tempTopic?.name);
         }
       });
       console.log('The Disabled Topic List is');
       console.log(disabledTopicList);
       if (disabledTopicList.length) {
+        // dispatch(
+        //   showSnackbar(`
+        //   The following topics have been disabled. Please remove them to save the post.
+        //   ${disabledTopicList.join(',')}
+        //   `)
+        // );
         setOpenSnackbar(true);
         setSnackbarMessage(`
-        The following topics have been disabled. Please remove them:
+        The following topics have been disabled. Please remove them to save the post.
         ${disabledTopicList.join(',')}
         `);
         return;
@@ -415,10 +406,10 @@ const EditPost = ({
         selectedTopics
       );
       const newpost: FeedPost = response?.data?.post;
-      const newFeedArray = [...feedArray];
-      const thisFeedIndex = newFeedArray.findIndex((item: FeedPost) => item.Id === post?.Id!);
-      newFeedArray[thisFeedIndex] = { ...newpost };
-      setFeedArray(newFeedArray as any);
+
+      dispatch(replaceEditedMessage(newpost));
+      dispatch(addNewTopics(response.data.topics));
+      dispatch(addNewUsers(response.data.users));
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -473,6 +464,9 @@ const EditPost = ({
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
+      if (!text.trim().length) {
+        return;
+      }
       const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
       if (!text.includes(ogTagLinkArray[0])) {
         ogTagLinkArray.splice(0, 1);

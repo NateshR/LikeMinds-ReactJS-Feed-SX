@@ -1,5 +1,5 @@
 .attachmentHolder {
-  margin: 0 0 20px 0;
+  /* margin: 0 0 20px 0; */
   display: flex;
   width: 100%;
   height: auto;
@@ -181,7 +181,7 @@ input[type='file'] {
 }
 
 .ogTagPreviewContainer {
-  height: 355px;
+  /* height: 355px; */
   width: 100%;
   padding-left: 16px;
   padding-right: 16px;

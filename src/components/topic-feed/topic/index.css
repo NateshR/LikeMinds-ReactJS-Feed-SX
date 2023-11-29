@@ -13,6 +13,14 @@
     margin-bottom: 8px;
 }
 
+.topicBlock>span {
+    text-overflow: ellipsis;
+    max-width: 400px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .crossIcon {
     cursor: pointer;
 }

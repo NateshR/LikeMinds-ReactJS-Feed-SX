@@ -736,6 +736,7 @@ const CreatePostDialog = ({
               setTopicsForTopicFeed={setTopicsForTopicFeed}
               isCreateMode={true}
             />
+
             <div
               style={{
                 maxHeight: '324px',
@@ -817,6 +818,9 @@ const CreatePostDialog = ({
                 textContent = textContent.trim();
                 if (textContent === PLACE_HOLDER_TEXT) {
                   textContent = '';
+                }
+                if (!textContent.length) {
+                  return;
                 }
                 const timeStamp = Date.now().toString();
                 const tempPost = makeTempPost(

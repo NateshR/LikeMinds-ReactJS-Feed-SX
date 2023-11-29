@@ -1,14 +1,16 @@
-.topicTile{
+.topicTile {
     width: 279px;
     height: 56px;
     padding: 16px;
     padding-left: 0px;
     display: flex;
 }
-.topicTile:hover{
+
+.topicTile:hover {
     background-color: white;
 }
-.allTopicButton{
+
+.allTopicButton {
     width: 122px;
     height: 36px;
     border-radius: 4px;
@@ -24,4 +26,12 @@
     border: 1px solid #D0D8E2;
     cursor: pointer;
     color: #666666;
+}
+
+.topicNameContainer {
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-left: 28px;
 }

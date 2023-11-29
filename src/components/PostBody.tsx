@@ -146,9 +146,7 @@ const PostBody: React.FC = () => {
             key={attachment?.attachmentMeta?.url}
             style={{
               background: 'white',
-              height: '100%',
-              paddingBottom: '20px',
-              paddingTop: '20px'
+              height: '100%'
             }}>
             <div
               className="lmPdfViewer"

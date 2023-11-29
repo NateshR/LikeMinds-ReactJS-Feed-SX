@@ -41,6 +41,7 @@ import { addNewUsers } from '../../store/users/usersSlice';
 import { FeedPost } from '../../models/feedPost';
 import { PostContext } from '../../contexts/postContext';
 import { Topic } from '../../models/topics';
+import { handleEditDialogState } from '../../store/snackbar/snackbarSlice';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
 }
@@ -50,6 +51,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   const feedPosts = useSelector((state: RootState) => state.posts);
   const users = useSelector((state: RootState) => state.users);
   const topics = useSelector((state: RootState) => state.topics);
+  const snackbarState = useSelector((state: RootState) => state.snackbar);
   const dispatch = useDispatch();
   // const [user, setUser] = useState(null);
   // const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
@@ -410,20 +412,14 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         message={snackBarMessage}
       />
       <Dialog
-        open={openDialogBox}
-        onClose={() => setOpenDialogBox(false)}
+        open={snackbarState.openEditDialogBox}
+        onClose={() => dispatch(handleEditDialogState(false))}
         PaperProps={{
           sx: {
             borderRadius: '16px'
           }
         }}>
-        {/* <EditPost
-          feedArray={feedPosts}
-          setFeedArray={setFeedPostsArray}
-          closeCreatePostDialog={() => setOpenDialogBox(false)}
-          post={tempPost}
-          topics={topics}
-        /> */}
+        <EditPost closeCreatePostDialog={() => dispatch(handleEditDialogState(false))} />
       </Dialog>
     </>
   );

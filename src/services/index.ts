@@ -25,7 +25,8 @@ import {
   GetAllMembersRequest,
   GetPostLikesRequest,
   GetCommentLikesRequest,
-  GetTopicsRequest
+  GetTopicsRequest,
+  EditCommentRequest
 } from '@likeminds.community/feed-js-beta';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
@@ -383,10 +384,10 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return error;
     }
   }
-  async addComment(postId: string, text: string) {
+  async addComment(postId: string, text: string, timeStamp: string) {
     try {
       const apiCallResponse = await this.client.addComment(
-        AddCommentRequest.builder().setpostId(postId).settext(text).build()
+        AddCommentRequest.builder().setpostId(postId).settext(text).setTempId(timeStamp).build()
       );
       return apiCallResponse;
     } catch (error) {
@@ -394,14 +395,33 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       return error;
     }
   }
-  async replyComment(postId: string, commentId: string, text: string) {
+  async replyComment(postId: string, commentId: string, text: string, tempId: string) {
     try {
-      const apiCallResponse = await this.client.replyComment(
+      const apiCallResponse: any = await this.client.replyComment(
         ReplyCommentRequest.builder()
           .setPostId(postId)
           .setCommentId(commentId)
           .setText(text)
+          .setTempId(tempId)
           .build()
+      );
+      return {
+        status: true,
+        comment: apiCallResponse?.data?.comment
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: false,
+        comment: undefined
+      };
+    }
+  }
+
+  async editComment(postId: string, commentId: string, text: string) {
+    try {
+      const apiCallResponse = await this.client.editComment(
+        EditCommentRequest.builder().setpostId(postId).setcommentId(commentId).settext(text).build()
       );
       return apiCallResponse;
     } catch (error) {

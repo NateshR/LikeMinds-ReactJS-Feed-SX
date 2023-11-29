@@ -15,8 +15,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DeleteDialog from './DeleteDialog';
 import { PostContext } from '../contexts/postContext';
 import { MenuItem } from '../models/menuItem';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { deleteAPost } from '../store/feedPosts/feedsSlice';
+import { handleEditDialogState, setTemporaryPost } from '../store/snackbar/snackbarSlice';
 
 const PostHeader: React.FC = () => {
   const { post, topics, index, user } = useContext(PostContext);
@@ -24,6 +26,7 @@ const PostHeader: React.FC = () => {
   const { name, customTitle, imageUrl } = user![uuid.toString()];
 
   const currentUser = useSelector((state: RootState) => state?.currentUser.user);
+  const dispatch = useDispatch();
 
   const [moreAnchorsMenu, setMoreOptionsMenu] = useState<HTMLElement | null>(null);
   const [openDialogBox, setOpenDialog] = useState(false);
@@ -58,7 +61,9 @@ const PostHeader: React.FC = () => {
     return await lmFeedClient.pinPost(Id);
   }
   async function deletePost() {
+    dispatch(deleteAPost(Id));
     await lmFeedClient.deletePost(Id);
+
     if (location.pathname.includes('/post')) {
       navigate('/');
     } else {
@@ -71,6 +76,8 @@ const PostHeader: React.FC = () => {
     setOpenDialog(false);
   }
   async function editPost() {
+    dispatch(handleEditDialogState(true));
+    dispatch(setTemporaryPost(post!));
     // feedModerationHandler(EDIT_POST, index, null);
   }
   async function openReport() {

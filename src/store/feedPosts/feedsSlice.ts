@@ -30,6 +30,21 @@ export const feedsSlice = createSlice({
       }
       return state;
     },
+    deleteAPost: (state, action: PayloadAction<string>) => {
+      const targetPostIndex = state.findIndex((post) => post.Id === action.payload);
+      if (targetPostIndex !== -1) {
+        state.splice(targetPostIndex, 1);
+      }
+      return state;
+    },
+    replaceEditedMessage: (state, action: PayloadAction<FeedPost>) => {
+      const replacedPostId = action.payload.Id;
+      const targetPostIndex = state.findIndex((post) => post.Id === replacedPostId);
+      if (targetPostIndex !== -1) {
+        state[targetPostIndex] = action.payload;
+      }
+      return state;
+    },
     handlePostLike: (state, action: PayloadAction<string>) => {
       const targetPost = state.find((post: FeedPost) => post.Id === action.payload);
       if (targetPost) {
@@ -41,5 +56,12 @@ export const feedsSlice = createSlice({
 });
 
 export default feedsSlice.reducer;
-export const { addNewPosts, clearPosts, setNewFeedPosts, addNewLocalPost, replaceLocalPost } =
-  feedsSlice.actions;
+export const {
+  addNewPosts,
+  clearPosts,
+  setNewFeedPosts,
+  addNewLocalPost,
+  replaceLocalPost,
+  deleteAPost,
+  replaceEditedMessage
+} = feedsSlice.actions;
