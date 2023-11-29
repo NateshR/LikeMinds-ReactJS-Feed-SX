@@ -4,6 +4,7 @@ import feedsSlice from './feedPosts/feedsSlice';
 import topicsSlice from './topics/topicsSlice';
 import usersSlice from './users/usersSlice';
 import snackbarSlice from './snackbar/snackbarSlice';
+import extrasSlice from './extrasSlice/extraSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     posts: feedsSlice,
     topics: topicsSlice,
     users: usersSlice,
-    snackbar: snackbarSlice
+    snackbar: snackbarSlice,
+    extras: extrasSlice
   }
 });
 export type RootState = ReturnType<typeof store.getState>;

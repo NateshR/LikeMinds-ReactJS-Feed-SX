@@ -32,6 +32,12 @@
   /* height: 40px; */
   /* display: flex; */
   align-items: center;
+  color: rgba(72, 79, 103, 1) !important
+}
+
+#editableDiv>a {
+  color:
+    rgba(0, 122, 255, 1) !important;
 }
 
 #editableDiv:focus {
