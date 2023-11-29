@@ -4,69 +4,59 @@ import comment from '../assets/images/comment.svg';
 import bookmark from '../assets/images/bookmark.svg';
 import share from '../assets/images/share.svg';
 
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PostHeader from './PostHeader';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
-import { IPost, IUser } from '@likeminds.community/feed-js';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
+import PostTopicBlock from './topic-feed/post-topic-block';
+import { FeedPost } from '../models/feedPost';
+import { User } from '../models/User';
+import { PostContext } from '../contexts/postContext';
+import { Topic } from '../models/topics';
 
 interface PostProps {
-  post: IPost;
-  user: IUser;
-  feedModerationHandler: (action: string, index: number, value: any) => void;
-  index: number;
   rightSidebarHandler: (action: string, value: any) => void;
 }
 const pattern = /<<.*?>>/g;
 
-const Post: React.FC<PostProps> = ({
-  post,
-  user,
-  feedModerationHandler,
-  index,
-  rightSidebarHandler
-}) => {
+const Post: React.FC<PostProps> = ({ rightSidebarHandler }) => {
+  const { post, topics, index, user } = useContext(PostContext);
+  const [topicsForPost, setTopicsForPost] = useState<Topic[]>([]);
+  useEffect(() => {
+    if (topics && post) {
+      const selectedPostTopics = post?.topics?.map((topicId: string) => {
+        return topics[topicId];
+      });
+      setTopicsForPost(selectedPostTopics);
+    }
+  }, [topics, post]);
   if (!user) {
     return null;
   }
+  if (!post) {
+    return null;
+  }
+  // useEffect(() => {
+  //   console.log('The topics are', topics);
+  //   if (topics) {
+  //     for (let [key, val] of Object.entries(topics)) {
+  //       console.log(val);
+  //     }
+  //   }
+  // }, [topics]);
   return (
     <div>
       {/* Post */}
       {/* declare custom title in user model */}
       <div className="lmWrapper__feed__post">
         {/* header */}
-        <PostHeader
-          imgUrl={user.imageUrl}
-          username={user.name}
-          customTitle={user.customTitle}
-          createdAt={post.createdAt}
-          menuOptions={post.menuItems}
-          postId={post.Id}
-          feedModerationHandler={feedModerationHandler}
-          index={index}
-          uuid={post.uuid}
-          isPinned={post.isPinned}
-          isEdited={post.isEdited}
-        />
+        <PostHeader />
+        <PostTopicBlock topics={topicsForPost} />
         {/* post */}
-        <PostBody
-          answer={post.text}
-          attachments={post.attachments!}
-          feedModerationHandler={feedModerationHandler}
-        />
+        <PostBody />
         {/* footer */}
-        <PostFooter
-          rightSidebarHandler={rightSidebarHandler}
-          postId={post.Id}
-          isLiked={post.isLiked}
-          isPinned={post.isPinned}
-          isEdited={post.isEdited}
-          isSaved={post.isSaved}
-          likesCount={post.likesCount}
-          feedModerationHandler={feedModerationHandler}
-          index={index}
-          commentsCount={post.commentsCount}
-        />
+        <PostFooter rightSidebarHandler={rightSidebarHandler} />
       </div>
       {/* Post */}
     </div>

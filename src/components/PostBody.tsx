@@ -1,7 +1,7 @@
 import post from '../assets/images/post.jpg';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { Dialog, IconButton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import { Attachment } from '@likeminds.community/feed-js';
@@ -14,14 +14,11 @@ import { HolderWithCross } from './dialog/createPost/AttachmentsHolder';
 import { OgTags } from '../services/models';
 import pdfIcon from '../assets/images/poll.svg';
 import ImageMedia from './media-components/ImageMedia';
+import { PostContext } from '../contexts/postContext';
 
 const url = `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 pdfjs.GlobalWorkerOptions.workerSrc = url;
-interface PostBodyProps {
-  answer: string;
-  attachments: Attachment[];
-  feedModerationHandler: (action: string, index: number, value: any) => void;
-}
+
 interface MatchPattern {
   type: number;
   displayName?: string;
@@ -29,7 +26,9 @@ interface MatchPattern {
   link?: string;
 }
 
-const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
+const PostBody: React.FC = () => {
+  const { post } = useContext(PostContext);
+  const { text, attachments = [] } = post!;
   const [renderedData, setRenderedData] = useState<any>(null);
   const [pdfPageNo, setPdfPageNo] = useState<number>(1);
   const [ogTagPreview, setOgTagPreview] = useState<boolean>(true);
@@ -101,8 +100,8 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
         (attachment: Attachment) =>
           attachment.attachmentType === 1 ||
           attachment.attachmentType === 2 ||
-          attachment.attachmentType === 3 ||
-          attachment.attachmentType === 4
+          attachment.attachmentType === 3
+        // attachment.attachmentType === 4
       )
       .map((attachment: Attachment) => {
         return renderMediaItem(attachment);
@@ -147,9 +146,7 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
             key={attachment?.attachmentMeta?.url}
             style={{
               background: 'white',
-              height: '100%',
-              paddingBottom: '20px',
-              paddingTop: '20px'
+              height: '100%'
             }}>
             <div
               className="lmPdfViewer"
@@ -208,7 +205,6 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           return (
             <div
               style={{
-                float: 'left',
                 background: 'white'
               }}
               key={attachment.attachmentMeta?.ogTags?.url?.toString()}>
@@ -231,12 +227,12 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
 
   return (
     <div className="lmWrapper__feed__post__body">
-      {answer && (
+      {text && (
         <div className="lmWrapper__feed__post__body--content">
-          {isReadMore && answer.length > 300
-            ? Parser().parse(convertTextToHTML(answer.substring(0, 300)).innerHTML)
-            : Parser().parse(convertTextToHTML(answer).innerHTML)}
-          {isReadMore && answer.length > 300 ? (
+          {isReadMore && text.length > 300
+            ? Parser().parse(convertTextToHTML(text.substring(0, 300)).innerHTML)
+            : Parser().parse(convertTextToHTML(text).innerHTML)}
+          {isReadMore && text.length > 300 ? (
             <span
               style={{
                 color: 'gray',
@@ -259,6 +255,11 @@ const PostBody: React.FC<PostBodyProps> = ({ answer, attachments }) => {
           showIndicators={false}>
           {renderedData}
         </Carousel>
+        {attachments
+          .filter((attachment: Attachment) => attachment.attachmentType === 4)
+          .map((attachment: Attachment) => {
+            return renderMediaItem(attachment);
+          })}
       </div>
     </div>
   );

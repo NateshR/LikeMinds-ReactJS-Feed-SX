@@ -1,21 +1,30 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import '../createPost/createPostDialog.css';
-import UserContext from '../../../contexts/UserContext';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { Attachment, AttachmentMeta, IPost } from '@likeminds.community/feed-js';
+import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js';
 import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
+import { Snackbar } from '@mui/material';
+import { FeedPost } from '../../../models/feedPost';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
+import { replaceEditedMessage } from '../../../store/feedPosts/feedsSlice';
+import { addNewTopics } from '../../../store/topics/topicsSlice';
+import { addNewUsers } from '../../../store/users/usersSlice';
+import { showSnackbar } from '../../../store/snackbar/snackbarSlice';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
   closeCreatePostDialog: () => void;
   //   showMediaAttachmentOnInitiation: boolean;
   //   setShowMediaAttachmentOnInitiation: React.Dispatch<React.SetStateAction<boolean>>;
-  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: IPost[];
-  post: IPost | null;
+  // setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
+  // feedArray: FeedPost[];
+  // post: IPost | null;
+  // topics: Record<string, LMFeedTopics>;
 }
 interface Limits {
   left: number;
@@ -86,21 +95,20 @@ export function checkAtSymbol(str: string, index: number): number {
   }
 }
 
-const EditPost = ({
-  closeCreatePostDialog,
-
-  setFeedArray,
-  feedArray,
-  post
-}: CreatePostDialogProps) => {
-  const userContext = useContext(UserContext);
+const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
+  // redux managed state
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+  const post = useSelector((state: RootState) => state.snackbar).temporaryPost;
+  const feedArray = useSelector((state: RootState) => state.posts);
+  const topics = useSelector((state: RootState) => state.topics);
+  const dispatch = useDispatch();
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -124,7 +132,7 @@ const EditPost = ({
             letterSpacing: '1px',
             borderRadius: '50%'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -145,6 +153,22 @@ const EditPost = ({
     left: 0,
     right: 0
   });
+  const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
+  const [existingSelectedTopics, setExistingSelectedTopics] = useState<LMFeedTopics[]>([]);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
+  function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
+    console.log('Called');
+    const newSelectedTopics = topics?.map((topic) => {
+      return topic.Id;
+    });
+    console.log(newSelectedTopics);
+    if (newSelectedTopics && newSelectedTopics.length) {
+      setSelectedTopics(newSelectedTopics);
+    } else {
+      setSelectedTopics([]);
+    }
+  }
   function setToEndOfContent(element: HTMLDivElement): void {
     if (element.contentEditable === 'true') {
       const range = document.createRange();
@@ -234,12 +258,12 @@ const EditPost = ({
   }
   function convertTextToHTML(text: string) {
     const regex = /<<.*?>>|(?:https?|ftp):\/\/[^\s/$.?#].[^\s]*|www\.[^\s/$.?#].[^\s]*/g;
-    const matches = text.match(regex) || [];
-    const splits = text.split(regex);
+    const matches = text?.match(regex) || [];
+    const splits = text?.split(regex);
 
     const container = document.createElement('div');
 
-    for (let i = 0; i < splits.length; i++) {
+    for (let i = 0; i < splits?.length; i++) {
       const splitNode = document.createTextNode(splits[i]);
       container.appendChild(splitNode);
 
@@ -277,25 +301,6 @@ const EditPost = ({
 
     return container;
   }
-  const attachmentProps = {
-    showMediaUploadBar,
-    setShowMediaUploadBar,
-    imageOrVideoUploadArray,
-    setImageOrVideoUploadArray,
-    documentUploadArray,
-    setDocumentUploadArray,
-    attachmentType,
-    setAttachmentType,
-    showInitiateUploadComponent,
-    setShowInitiateUploadComponent,
-    showOGTagPreview,
-    setShowOGTagPreview,
-    previewOGTagData,
-    setPreviewOGTagData,
-    hasPreviewClosedOnce,
-    setHasPreviewClosedOnce
-    // showMediaAttachmentOnInitiation
-  };
 
   const setCloseDialog = () => {};
   function findTag(str: string): TagInfo | undefined {
@@ -349,10 +354,10 @@ const EditPost = ({
         textContent = '';
       }
 
-      closeDialogBox();
       let response: any;
 
       if (textContent === '') {
+        dispatch(showSnackbar('Please Add Text to create a post'));
         return;
       }
       let newArr: any[] = [];
@@ -368,16 +373,44 @@ const EditPost = ({
         }
         return item;
       });
-      response = await lmFeedClient.editPost(post?.Id!, textContent, [
-        ...imageOrVideoUploadArray,
-        ...documentUploadArray,
-        ...previewOGTagData
-      ]);
-      const newpost: IPost = response?.data?.post;
-      const newFeedArray = [...feedArray];
-      const thisFeedIndex = newFeedArray.findIndex((item: IPost) => item.Id === post?.Id!);
-      newFeedArray[thisFeedIndex] = { ...newpost };
-      setFeedArray(newFeedArray);
+      const disabledTopicList: string[] = [];
+      console.log('the selected topicIds are');
+      console.log(selectedTopics);
+      selectedTopics?.forEach((topicId: string) => {
+        const tempTopic = topics[topicId];
+        console.log(tempTopic?.isEnabled);
+        if (tempTopic && !tempTopic?.isEnabled) {
+          disabledTopicList.push(tempTopic?.name);
+        }
+      });
+      console.log('The Disabled Topic List is');
+      console.log(disabledTopicList);
+      if (disabledTopicList.length) {
+        // dispatch(
+        //   showSnackbar(`
+        //   The following topics have been disabled. Please remove them to save the post.
+        //   ${disabledTopicList.join(',')}
+        //   `)
+        // );
+        setOpenSnackbar(true);
+        setSnackbarMessage(`
+        The following topics have been disabled. Please remove them to save the post.
+        ${disabledTopicList.join(',')}
+        `);
+        return;
+      }
+      closeDialogBox();
+      response = await lmFeedClient.editPost(
+        post?.Id!,
+        textContent,
+        [...imageOrVideoUploadArray, ...documentUploadArray, ...previewOGTagData],
+        selectedTopics
+      );
+      const newpost: FeedPost = response?.data?.post;
+
+      dispatch(replaceEditedMessage(newpost));
+      dispatch(addNewTopics(response.data.topics));
+      dispatch(addNewUsers(response.data.users));
     } catch (error) {
       lmFeedClient.logError(error);
     }
@@ -432,6 +465,9 @@ const EditPost = ({
 
   useEffect(() => {
     const timeOut = setTimeout(() => {
+      if (!text.trim().length) {
+        return;
+      }
       const ogTagLinkArray: string[] = lmFeedClient.detectLinks(text);
       if (!text.includes(ogTagLinkArray[0])) {
         ogTagLinkArray.splice(0, 1);
@@ -507,13 +543,22 @@ const EditPost = ({
       setToEndOfContent(contentEditableDiv.current);
     }
   }, [contentEditableDiv.current]);
+  useEffect(() => {
+    const postTopics: any = post?.topics;
+    const selectedTopicsList = postTopics?.map((topicId: string) => {
+      return topics[topicId];
+    });
+    console.log('The selected topics list is');
+    console.log(selectedTopicsList);
+    setExistingSelectedTopics(selectedTopicsList);
+  }, [topics, post]);
   function setTagUserImage(user: any) {
     const imageLink = user?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -641,14 +686,14 @@ const EditPost = ({
           className="create-post-feed-dialog-wrapper_container--closeicon"
           onClick={closeDialogBox}>
           <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M3.47755 20.5254C3.89943 20.9356 4.59084 20.9356 4.98927 20.5254L11.9971 13.5176L19.0049 20.5254C19.4151 20.9356 20.1065 20.9473 20.5166 20.5254C20.9268 20.1035 20.9385 19.4121 20.5283 19.002L13.5205 11.9942L20.5283 4.99806C20.9385 4.58791 20.9385 3.88478 20.5166 3.47462C20.0947 3.06447 19.4151 3.06447 19.0049 3.47462L11.9971 10.4824L4.98927 3.47462C4.59084 3.06447 3.88771 3.05275 3.47755 3.47462C3.0674 3.8965 3.0674 4.58791 3.47755 4.99806L10.4736 11.9942L3.47755 19.002C3.0674 19.4121 3.05568 20.1152 3.47755 20.5254Z"
-              fill="#000000"
+              d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
+              fill="#484F67"
             />
           </svg>
         </span>
@@ -656,14 +701,20 @@ const EditPost = ({
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--heading">
             <p>Edit Post</p>
           </div>
-          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info">
-            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image">
+          <div className="create-post-feed-dialog-wrapper_container_post-wrapper--user-info margin-bottom-16">
+            <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-image ">
               {setUserImage()}
             </div>
             <div className="create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name">
-              {userContext?.user?.name}
+              {currentUser?.name.toUpperCase()}
             </div>
           </div>
+          <TopicFeedDropdownSelector
+            setTopicsForTopicFeed={setTopicsForTopicFeed}
+            isCreateMode={true}
+            existingSelectedTopics={existingSelectedTopics}
+          />
+          <div className="separator"></div>
           <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
             <div
               ref={contentEditableDiv}
@@ -691,7 +742,7 @@ const EditPost = ({
               }}
               onFocus={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
-                  if (text.trim() === '') {
+                  if (text?.trim() === '') {
                     contentEditableDiv.current.textContent = ``;
                   }
                 }
@@ -729,6 +780,14 @@ const EditPost = ({
           </div>
         </div>
       </div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={5000}
+        message={snackbarMessage}
+        onClose={() => {
+          setOpenSnackbar(false);
+        }}
+      />
     </div>
   );
 };

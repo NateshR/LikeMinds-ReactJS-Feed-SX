@@ -6,13 +6,15 @@ import DialogBox from './dialog/DialogBox';
 import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 import { lmFeedClient } from '..';
 import { Dialog } from '@mui/material';
-import UserContext from '../contexts/UserContext';
 import { IPost } from '@likeminds.community/feed-js';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 interface CreateFeedProps {
-  setFeedArray: React.Dispatch<React.SetStateAction<IPost[]>>;
-  feedArray: IPost[];
+  feedModerationHandler: any;
 }
-const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
+const CreatePost: React.FC<CreateFeedProps> = ({ feedModerationHandler }) => {
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+
   const ref = useRef<HTMLInputElement | null>(null);
   const [openCreatePostDialog, setOpenCreatePostDialog] = useState(false);
   const [showMediaAttachmentOnInitiation, setShowMediaAttachmentOnInitiation] =
@@ -33,15 +35,14 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
     }
   }, [openCreatePostDialog]);
   const [open, setOpen] = useState(false);
-  const userContext = useContext(UserContext);
 
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -65,7 +66,7 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -79,15 +80,19 @@ const CreatePost: React.FC<CreateFeedProps> = ({ setFeedArray, feedArray }) => {
         onClose={(e: any) => {
           closeCreatePostDialog();
           e.preventDefault();
+        }}
+        PaperProps={{
+          sx: {
+            borderRadius: '16px'
+          }
         }}>
         <CreatePostDialog
           closeCreatePostDialog={closeCreatePostDialog}
           showMediaAttachmentOnInitiation={showMediaAttachmentOnInitiation}
           setShowMediaAttachmentOnInitiation={setShowMediaAttachmentOnInitiation}
-          setFeedArray={setFeedArray}
-          feedArray={feedArray}
           showDocumentAttachmentOnInitiation={showDocumentAttachmentOnInitiation}
           setShowDocumentAttachmentOnInitiation={setShowDocumentAttachmentOnInitiation}
+          feedModerationHandler={feedModerationHandler}
         />
       </Dialog>
       <div className="lmWrapper__feed__creatPost">

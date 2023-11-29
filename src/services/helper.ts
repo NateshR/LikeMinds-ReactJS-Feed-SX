@@ -9,7 +9,7 @@ interface HelperFunctionsInterface {
 export class HelperFunctionsClass implements HelperFunctionsInterface {
   detectLinks(text: string) {
     const regex = /\b(?:https?:\/\/)?(?:[\w.]+\.\w+)(?:(?<=\\n)|\b)/g;
-    const links = text.match(regex);
+    const links = text?.match(regex);
     return links ? links : [];
   }
 

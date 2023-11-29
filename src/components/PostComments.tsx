@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
-import { Dialog, IconButton, Menu, MenuItem } from '@mui/material';
-import { IComment, IMenuItem, IUser } from '@likeminds.community/feed-js';
+import { Dialog, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
+import { IMenuItem, IUser } from '@likeminds.community/feed-js';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';
@@ -23,7 +23,6 @@ import {
   setCursorAtEnd
 } from './dialog/createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import UserContext from '../contexts/UserContext';
 import ReportPostDialogBox from './ReportPost';
 import { truncateSync } from 'fs';
 import SeePostLikes from './SeePostLikes';
@@ -35,12 +34,17 @@ import {
   UPDATE_LIKES_COUNT_DECREMENT,
   UPDATE_LIKES_COUNT_INCREMENT
 } from '../services/feedModerationActions';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
+import { Comment } from '../models/comment';
+import EditCommentBox from './EditComment';
 dayjs.extend(relativeTime);
 interface CommentProps {
-  comment: IComment;
+  updateReplies: any;
+  comment: Comment;
   postId: string;
-  commentArray: IComment[];
-  setCommentArray: React.Dispatch<IComment[]>;
+  commentArray: Comment[];
+  setCommentArray: React.Dispatch<Comment[]>;
   index: number;
   user?: IUser;
   setParentCommentsCount: React.Dispatch<number>;
@@ -56,9 +60,15 @@ const PostComents: React.FC<CommentProps> = ({
   user,
   setParentCommentsCount,
   parentCommentsCount,
-  rightSidebarHandler
+  rightSidebarHandler,
+  updateReplies
 }) => {
-  const [repliesArray, setRepliesArray] = useState<IComment[]>([]);
+  // Redux Managed State
+  const currentUser = useSelector((state: RootState) => state.currentUser.user);
+
+  // Local states
+  const [editCommentMode, setEditCommentMode] = useState<boolean>(false);
+  const [repliesArray, setRepliesArray] = useState<Comment[]>([]);
   const [openDialogBox, setOpenDialogBox] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(comment.isLiked);
   const [likesCount, setLikesCount] = useState<number>(comment.likesCount);
@@ -68,6 +78,15 @@ const PostComents: React.FC<CommentProps> = ({
   const [loadMoreReplies, setLoadMoreReplies] = useState<boolean>(true);
   const [openCommentsLikesDialog, setOpenCommentsDialog] = useState<boolean>(false);
   const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState<boolean>(false);
+  const [showShimmer, setShowShimmer] = useState<boolean>(true);
+  useEffect(() => {
+    setShowShimmer(false);
+  }, [comment]);
+  function updateCommentsArray(index: number, comment: Comment) {
+    const newArr = [...repliesArray];
+    newArr[index] = comment;
+    setRepliesArray(newArr);
+  }
   function closeDeleteDialog() {
     setOpenDeleteConfirmationDialog(false);
   }
@@ -128,8 +147,9 @@ const PostComents: React.FC<CommentProps> = ({
       setUsersMap({ ...usersMap, ...userMap });
       if (pageCount === 1) {
         const tempArr: { [key: string]: number } = {};
-        repliesArray.forEach((item: IComment) => (tempArr[item.Id] = 1));
-        let newResponseReplies = replyArray.filter((item: IComment) => {
+        repliesArray.forEach((item: Comment) => (tempArr[item.Id] = 1));
+        let newResponseReplies = [];
+        newResponseReplies = replyArray?.filter((item: Comment) => {
           if (tempArr[item.Id] != 1) {
             return item;
           }
@@ -167,15 +187,14 @@ const PostComents: React.FC<CommentProps> = ({
       console.log(error);
     }
   }
-  const userContext = useContext(UserContext);
 
   function setUserImage() {
-    const imageLink = userContext?.user?.imageUrl;
+    const imageLink = currentUser?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
             width: '100%',
             height: '100%',
@@ -199,7 +218,7 @@ const PostComents: React.FC<CommentProps> = ({
             color: '#fff',
             letterSpacing: '1px'
           }}>
-          {userContext.user?.name?.split(' ').map((part: string) => {
+          {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
         </span>
@@ -216,6 +235,9 @@ const PostComents: React.FC<CommentProps> = ({
       case '7':
         openReportDialogBox();
         break;
+      case 'editCommentMenuTile':
+        setEditCommentMode(true);
+        break;
     }
     setMenuAnchor(null);
   }
@@ -230,6 +252,8 @@ const PostComents: React.FC<CommentProps> = ({
   const contentEditableDiv = useRef<HTMLDivElement>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [openCommentsSection, setOpenCommentsSection] = useState<boolean>(false);
+  const [newCommentContent, setNewCommentContent] = useState<string>('');
+  const editCommentRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (contentEditableDiv && contentEditableDiv.current) {
       if (text === '' && !contentEditableDiv.current.isSameNode(document.activeElement)) {
@@ -262,7 +286,22 @@ const PostComents: React.FC<CommentProps> = ({
           paddingY: '0px'
         }}>
         {comment.menuItems.map((item: IMenuItem) => {
-          if (item.id === 8) return null;
+          if (item.id === 8)
+            return (
+              <div
+                className="lmOverflowMenuTitle"
+                id={'editCommentMenuTile'}
+                key={item.id.toString()}
+                onClick={handleMenuClick}
+                style={{
+                  width: '196px',
+                  padding: '1rem',
+                  cursor: 'pointer'
+                  // boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
+                }}>
+                {item.title}
+              </div>
+            );
           return (
             <div
               className="lmOverflowMenuTitle"
@@ -379,16 +418,16 @@ const PostComents: React.FC<CommentProps> = ({
 
     return container;
   }
-  function setTagUserImage(user: any) {
+  function setTagUserImage(user: any, dimension: string) {
     const imageLink = user?.imageUrl;
     if (imageLink !== '') {
       return (
         <img
           src={imageLink}
-          alt={userContext.user?.imageUrl}
+          alt={''}
           style={{
-            width: '100%',
-            height: '100%',
+            width: dimension,
+            height: dimension,
             borderRadius: '50%'
           }}
         />
@@ -536,7 +575,7 @@ const PostComents: React.FC<CommentProps> = ({
                           display: 'flex',
                           alignItems: 'center'
                         }}>
-                        {setTagUserImage(item)}
+                        {setTagUserImage(item, '40px')}
                         <div
                           style={{
                             padding: '0px 0.5rem',
@@ -579,6 +618,36 @@ const PostComents: React.FC<CommentProps> = ({
     }
   }
   // function renamed to post comments
+  function makeTempComment(timeStamp: string, text: string) {
+    const tempComment: Comment = {
+      Id: timeStamp,
+      commentsCount: 0,
+      communityId: 0,
+      createdAt: parseInt(timeStamp),
+      isEdited: false,
+      isLiked: false,
+      level: 0,
+      likesCount: 0,
+      menuItems: [
+        {
+          id: 8,
+          title: 'Edit'
+        },
+        {
+          id: 6,
+          title: 'Delete'
+        }
+      ],
+      postId: '',
+      replies: [],
+      tempId: null,
+      text: text,
+      updatedAt: 1701118115396,
+      userId: '',
+      uuid: currentUser?.uuid!
+    };
+    return tempComment;
+  }
   async function postReply() {
     try {
       let textContent: string = extractTextFromNode(contentEditableDiv.current);
@@ -588,16 +657,26 @@ const PostComents: React.FC<CommentProps> = ({
       while (contentEditableDiv.current?.firstChild) {
         contentEditableDiv.current.removeChild(contentEditableDiv.current.firstChild);
       }
+      const timeStamp = Date.now().toString();
       // setOpenReplyBox(false);
-      setOpenCommentsSection(true);
-      const response: any = await lmFeedClient.replyComment(postId, comment.Id, textContent);
-      let newAddedComment: IComment = response.data.comment;
-      if (repliesArray.length) {
-        let newRepliesArray = [];
-        newRepliesArray.push(newAddedComment);
-        newRepliesArray = newRepliesArray.concat([...repliesArray]);
-        setRepliesArray(newRepliesArray);
+      // setOpenCommentsSection(true);
+      const tempComment = makeTempComment(timeStamp, textContent);
+      let newRepliesArray = [];
+      newRepliesArray.push(tempComment);
+      newRepliesArray = newRepliesArray.concat([...repliesArray]);
+      setRepliesArray(newRepliesArray);
+      const response: any = await lmFeedClient.replyComment(
+        postId,
+        comment.Id,
+        textContent,
+        timeStamp
+      );
+      if (response.status && response.comment) {
+        setRepliesArray([{ ...response.comment }, ...repliesArray]);
+      } else {
+        setRepliesArray([...repliesArray]);
       }
+
       setCommentsCount(commentsCount + 1);
     } catch (error) {
       lmFeedClient.logError(error);
@@ -641,6 +720,322 @@ const PostComents: React.FC<CommentProps> = ({
   useEffect(() => {
     getComments();
   }, []);
+  function returnCommentBox() {
+    return (
+      <div>
+        <div className="commentWrapper--upperLayer" id={comment.Id}>
+          <div className="commentWrapper__upperLayer--contentBox">
+            <div className="commentWrapper--contentContainer">
+              <div className="commentWrapper--commentContent">
+                <div className="commentWrapper__commentContent--username">{user?.name}</div>
+                <div
+                  className="commentWrapper__commentContent--content"
+                  style={{
+                    overflowWrap: 'anywhere'
+                  }}>
+                  {showContentOfComment()}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="commentWrapper__upperLayer--menuActionArea">
+            <span
+              onClick={openMenu}
+              style={{
+                height: '24px',
+                width: '24px',
+                marginRight: '8px',
+                cursor: 'pointer'
+              }}>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 12C8 10.9 7.1 10 6 10C4.9 10 4 10.9 4 12C4 13.1 4.9 14 6 14C7.1 14 8 13.1 8 12ZM10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10C10.9 10 10 10.9 10 12ZM16 12C16 13.1 16.9 14 18 14C19.1 14 20 13.1 20 12C20 10.9 19.1 10 18 10C16.9 10 16 10.9 16 12Z"
+                  fill="#666666"
+                />
+              </svg>
+            </span>
+
+            {renderMenu()}
+          </div>
+        </div>
+        <div className="commentWrapper--commentActions">
+          <span
+            className="like"
+            style={{
+              height: '24px',
+              width: '24px',
+              textAlign: 'center'
+            }}
+            onClick={likeComment}>
+            {renderLikeButton()}
+          </span>
+          <span
+            className="likes-count"
+            onClick={() => {
+              if (likesCount) {
+                rightSidebarHandler(SHOW_COMMENTS_LIKES_BAR, {
+                  postId: postId,
+                  entityType: 2,
+                  totalLikes: likesCount,
+                  commentId: comment.Id
+                });
+              } else {
+                likeComment();
+              }
+            }}
+            style={{ cursor: 'pointer' }}>
+            {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
+          </span>
+          {comment.level === 0 ? (
+            <>
+              {' '}
+              <span className="replies"> | </span>
+              <span className="replies">
+                <span
+                  style={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setOpenReplyBox(!openReplyBox);
+                  }}>
+                  {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
+                </span>{' '}
+                <span
+                  style={{
+                    cursor: 'pointer',
+                    // color: openCommentsSection && commentsCount > 0 ? '#5046E5' : 'rgba(72, 79, 103, 0.7)',
+                    color: 'rgba(72, 79, 103, 0.7)'
+                  }}
+                  className="replyCount"
+                  onClick={() => {
+                    if (commentsCount !== repliesArray.length) {
+                      getComments();
+                    }
+                    setOpenCommentsSection(!openCommentsSection);
+                  }}>
+                  <span>
+                    {commentsCount > 0 ? commentsCount + ' ' : null}
+                    {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
+                  </span>
+                </span>
+              </span>
+            </>
+          ) : null}
+
+          <span
+            className="replies"
+            style={{
+              flexGrow: 1,
+              textAlign: 'right'
+            }}>
+            {comment.isEdited ? (
+              <span
+                className="elevated-dot"
+                style={{
+                  color: 'rgba(15, 30, 61, 0.4)'
+                }}>
+                Edited <span className="dotAfter"></span>
+              </span>
+            ) : null}
+            <> {dayjs(comment.createdAt).fromNow()}</>
+          </span>
+        </div>
+      </div>
+    );
+  }
+  function showContentOfComment() {
+    switch (showShimmer) {
+      case true:
+        return (
+          <Skeleton
+            height={14}
+            sx={{
+              marginLeft: '24px',
+              borderRadius: '4px'
+            }}
+            width={'80%'}
+            variant="rectangular"
+          />
+        );
+      default: {
+        return (
+          <>
+            {isReadMore && comment.text.length > 300
+              ? Parser().parse(convertTextToHTML(comment.text.substring(0, 300)).innerHTML)
+              : Parser().parse(convertTextToHTML(comment.text).innerHTML)}
+            {isReadMore && comment.text.length > 300 ? (
+              <span
+                style={{
+                  color: 'gray',
+                  fontWeight: '400',
+                  cursor: 'pointer',
+
+                  fontSize: '14px'
+                }}
+                onClick={() => setIsReadMore(false)}>
+                ...ReadMore
+              </span>
+            ) : null}
+          </>
+        );
+      }
+    }
+  }
+  function renderCommentContainer() {
+    switch (editCommentMode) {
+      case true: {
+        return (
+          <div>
+            <div className="commentWrapper--upperLayer" id={comment.Id} ref={editCommentRef}>
+              <div className="commentWrapper__upperLayer--contentBox">
+                <div className="commentWrapper--contentContainer">
+                  <div className="commentWrapper--commentContent">
+                    <div className="commentWrapper__commentContent--username">{user?.name}</div>
+                    <div
+                      className="commentWrapper__commentContent--content"
+                      style={{
+                        overflowWrap: 'anywhere'
+                      }}>
+                      <EditCommentBox
+                        update={setNewCommentContent}
+                        minHeight={'24px'}
+                        placeholder="Write your comment"
+                        editValuePreset={true}
+                        editFieldValue={comment.text}
+                        setEditCommentMode={setEditCommentMode}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginRight: '10px'
+                }}>
+                <span
+                  style={{
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setShowShimmer(true);
+                    lmFeedClient
+                      .editComment(postId, comment.Id, newCommentContent)
+                      .then((res: any) => {
+                        comment = res?.data?.comment;
+                        updateReplies(index, res?.data?.comment);
+                      });
+                    setEditCommentMode(false);
+                  }}>
+                  <svg
+                    width="20"
+                    height="22"
+                    viewBox="0 0 20 22"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M18.6535 9.68369L2.85657 0.843068C2.59336 0.689576 2.29028 0.618275 1.98624 0.638321C1.68221 0.658368 1.3911 0.768846 1.15032 0.955568C0.904423 1.14958 0.725886 1.41613 0.640059 1.71736C0.554233 2.01859 0.565478 2.33921 0.672199 2.63369L3.30657 9.99307C3.33322 10.0664 3.38159 10.13 3.44523 10.1752C3.50886 10.2204 3.58476 10.2452 3.66282 10.2462H10.4316C10.6262 10.2431 10.8147 10.314 10.9592 10.4445C11.1036 10.575 11.1931 10.7554 11.2097 10.9493C11.2161 11.0517 11.2015 11.1543 11.1666 11.2507C11.1318 11.3472 11.0776 11.4355 11.0073 11.5102C10.937 11.5849 10.8522 11.6444 10.758 11.685C10.6638 11.7256 10.5623 11.7464 10.4597 11.7462H3.66282C3.58476 11.7472 3.50886 11.772 3.44523 11.8172C3.38159 11.8624 3.33322 11.9259 3.30657 11.9993L0.672199 19.3587C0.593155 19.5854 0.569337 19.8277 0.602724 20.0655C0.63611 20.3033 0.725738 20.5296 0.864165 20.7258C1.00259 20.922 1.18582 21.0823 1.39864 21.1935C1.61146 21.3046 1.84773 21.3634 2.08782 21.3649C2.34332 21.3638 2.59455 21.2994 2.81907 21.1774L18.6535 12.3087C18.8854 12.177 19.0783 11.9861 19.2126 11.7555C19.3468 11.525 19.4175 11.263 19.4175 10.9962C19.4175 10.7294 19.3468 10.4674 19.2126 10.2369C19.0783 10.0063 18.8854 9.81543 18.6535 9.68369Z"
+                      fill="#00897b"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div className="commentWrapper--commentActions">
+              <span
+                className="like"
+                style={{
+                  height: '24px',
+                  width: '24px',
+                  textAlign: 'center'
+                }}
+                onClick={likeComment}>
+                {renderLikeButton()}
+              </span>
+              <span
+                className="likes-count"
+                onClick={() => {
+                  if (likesCount) {
+                    rightSidebarHandler(SHOW_COMMENTS_LIKES_BAR, {
+                      postId: postId,
+                      entityType: 2,
+                      totalLikes: likesCount,
+                      commentId: comment.Id
+                    });
+                  } else {
+                    likeComment();
+                  }
+                }}
+                style={{ cursor: 'pointer' }}>
+                {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
+              </span>
+              {comment.level === 0 ? (
+                <>
+                  {' '}
+                  <span className="replies"> | </span>
+                  <span className="replies">
+                    <span
+                      style={{
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => {
+                        setOpenReplyBox(!openReplyBox);
+                        setOpenCommentsSection(true);
+                      }}>
+                      {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
+                    </span>{' '}
+                    <span
+                      style={{
+                        cursor: 'pointer',
+                        color:
+                          openCommentsSection && commentsCount > 0
+                            ? '#5046E5'
+                            : 'rgba(72, 79, 103, 0.7)'
+                      }}
+                      className="replyCount"
+                      onClick={() => {
+                        if (commentsCount !== repliesArray.length) {
+                          getComments();
+                        }
+                        setOpenCommentsSection(!openCommentsSection);
+                        // if (commentsCount > 0) {
+
+                        // }
+                      }}>
+                      <span>
+                        {commentsCount > 0 ? commentsCount + ' ' : null}
+                        {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
+                      </span>
+                    </span>
+                  </span>
+                </>
+              ) : null}
+
+              <span
+                className="replies"
+                style={{
+                  flexGrow: 1,
+                  textAlign: 'right'
+                }}>
+                {dayjs(comment.createdAt).fromNow()}
+              </span>
+            </div>
+          </div>
+        );
+      }
+      default: {
+        return returnCommentBox();
+      }
+    }
+  }
   return (
     <div
       className="commentWrapper"
@@ -650,7 +1045,7 @@ const PostComents: React.FC<CommentProps> = ({
       <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
         <DeleteDialog onClose={closeDeleteDialog} deleteComment={deleteComment} type={2} />
       </Dialog>
-      <div className="commentWrapper--upperLayer">
+      {/* <div className="commentWrapper--upperLayer">
         <div className="commentWrapper__upperLayer--contentBox">
           <div className="commentWrapper--username">
             <span className="displayName">{user?.name}</span>
@@ -659,9 +1054,6 @@ const PostComents: React.FC<CommentProps> = ({
           <div className="commentWrapper--commentContent">
             <div
               className="commentWrapper__commentContent--content"
-              // dangerouslySetInnerHTML={{
-              //   __html: convertTextToHTML(comment.text).innerHTML
-              // }}
               style={{
                 overflowWrap: 'anywhere'
               }}>
@@ -674,14 +1066,13 @@ const PostComents: React.FC<CommentProps> = ({
                     color: 'gray',
                     fontWeight: '400',
                     cursor: 'pointer',
-                    // textDecoration: 'underline',
+
                     fontSize: '14px'
                   }}
                   onClick={() => setIsReadMore(false)}>
                   ...ReadMore
                 </span>
               ) : null}
-              {/* {} */}
             </div>
           </div>
         </div>
@@ -707,12 +1098,11 @@ const PostComents: React.FC<CommentProps> = ({
                 cursor: 'pointer'
               }}
             />
-            {/* </span> */}
           </IconButton>
           {renderMenu()}
         </div>
-      </div>
-      <div className="commentWrapper--commentActions">
+      </div> */}
+      {/* <div className="commentWrapper--commentActions">
         <span
           className="like"
           style={{
@@ -788,7 +1178,8 @@ const PostComents: React.FC<CommentProps> = ({
           }}>
           {dayjs(comment.createdAt).fromNow()}
         </span>
-      </div>
+      </div> */}
+      {renderCommentContainer()}
       {showReplyBox()}
       <div
         style={{
@@ -804,7 +1195,7 @@ const PostComents: React.FC<CommentProps> = ({
           dataLength={repliesArray?.length}
           scrollableTarget={comment.Id}>
           {repliesArray.length && openCommentsSection
-            ? repliesArray.map((comment: IComment, index: number, commentArray: IComment[]) => {
+            ? repliesArray.map((comment: Comment, index: number, commentArray: Comment[]) => {
                 return (
                   <PostComents
                     parentCommentsCount={commentsCount}
@@ -817,6 +1208,7 @@ const PostComents: React.FC<CommentProps> = ({
                     setCommentArray={setRepliesArray}
                     user={usersMap[comment?.uuid]}
                     rightSidebarHandler={rightSidebarHandler}
+                    updateReplies={updateCommentsArray}
                   />
                 );
               })

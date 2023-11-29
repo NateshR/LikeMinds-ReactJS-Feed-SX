@@ -6,6 +6,7 @@
   height: 100%;
   width: 100%;
 }
+
 .create-post-feed-dialog-wrapper--container {
   width: 532px;
   background-color: white;
@@ -15,12 +16,13 @@
   border-radius: 1rem;
   position: relative;
   padding: 1rem 2rem;
+  padding-top: 0px;
 }
 
 .create-post-feed-dialog-wrapper_container--closeicon {
   position: absolute;
-  right: 63.17px;
-  top: 38px;
+  right: 24px;
+  top: 24px;
   cursor: pointer;
 }
 
@@ -33,7 +35,7 @@
   padding: 20px 0px 36px 0px;
 }
 
-.create-post-feed-dialog-wrapper_container_post-wrapper--heading > p {
+.create-post-feed-dialog-wrapper_container_post-wrapper--heading>p {
   font-size: 1.25rem;
   font-weight: 500;
   line-height: 1.5rem;
@@ -51,6 +53,8 @@
   border-radius: 50%;
   width: 48px;
   height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 .create-post-feed-dialog-wrapper_container_post-wrapper_user-info--user-name {
@@ -65,7 +69,8 @@
   margin: 1rem 0;
   /* position: relative; */
 }
-.create-post-feed-dialog-wrapper_container_post-wrapper--post-container > textarea {
+
+.create-post-feed-dialog-wrapper_container_post-wrapper--post-container>textarea {
   width: 100%;
   resize: none;
   border: none;
@@ -74,7 +79,7 @@
   font-family: Roboto;
 }
 
-.create-post-feed-dialog-wrapper_container_post-wrapper--post-container > textarea:focus-visible {
+.create-post-feed-dialog-wrapper_container_post-wrapper--post-container>textarea:focus-visible {
   outline-offset: none;
   outline: none;
 }
@@ -88,10 +93,11 @@
   align-items: center;
   width: 100%;
 }
+
 .create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--add-post-text {
   font-weight: 500;
   font-size: 14px;
-  line-height: 1rem; 
+  line-height: 1rem;
   color: #484f67;
 }
 
@@ -113,7 +119,11 @@
   cursor: pointer;
   font-weight: 500;
 }
- 
-.taggingTile:hover{
+
+.taggingTile:hover {
   background: #E6EBF5;
+}
+
+.margin-bottom-16 {
+  margin-bottom: 16px;
 }

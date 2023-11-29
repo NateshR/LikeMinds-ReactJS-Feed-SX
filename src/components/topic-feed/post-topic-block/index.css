@@ -1,0 +1,7 @@
+.postTopicBlockContainer {
+    display: flex;
+    padding: 0px 16px;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
