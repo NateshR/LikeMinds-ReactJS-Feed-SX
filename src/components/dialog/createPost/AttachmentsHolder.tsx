@@ -5,7 +5,7 @@ import { ChangeEvent } from 'react';
 import { DecodeUrlModelSX } from '../../../services/models';
 import previewImage from './../../../assets/images/ogTagPreview.png';
 import { Carousel } from 'react-responsive-carousel';
-import { Attachment } from '@likeminds.community/feed-js-beta';
+import { Attachment } from '@likeminds.community/feed-js';
 import { DeleteOutlined } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 interface AttachmentsHolderProps {

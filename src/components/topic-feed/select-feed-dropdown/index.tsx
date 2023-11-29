@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './index.css';
-import { LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { LMFeedTopics } from '@likeminds.community/feed-js';
 import { lmFeedClient } from '../../..';
 import { Checkbox, FormControl, InputLabel, Menu, MenuItem, Select } from '@mui/material';
 import TopicList from '../topic-list';

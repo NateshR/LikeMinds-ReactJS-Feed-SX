@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import defaultUserImage from '../assets/images/defaultUserImage.png';
 import { Dialog, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
-import { IMenuItem, IUser } from '@likeminds.community/feed-js-beta';
+import { IMenuItem, IUser } from '@likeminds.community/feed-js';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { lmFeedClient } from '..';
 import SendIcon from '@mui/icons-material/Send';

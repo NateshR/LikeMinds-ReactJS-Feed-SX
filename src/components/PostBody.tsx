@@ -4,7 +4,7 @@ import { Carousel } from 'react-responsive-carousel';
 import React, { useContext, useMemo, useState } from 'react';
 import { Dialog, IconButton } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import { Attachment } from '@likeminds.community/feed-js-beta';
+import { Attachment } from '@likeminds.community/feed-js';
 import ReactDOMServer from 'react-dom/server';
 import { Parser } from 'html-to-react';
 import './../assets/css/post-body.css';

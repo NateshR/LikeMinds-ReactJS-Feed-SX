@@ -7,7 +7,7 @@ import {
   UPDATE_LIKES_COUNT_DECREMENT_POST,
   UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../services/feedModerationActions';
-import { IComment, IMemberRight, IUser } from '@likeminds.community/feed-js-beta';
+import { IComment, IMemberRight, IUser } from '@likeminds.community/feed-js';
 
 import {
   TagInfo,

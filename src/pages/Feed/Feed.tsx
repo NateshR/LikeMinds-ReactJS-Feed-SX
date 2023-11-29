@@ -5,7 +5,7 @@ import Post from '../../components/Post';
 import { lmFeedClient } from '../..';
 import DialogBox from '../../components/dialog/DialogBox';
 import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
-import { IPost, IUser, IMemberState, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { IPost, IUser, IMemberState, LMFeedTopics } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
 import {
