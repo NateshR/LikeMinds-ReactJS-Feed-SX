@@ -47,6 +47,7 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
         const newPost = resp?.data?.post;
         setPost(newPost!);
         setUser(resp?.data?.users);
+        setTopics(resp?.data?.topics);
       } catch (error) {
         dispatch(showSnackbar(POST_DOESNT_EXISTS));
         navigate('/');

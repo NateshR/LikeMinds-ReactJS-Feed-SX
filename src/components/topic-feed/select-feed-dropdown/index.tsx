@@ -124,6 +124,9 @@ const TopicFeedDropdownSelector = ({
             <button onClick={handleButtonClick} className="allTopicButton">
               All Topics{' '}
               <svg
+                style={{
+                  marginLeft: '2px'
+                }}
                 width="12"
                 height="16"
                 viewBox="0 0 12 16"

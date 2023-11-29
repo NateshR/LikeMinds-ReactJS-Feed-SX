@@ -37,7 +37,14 @@ const Post: React.FC<PostProps> = ({ rightSidebarHandler }) => {
   if (!post) {
     return null;
   }
-
+  // useEffect(() => {
+  //   console.log('The topics are', topics);
+  //   if (topics) {
+  //     for (let [key, val] of Object.entries(topics)) {
+  //       console.log(val);
+  //     }
+  //   }
+  // }, [topics]);
   return (
     <div>
       {/* Post */}
