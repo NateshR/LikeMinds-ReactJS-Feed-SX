@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import PostHeader from './PostHeader';
 import PostBody from './PostBody';
 import PostFooter from './PostFooter';
-import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
 import PostTopicBlock from './topic-feed/post-topic-block';
 import { FeedPost } from '../models/feedPost';
 import { User } from '../models/User';

@@ -1,4 +1,4 @@
-import { Attachment } from '@likeminds.community/feed-js-beta';
+import { Attachment } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
 import './image-media.css';
 

@@ -27,7 +27,7 @@ import {
   GetCommentLikesRequest,
   GetTopicsRequest,
   EditCommentRequest
-} from '@likeminds.community/feed-js-beta';
+} from '@likeminds.community/feed-js';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
 

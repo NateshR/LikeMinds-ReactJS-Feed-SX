@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import './index.css';
-import { LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { LMFeedTopics } from '@likeminds.community/feed-js';
 import { Checkbox, MenuItem } from '@mui/material';
 interface TopicListProps {
   topic: LMFeedTopics;

@@ -13,7 +13,7 @@ import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 import { lmFeedClient } from '../../..';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX, OgTags } from '../../../services/models';
-import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
 import { ADD_NEW_POST, ADD_POST_LOCALLY } from '../../../services/feedModerationActions';

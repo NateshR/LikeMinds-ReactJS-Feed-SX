@@ -1,4 +1,4 @@
-import { IMember } from '@likeminds.community/feed-js-beta';
+import { IMember } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
 import { lmFeedClient } from '..';
 import '../assets/css/all-members.css';

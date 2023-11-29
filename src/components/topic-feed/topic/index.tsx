@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import { LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { LMFeedTopics } from '@likeminds.community/feed-js';
 interface TopicBlockProps {
   topic: LMFeedTopics;
   onDeleteClick: any;

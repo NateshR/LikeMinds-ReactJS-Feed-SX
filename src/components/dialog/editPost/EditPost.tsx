@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import '../createPost/createPostDialog.css';
 import { lmFeedClient } from '../../..';
 import { DecodeUrlModelSX } from '../../../services/models';
-import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js-beta';
+import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js';
 import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';

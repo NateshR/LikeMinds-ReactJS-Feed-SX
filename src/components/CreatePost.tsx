@@ -6,7 +6,7 @@ import DialogBox from './dialog/DialogBox';
 import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 import { lmFeedClient } from '..';
 import { Dialog } from '@mui/material';
-import { IPost } from '@likeminds.community/feed-js-beta';
+import { IPost } from '@likeminds.community/feed-js';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 interface CreateFeedProps {
