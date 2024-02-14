@@ -66,7 +66,8 @@ const ReportPostDialogBox = ({
         <div
           style={{
             display: openOtherReasonsInputBox ? 'block' : 'none'
-          }}>
+          }}
+        >
           <input
             type="text"
             value={otherReasonsText}
@@ -85,7 +86,8 @@ const ReportPostDialogBox = ({
                 otherReasonsText
               );
               closeBox();
-            }}>
+            }}
+          >
             Report
           </button>
         </div>
@@ -127,7 +129,8 @@ const ReportedReasonBlock = ({
     style={{
       border: selectedId === id ? '1px solid #5046e4' : '1px solid rgba(72, 79, 103, 0.5)',
       color: selectedId === id ? '#5046e4' : 'rgba(72, 79, 103, 0.5)'
-    }}>
+    }}
+  >
     {/* // className="inline-block border rounded-[20px] py-2 px-3 mr-2 mb-2 text-sm text=[#9b9b9b]"> */}
     {name}
   </div>

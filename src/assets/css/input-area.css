@@ -11,12 +11,10 @@
 .inputAreaWrapper:focus-visible {
   outline: none;
 }
-.separator{
-  
+.separator {
   border-bottom: 1px solid #d0d8e2;
-
 }
-.inputAreaWrapper > a{
-  color: #007AFF;
+.inputAreaWrapper > a {
+  color: #007aff;
   text-decoration: none;
 }

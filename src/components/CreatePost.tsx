@@ -65,7 +65,8 @@ const CreatePost: React.FC<CreateFeedProps> = ({ feedModerationHandler }) => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -85,7 +86,8 @@ const CreatePost: React.FC<CreateFeedProps> = ({ feedModerationHandler }) => {
           sx: {
             borderRadius: '16px'
           }
-        }}>
+        }}
+      >
         <CreatePostDialog
           closeCreatePostDialog={closeCreatePostDialog}
           showMediaAttachmentOnInitiation={showMediaAttachmentOnInitiation}

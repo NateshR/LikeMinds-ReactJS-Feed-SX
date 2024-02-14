@@ -126,7 +126,8 @@ const PostBody: React.FC = () => {
             style={{
               background: 'black'
             }}
-            key={attachment.attachmentMeta.url + Math.random().toString()}>
+            key={attachment.attachmentMeta.url + Math.random().toString()}
+          >
             <video
               className="postMediaAttachment--video"
               src={attachment.attachmentMeta.url}
@@ -147,7 +148,8 @@ const PostBody: React.FC = () => {
             style={{
               background: 'white',
               height: '100%'
-            }}>
+            }}
+          >
             <div
               className="lmPdfViewer"
               onClick={() => {
@@ -155,7 +157,8 @@ const PostBody: React.FC = () => {
               }}
               style={{
                 cursor: 'pointer'
-              }}>
+              }}
+            >
               <Document file={attachment?.attachmentMeta?.url}>
                 <Page
                   pageNumber={pdfPageNo}
@@ -172,7 +175,8 @@ const PostBody: React.FC = () => {
                     height="36"
                     viewBox="0 0 28 36"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       fillRule="evenodd"
                       clipRule="evenodd"
@@ -207,7 +211,8 @@ const PostBody: React.FC = () => {
               style={{
                 background: 'white'
               }}
-              key={attachment.attachmentMeta?.ogTags?.url?.toString()}>
+              key={attachment.attachmentMeta?.ogTags?.url?.toString()}
+            >
               <PreviewForOGTag
                 setOgTagPreview={setOgTagPreview}
                 ogTagPreviewData={attachment.attachmentMeta.ogTags as any}
@@ -240,7 +245,8 @@ const PostBody: React.FC = () => {
                 cursor: 'pointer',
                 fontSize: '14px'
               }}
-              onClick={() => setIsReadMore(false)}>
+              onClick={() => setIsReadMore(false)}
+            >
               ...ReadMore
             </span>
           ) : null}
@@ -252,7 +258,8 @@ const PostBody: React.FC = () => {
           className="postMediaAttachment"
           showThumbs={false}
           showStatus={false}
-          showIndicators={false}>
+          showIndicators={false}
+        >
           {renderedData}
         </Carousel>
         {attachments
@@ -300,7 +307,8 @@ const PreviewForOGTag = ({
                 : 'https://' + ogTagPreviewData?.url,
               '_blank'
             )
-          }>
+          }
+        >
           <div className="ogTagPreviewContainer__wrapper--imageWrapper">
             {
               <img

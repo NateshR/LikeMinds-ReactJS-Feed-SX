@@ -39,7 +39,7 @@ export class HelperFunctionsClass implements HelperFunctionsInterface {
   }
 
   uploadMedia(media: any, userUniqueId: any) {
-    let mediaObject = this.getAWS().upload({
+    const mediaObject = this.getAWS().upload({
       Key: `files/post/${userUniqueId}/${media.name}`,
       Bucket: 'beta-likeminds-media',
       Body: media,

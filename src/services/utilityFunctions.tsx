@@ -34,7 +34,8 @@ export function setUserImage(user: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}>
+        }}
+      >
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}
@@ -52,7 +53,7 @@ export interface TagInfo {
   limitRight: number;
 }
 export function getCharacterWidth(character: string): number {
-  let font: string = 'Roboto',
+  const font: string = 'Roboto',
     fontSize: number = 16;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -213,7 +214,8 @@ export function setTagUserImage(user: any, userContext: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}>
+        }}
+      >
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}
@@ -291,21 +293,21 @@ export enum fields {
 // }
 
 export function validateUrl(str: string) {
-  var protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
+  const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
 
-  var localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
-  var nonLocalhostDomainRE = /^[^\s\.]+\.\S{2,}$/;
+  const localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
+  const nonLocalhostDomainRE = /^[^\s\.]+\.\S{2,}$/;
 
   if (typeof str !== 'string') {
     return false;
   }
 
-  var match = str.match(protocolAndDomainRE);
+  const match = str.match(protocolAndDomainRE);
   if (!match) {
     return false;
   }
 
-  var everythingAfterProtocol = match[1];
+  const everythingAfterProtocol = match[1];
   if (!everythingAfterProtocol) {
     return false;
   }
@@ -351,7 +353,8 @@ export function setTagUserImageInResourceView(user: any, userContext: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}>
+        }}
+      >
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}

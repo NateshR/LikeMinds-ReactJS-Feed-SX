@@ -23,7 +23,8 @@ const PostOptions: React.FC<{
             }}
             style={{
               cursor: 'pointer'
-            }}>
+            }}
+          >
             <img src={photoIcon} alt="photo" /> <span>Photo</span>
           </li>
           <li
@@ -33,7 +34,8 @@ const PostOptions: React.FC<{
             }}
             style={{
               cursor: 'pointer'
-            }}>
+            }}
+          >
             <img src={videoIcon} alt="Video" /> <span>Video</span>
           </li>
           <li
@@ -43,7 +45,8 @@ const PostOptions: React.FC<{
             }}
             style={{
               cursor: 'pointer'
-            }}>
+            }}
+          >
             <img src={attachPDF} alt="Video" /> <span>Document</span>
           </li>
           {/* <li>
@@ -57,7 +60,8 @@ const PostOptions: React.FC<{
             cursor: 'pointer'
           }}
           type="button"
-          onClick={openCreatePostDialogBox}>
+          onClick={openCreatePostDialogBox}
+        >
           Post
         </button>
       </div>

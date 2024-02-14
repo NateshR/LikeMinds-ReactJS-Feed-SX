@@ -20,7 +20,7 @@
   margin-right: auto;
   margin-left: auto;
 }
-.lmWrapper__feed__post__body--content{
+.lmWrapper__feed__post__body--content {
   word-wrap: break-word;
 }
 .carousel {
@@ -43,7 +43,7 @@
   height: 100%;
   width: auto;
 } */
-.react-pdf__Page__canvas{
+.react-pdf__Page__canvas {
   width: 100% !important;
   height: auto !important;
 }

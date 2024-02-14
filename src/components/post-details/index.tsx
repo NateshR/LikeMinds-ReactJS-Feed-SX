@@ -69,19 +69,22 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
       style={{
         maxHeight: '100vh',
         overflowY: 'auto'
-      }}>
+      }}
+    >
       <div className="lmWrapper">
         <div
           style={{
             flexGrow: 1
-          }}>
+          }}
+        >
           <div className="postDetailsHeaderWrapper">
             <div
               className="postDetailsHeaderWrapper--backIconHolder"
               onClick={() => {
                 //   navigate('/');
                 window.history.back();
-              }}>
+              }}
+            >
               <img src={backIcon} alt="back icon" />
             </div>
             <div className="postDetailsHeaderWrapper--toolBarArea">
@@ -97,7 +100,8 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
                     user,
                     topics,
                     index
-                  }}>
+                  }}
+                >
                   <Post rightSidebarHandler={rightSidebarHandler} />
                 </PostContext.Provider>
               </div>

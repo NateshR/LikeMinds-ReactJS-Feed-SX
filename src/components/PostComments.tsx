@@ -217,7 +217,8 @@ const PostComents: React.FC<CommentProps> = ({
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -284,7 +285,8 @@ const PostComents: React.FC<CommentProps> = ({
         }}
         sx={{
           paddingY: '0px'
-        }}>
+        }}
+      >
         {comment.menuItems.map((item: IMenuItem) => {
           if (item.id === 8)
             return (
@@ -298,7 +300,8 @@ const PostComents: React.FC<CommentProps> = ({
                   padding: '1rem',
                   cursor: 'pointer'
                   // boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
-                }}>
+                }}
+              >
                 {item.title}
               </div>
             );
@@ -313,7 +316,8 @@ const PostComents: React.FC<CommentProps> = ({
                 padding: '1rem',
                 cursor: 'pointer'
                 // boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
-              }}>
+              }}
+            >
               {item.title}
             </div>
           );
@@ -448,7 +452,8 @@ const PostComents: React.FC<CommentProps> = ({
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -466,7 +471,8 @@ const PostComents: React.FC<CommentProps> = ({
             className="inputDiv"
             style={{
               overflow: 'visible'
-            }}>
+            }}
+          >
             <div
               ref={contentEditableDiv}
               contentEditable={true}
@@ -498,25 +504,26 @@ const PostComents: React.FC<CommentProps> = ({
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
                 if (selection === null) return;
-                let focusNode = selection.focusNode;
+                const focusNode = selection.focusNode;
                 if (focusNode === null) {
                   return;
                 }
-                let div = focusNode.parentElement;
+                const div = focusNode.parentElement;
                 if (div === null) {
                   return;
                 }
-                let text = div.childNodes;
+                const text = div.childNodes;
                 // if (focusNode === null || text.length === 0) {
                 //   return;
                 // }
-                let textContentFocusNode = focusNode.textContent;
+                const textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
+                const tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
-              }}>
+              }}
+            >
               {/*  */}
             </div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
@@ -528,39 +535,39 @@ const PostComents: React.FC<CommentProps> = ({
                       className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
+                        const focusNode = window.getSelection()!.focusNode;
                         if (focusNode === null) {
                           return;
                         }
                         ('A');
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
+                        const div = focusNode.parentElement;
+                        const text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
                         ('B');
-                        let textContentFocusNode = focusNode.textContent;
+                        const textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
                         ('C');
-                        let tagOp = findTag(textContentFocusNode);
+                        const tagOp = findTag(textContentFocusNode);
                         ('D');
                         if (tagOp === undefined) return;
                         ('E');
-                        let substr = tagOp?.tagString;
+                        const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
 
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                        const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                        const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
+                        const textNode1 = document.createTextNode(textNode1Text);
+                        const anchorNode = document.createElement('a');
                         anchorNode.id = item?.id;
                         anchorNode.href = '#';
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
-                        let textNode2 = document.createTextNode(textNode2Text);
+                        const textNode2 = document.createTextNode(textNode2Text);
                         const dummyNode = document.createElement('span');
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
@@ -569,12 +576,14 @@ const PostComents: React.FC<CommentProps> = ({
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                         setCursorAtEnd(contentEditableDiv);
-                      }}>
+                      }}
+                    >
                       <div
                         style={{
                           display: 'flex',
                           alignItems: 'center'
-                        }}>
+                        }}
+                      >
                         {setTagUserImage(item, '40px')}
                         <div
                           style={{
@@ -582,7 +591,8 @@ const PostComents: React.FC<CommentProps> = ({
                             textTransform: 'capitalize',
                             overflowY: 'hidden',
                             textOverflow: 'ellipsis'
-                          }}>
+                          }}
+                        >
                           {item?.name}
                         </div>
                       </div>
@@ -650,7 +660,7 @@ const PostComents: React.FC<CommentProps> = ({
   }
   async function postReply() {
     try {
-      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      const textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
         return;
       }
@@ -732,7 +742,8 @@ const PostComents: React.FC<CommentProps> = ({
                   className="commentWrapper__commentContent--content"
                   style={{
                     overflowWrap: 'anywhere'
-                  }}>
+                  }}
+                >
                   {showContentOfComment()}
                 </div>
               </div>
@@ -746,13 +757,15 @@ const PostComents: React.FC<CommentProps> = ({
                 width: '24px',
                 marginRight: '8px',
                 cursor: 'pointer'
-              }}>
+              }}
+            >
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
@@ -773,7 +786,8 @@ const PostComents: React.FC<CommentProps> = ({
               width: '24px',
               textAlign: 'center'
             }}
-            onClick={likeComment}>
+            onClick={likeComment}
+          >
             {renderLikeButton()}
           </span>
           <span
@@ -790,7 +804,8 @@ const PostComents: React.FC<CommentProps> = ({
                 likeComment();
               }
             }}
-            style={{ cursor: 'pointer' }}>
+            style={{ cursor: 'pointer' }}
+          >
             {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
           </span>
           {comment.level === 0 ? (
@@ -804,7 +819,8 @@ const PostComents: React.FC<CommentProps> = ({
                   }}
                   onClick={() => {
                     setOpenReplyBox(!openReplyBox);
-                  }}>
+                  }}
+                >
                   {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
                 </span>{' '}
                 <span
@@ -819,7 +835,8 @@ const PostComents: React.FC<CommentProps> = ({
                       getComments();
                     }
                     setOpenCommentsSection(!openCommentsSection);
-                  }}>
+                  }}
+                >
                   <span>
                     {commentsCount > 0 ? commentsCount + ' ' : null}
                     {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
@@ -834,13 +851,15 @@ const PostComents: React.FC<CommentProps> = ({
             style={{
               flexGrow: 1,
               textAlign: 'right'
-            }}>
+            }}
+          >
             {comment.isEdited ? (
               <span
                 className="elevated-dot"
                 style={{
                   color: 'rgba(15, 30, 61, 0.4)'
-                }}>
+                }}
+              >
                 Edited <span className="dotAfter"></span>
               </span>
             ) : null}
@@ -879,7 +898,8 @@ const PostComents: React.FC<CommentProps> = ({
 
                   fontSize: '14px'
                 }}
-                onClick={() => setIsReadMore(false)}>
+                onClick={() => setIsReadMore(false)}
+              >
                 ...ReadMore
               </span>
             ) : null}
@@ -902,7 +922,8 @@ const PostComents: React.FC<CommentProps> = ({
                       className="commentWrapper__commentContent--content"
                       style={{
                         overflowWrap: 'anywhere'
-                      }}>
+                      }}
+                    >
                       <EditCommentBox
                         update={setNewCommentContent}
                         minHeight={'24px'}
@@ -920,7 +941,8 @@ const PostComents: React.FC<CommentProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   marginRight: '10px'
-                }}>
+                }}
+              >
                 <span
                   style={{
                     cursor: 'pointer'
@@ -934,13 +956,15 @@ const PostComents: React.FC<CommentProps> = ({
                         updateReplies(index, res?.data?.comment);
                       });
                     setEditCommentMode(false);
-                  }}>
+                  }}
+                >
                   <svg
                     width="20"
                     height="22"
                     viewBox="0 0 20 22"
                     fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M18.6535 9.68369L2.85657 0.843068C2.59336 0.689576 2.29028 0.618275 1.98624 0.638321C1.68221 0.658368 1.3911 0.768846 1.15032 0.955568C0.904423 1.14958 0.725886 1.41613 0.640059 1.71736C0.554233 2.01859 0.565478 2.33921 0.672199 2.63369L3.30657 9.99307C3.33322 10.0664 3.38159 10.13 3.44523 10.1752C3.50886 10.2204 3.58476 10.2452 3.66282 10.2462H10.4316C10.6262 10.2431 10.8147 10.314 10.9592 10.4445C11.1036 10.575 11.1931 10.7554 11.2097 10.9493C11.2161 11.0517 11.2015 11.1543 11.1666 11.2507C11.1318 11.3472 11.0776 11.4355 11.0073 11.5102C10.937 11.5849 10.8522 11.6444 10.758 11.685C10.6638 11.7256 10.5623 11.7464 10.4597 11.7462H3.66282C3.58476 11.7472 3.50886 11.772 3.44523 11.8172C3.38159 11.8624 3.33322 11.9259 3.30657 11.9993L0.672199 19.3587C0.593155 19.5854 0.569337 19.8277 0.602724 20.0655C0.63611 20.3033 0.725738 20.5296 0.864165 20.7258C1.00259 20.922 1.18582 21.0823 1.39864 21.1935C1.61146 21.3046 1.84773 21.3634 2.08782 21.3649C2.34332 21.3638 2.59455 21.2994 2.81907 21.1774L18.6535 12.3087C18.8854 12.177 19.0783 11.9861 19.2126 11.7555C19.3468 11.525 19.4175 11.263 19.4175 10.9962C19.4175 10.7294 19.3468 10.4674 19.2126 10.2369C19.0783 10.0063 18.8854 9.81543 18.6535 9.68369Z"
                       fill="#00897b"
@@ -957,7 +981,8 @@ const PostComents: React.FC<CommentProps> = ({
                   width: '24px',
                   textAlign: 'center'
                 }}
-                onClick={likeComment}>
+                onClick={likeComment}
+              >
                 {renderLikeButton()}
               </span>
               <span
@@ -974,7 +999,8 @@ const PostComents: React.FC<CommentProps> = ({
                     likeComment();
                   }
                 }}
-                style={{ cursor: 'pointer' }}>
+                style={{ cursor: 'pointer' }}
+              >
                 {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
               </span>
               {comment.level === 0 ? (
@@ -989,7 +1015,8 @@ const PostComents: React.FC<CommentProps> = ({
                       onClick={() => {
                         setOpenReplyBox(!openReplyBox);
                         setOpenCommentsSection(true);
-                      }}>
+                      }}
+                    >
                       {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
                     </span>{' '}
                     <span
@@ -1009,7 +1036,8 @@ const PostComents: React.FC<CommentProps> = ({
                         // if (commentsCount > 0) {
 
                         // }
-                      }}>
+                      }}
+                    >
                       <span>
                         {commentsCount > 0 ? commentsCount + ' ' : null}
                         {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
@@ -1024,7 +1052,8 @@ const PostComents: React.FC<CommentProps> = ({
                 style={{
                   flexGrow: 1,
                   textAlign: 'right'
-                }}>
+                }}
+              >
                 {dayjs(comment.createdAt).fromNow()}
               </span>
             </div>
@@ -1041,7 +1070,8 @@ const PostComents: React.FC<CommentProps> = ({
       className="commentWrapper"
       style={{
         borderBottom: comment.level > 0 ? 'none' : '1px solid #dde3ed'
-      }}>
+      }}
+    >
       <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
         <DeleteDialog onClose={closeDeleteDialog} deleteComment={deleteComment} type={2} />
       </Dialog>
@@ -1187,13 +1217,15 @@ const PostComents: React.FC<CommentProps> = ({
           maxHeight: '328.5px',
           overflowY: 'auto'
         }}
-        id={comment.Id}>
+        id={comment.Id}
+      >
         <InfiniteScroll
           loader={null}
           hasMore={loadMoreReplies}
           next={getComments}
           dataLength={repliesArray?.length}
-          scrollableTarget={comment.Id}>
+          scrollableTarget={comment.Id}
+        >
           {repliesArray.length && openCommentsSection
             ? repliesArray.map((comment: Comment, index: number, commentArray: Comment[]) => {
                 return (
@@ -1218,7 +1250,8 @@ const PostComents: React.FC<CommentProps> = ({
           open={openDialogBox}
           onClose={() => {
             setOpenDialogBox(false);
-          }}>
+          }}
+        >
           <ReportPostDialogBox
             entity={comment.level === 0 ? 6 : 7}
             uuid={comment.uuid}

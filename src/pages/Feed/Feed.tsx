@@ -309,7 +309,8 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 topics: postTopics,
                 user: users,
                 index: index
-              }}>
+              }}
+            >
               <Post rightSidebarHandler={rightSidebarhandler} />
             </PostContext.Provider>
           );
@@ -336,7 +337,8 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
                 })()}
                 next={() => {
                   getFeeds();
-                }}>
+                }}
+              >
                 <CreatePost feedModerationHandler={feedModerationLocalHandler} />
                 {/* Create Post */}
 
@@ -431,7 +433,8 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
           sx: {
             borderRadius: '16px'
           }
-        }}>
+        }}
+      >
         <EditPost closeCreatePostDialog={() => dispatch(handleEditDialogState(false))} />
       </Dialog>
     </>

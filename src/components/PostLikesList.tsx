@@ -110,9 +110,9 @@ function PostLikesList({
   async function getAllMembersThrice() {
     try {
       if (entityType === 1) {
-        let r1: any = await lmFeedClient.getPostLikes(postId, 1);
-        let r2: any = await lmFeedClient.getPostLikes(postId, 2);
-        let r3: any = await lmFeedClient.getPostLikes(postId, 3);
+        const r1: any = await lmFeedClient.getPostLikes(postId, 1);
+        const r2: any = await lmFeedClient.getPostLikes(postId, 2);
+        const r3: any = await lmFeedClient.getPostLikes(postId, 3);
         const membersArrayOne: IMember[] = r1?.data?.likes;
         const membersArrayTwo: IMember[] = r2?.data?.likes;
         const membersArrayThree: IMember[] = r3?.data?.likes;
@@ -122,9 +122,9 @@ function PostLikesList({
         setPostLikesArray([...membersArrayOne, ...membersArrayTwo, ...membersArrayThree]);
         setUserMap({ ...membersObjectOne, ...membersObjectTwo, ...membersObjectThree });
       } else {
-        let r1: any = await lmFeedClient.getCommentLikes(postId, 1, entityId!);
-        let r2: any = await lmFeedClient.getCommentLikes(postId, 2, entityId!);
-        let r3: any = await lmFeedClient.getCommentLikes(postId, 3, entityId!);
+        const r1: any = await lmFeedClient.getCommentLikes(postId, 1, entityId!);
+        const r2: any = await lmFeedClient.getCommentLikes(postId, 2, entityId!);
+        const r3: any = await lmFeedClient.getCommentLikes(postId, 3, entityId!);
         const membersArrayOne: IMember[] = r1?.data?.likes;
         const membersArrayTwo: IMember[] = r2?.data?.likes;
         const membersArrayThree: IMember[] = r3?.data?.likes;
@@ -206,7 +206,8 @@ function PostLikesList({
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -264,7 +265,8 @@ function PostLikesList({
       open={true}
       onClose={() => {
         rightSidebarhandler(' ', null);
-      }}>
+      }}
+    >
       <div className="allMembers">
         {showLoadingBars ? (
           <div className="noMemberSkeletonContainer">
@@ -279,7 +281,8 @@ function PostLikesList({
             style={{
               display: 'flex',
               justifyContent: 'space-between'
-            }}>
+            }}
+          >
             <div>
               Likes {'('}
               {totalLikes}
@@ -295,13 +298,15 @@ function PostLikesList({
                 }}
                 onClick={() => {
                   rightSidebarhandler(' ', null);
-                }}>
+                }}
+              >
                 <svg
                   width="18"
                   height="18"
                   viewBox="0 0 18 18"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
                     fill="#484F67"
@@ -317,7 +322,8 @@ function PostLikesList({
             hasMore={loadMore}
             dataLength={entityType === 1 ? postLikesArray.length : commentLikesArray.length}
             next={entityType === 1 ? getAllMembers : getAllMembersComment}
-            scrollableTarget="allMembersScrollWrapper">
+            scrollableTarget="allMembersScrollWrapper"
+          >
             {renderComponent()}
           </InfiniteScroll>
         </div>

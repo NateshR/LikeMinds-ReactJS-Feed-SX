@@ -108,7 +108,8 @@ const TopicFeedDropdownSelector = ({
         height="16"
         viewBox="0 0 16 16"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg">
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <path
           d="M6.3833 12.8767C7.76953 12.8767 9.04785 12.4285 10.0938 11.6814L14.0283 15.616C14.2109 15.7986 14.4517 15.8899 14.709 15.8899C15.2485 15.8899 15.6304 15.4749 15.6304 14.9436C15.6304 14.6946 15.5474 14.4539 15.3647 14.2795L11.4551 10.3616C12.2769 9.28247 12.7666 7.94604 12.7666 6.49341C12.7666 2.98218 9.89453 0.110107 6.3833 0.110107C2.88037 0.110107 0 2.97388 0 6.49341C0 10.0046 2.87207 12.8767 6.3833 12.8767ZM6.3833 11.4988C3.64404 11.4988 1.37793 9.23267 1.37793 6.49341C1.37793 3.75415 3.64404 1.48804 6.3833 1.48804C9.12256 1.48804 11.3887 3.75415 11.3887 6.49341C11.3887 9.23267 9.12256 11.4988 6.3833 11.4988Z"
           fill="#3C3C43"
@@ -139,7 +140,8 @@ const TopicFeedDropdownSelector = ({
                 height="16"
                 viewBox="0 0 12 16"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M6.52567 15.7821L11.287 11.0208C11.5775 10.7303 11.5775 10.2591 11.287 9.96863C10.9964 9.67807 10.5254 9.67807 10.2349 9.96863L6.74356 13.4599L6.74356 0.743959C6.74356 0.333115 6.41044 0 5.9996 0C5.58882 0 5.25564 0.333115 5.25564 0.743959L5.25564 13.4599L1.76433 9.96875C1.47377 9.67819 1.00275 9.67819 0.712193 9.96875C0.567032 10.114 0.494303 10.3044 0.494303 10.4948C0.494303 10.6852 0.567032 10.8756 0.712193 11.0209L5.47353 15.7821C5.76409 16.0727 6.23511 16.0727 6.52567 15.7821Z"
                   fill="#666666"
@@ -165,13 +167,15 @@ const TopicFeedDropdownSelector = ({
                   },
                   id: 'scrollerTopics'
                 }
-              }}>
+              }}
+            >
               <InfiniteScroll
                 next={getFeedTopics}
                 hasMore={hasMoreTopics}
                 loader={null}
                 dataLength={topicList.length}
-                scrollableTarget={'scrollerTopics'}>
+                scrollableTarget={'scrollerTopics'}
+              >
                 {searchBox}
                 <MenuItem
                   disableRipple={true}
@@ -180,7 +184,8 @@ const TopicFeedDropdownSelector = ({
                   sx={{
                     padding: '0px',
                     borderBottom: '1px solid rgba(208, 216, 226, 0.40)'
-                  }}>
+                  }}
+                >
                   <TopicListItem
                     clickHandler={handleSelectAll}
                     topic={{
@@ -228,7 +233,8 @@ const TopicFeedDropdownSelector = ({
                 height="16"
                 viewBox="0 0 16 16"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M2 8C2 8.16537 2.05939 8.30749 2.17818 8.42636C2.29697 8.54005 2.43641 8.5969 2.59651 8.5969H7.40736V13.4109C7.40736 13.5711 7.46417 13.708 7.57779 13.8217C7.69658 13.9406 7.83861 14 8.00387 14C8.16398 14 8.30084 13.9406 8.41446 13.8217C8.52808 13.708 8.58489 13.5711 8.58489 13.4109V8.5969H13.4112C13.5713 8.5969 13.7082 8.54005 13.8218 8.42636C13.9406 8.30749 14 8.16537 14 8C14 7.83979 13.9406 7.70284 13.8218 7.58915C13.7082 7.47028 13.5713 7.41085 13.4112 7.41085H8.58489V2.58915C8.58489 2.43411 8.52808 2.29716 8.41446 2.17829C8.30084 2.05943 8.16398 2 8.00387 2C7.83861 2 7.69658 2.05943 7.57779 2.17829C7.46417 2.29716 7.40736 2.43411 7.40736 2.58915V7.41085H2.59651C2.43641 7.41085 2.29697 7.47028 2.17818 7.58915C2.05939 7.70284 2 7.83979 2 8Z"
                   fill="#5046E5"
@@ -255,13 +261,15 @@ const TopicFeedDropdownSelector = ({
                   },
                   id: 'scrollerTopics'
                 }
-              }}>
+              }}
+            >
               <InfiniteScroll
                 next={getFeedTopics}
                 hasMore={hasMoreTopics}
                 loader={null}
                 dataLength={topicList.length}
-                scrollableTarget={'scrollerTopics'}>
+                scrollableTarget={'scrollerTopics'}
+              >
                 {searchBox}
                 {/* {menuListOfSelectedTopics} */}
                 {menuList}
@@ -292,13 +300,15 @@ const TopicFeedDropdownSelector = ({
                   },
                   id: 'scrollerTopics'
                 }
-              }}>
+              }}
+            >
               <InfiniteScroll
                 next={getFeedTopics}
                 hasMore={hasMoreTopics}
                 loader={null}
                 dataLength={topicList.length}
-                scrollableTarget={'scrollerTopics'}>
+                scrollableTarget={'scrollerTopics'}
+              >
                 {searchBox}
                 {menuListOfSelectedTopics}
                 {menuList}
@@ -322,7 +332,8 @@ const TopicFeedDropdownSelector = ({
                   height="20"
                   viewBox="0 0 20 20"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg">
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     fillRule="evenodd"
                     clipRule="evenodd"
@@ -399,7 +410,8 @@ const TopicFeedDropdownSelector = ({
           key={topic.Id}
           sx={{
             padding: '0px'
-          }}>
+          }}
+        >
           <TopicListItem
             clickHandler={menuButtonClickHandler}
             topic={topic}
@@ -419,7 +431,8 @@ const TopicFeedDropdownSelector = ({
           key={topic?.Id}
           sx={{
             padding: '0px'
-          }}>
+          }}
+        >
           <TopicListItem
             clickHandler={menuButtonClickHandler}
             topic={topic}

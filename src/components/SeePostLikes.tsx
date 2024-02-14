@@ -65,7 +65,8 @@ function SeePostLikes({ entityId, onClose, likesCount, entityType, commentId }: 
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -94,13 +95,15 @@ function SeePostLikes({ entityId, onClose, likesCount, entityType, commentId }: 
           right: '1rem',
           cursor: 'pointer'
         }}
-        onClick={onClose}>
+        onClick={onClose}
+      >
         <svg
           width="26"
           height="26"
           viewBox="0 0 26 26"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <circle cx="13" cy="13" r="12" fill="white" stroke="#484F67" />
           <path
             fillRule="evenodd"
@@ -122,7 +125,8 @@ function SeePostLikes({ entityId, onClose, likesCount, entityType, commentId }: 
           dataLength={likesArr.length}
           loader={null}
           hasMore={loadMore}
-          next={getLikes}>
+          next={getLikes}
+        >
           {likesArr.map((like: any) => {
             return (
               <div className="likesUserTile" key={like.Id}>

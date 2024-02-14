@@ -61,40 +61,40 @@ function EditCommentBox({
   function handleTagButtonClick(e: React.MouseEvent, item: any) {
     e.preventDefault();
 
-    let focusNode = window.getSelection()!.focusNode;
+    const focusNode = window.getSelection()!.focusNode;
     if (focusNode === null) {
       return;
     }
 
-    let div = focusNode.parentElement;
-    let text = div!.childNodes;
+    const div = focusNode.parentElement;
+    const text = div!.childNodes;
     if (focusNode === null || text.length === 0) {
       return;
     }
 
-    let textContentFocusNode = focusNode.textContent;
+    const textContentFocusNode = focusNode.textContent;
     if (textContentFocusNode === null) {
       return;
     }
 
-    let tagOp = findTag(textContentFocusNode, setTaggingPageCount);
+    const tagOp = findTag(textContentFocusNode, setTaggingPageCount);
 
     // ('the tag string is ', tagOp!.tagString);
     if (tagOp === undefined) return;
 
     const { limitLeft, limitRight } = tagOp;
 
-    let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+    const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
 
-    let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+    const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-    let textNode1 = document.createTextNode(textNode1Text);
-    let anchorNode = document.createElement('a');
+    const textNode1 = document.createTextNode(textNode1Text);
+    const anchorNode = document.createElement('a');
     anchorNode.id = item?.id;
     anchorNode.href = '#';
     anchorNode.textContent = `@${item?.name.trim()}`;
     anchorNode.contentEditable = 'false';
-    let textNode2 = document.createTextNode(textNode2Text);
+    const textNode2 = document.createTextNode(textNode2Text);
     const dummyNode = document.createElement('span');
     div!.replaceChild(textNode2, focusNode);
 
@@ -108,21 +108,21 @@ function EditCommentBox({
     const selection = window.getSelection();
     setText(event.currentTarget.textContent!);
     if (selection === null) return;
-    let focusNode = selection.focusNode;
+    const focusNode = selection.focusNode;
     if (focusNode === null) {
       return;
     }
-    let div = focusNode.parentElement;
+    const div = focusNode.parentElement;
     if (div === null) {
       return;
     }
-    let text = div.childNodes;
+    const text = div.childNodes;
     if (focusNode === null || text.length === 0) {
       return;
     }
-    let textContentFocusNode = focusNode.textContent;
+    const textContentFocusNode = focusNode.textContent;
 
-    let tagOp = findTag(textContentFocusNode!, setTaggingPageCount);
+    const tagOp = findTag(textContentFocusNode!, setTaggingPageCount);
 
     if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
       setTagString(tagOp?.tagString!);
@@ -224,18 +224,21 @@ function EditCommentBox({
     <div
       style={{
         position: 'relative'
-      }}>
+      }}
+    >
       {taggingMemberList && taggingMemberList?.length > 0 ? (
         <div
           className="taggingBox"
           id="scrollableTaggingContainer"
-          style={returnCSSForTagging(containerRef)}>
+          style={returnCSSForTagging(containerRef)}
+        >
           <InfiniteScroll
             loader={null}
             hasMore={loadMoreTaggingUsers}
             next={getTags}
             dataLength={taggingMemberList.length}
-            scrollableTarget="scrollableTaggingContainer">
+            scrollableTarget="scrollableTaggingContainer"
+          >
             {taggingMemberList?.map!((item: any) => {
               return (
                 <TaggingUserBlock
@@ -268,7 +271,8 @@ function EditCommentBox({
           //         }
           //     }
           // }}
-          onInput={handleInput}></div>
+          onInput={handleInput}
+        ></div>
       </div>
       {/* <div className="separator"></div> */}
     </div>

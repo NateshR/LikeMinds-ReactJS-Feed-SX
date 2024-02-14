@@ -131,7 +131,8 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             color: '#fff',
             letterSpacing: '1px',
             borderRadius: '50%'
-          }}>
+          }}
+        >
           {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -582,7 +583,8 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -595,18 +597,21 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     <div
       style={{
         position: 'relative'
-      }}>
+      }}
+    >
       {taggingMemberList && taggingMemberList?.length > 0 ? (
         <div
           className="taggingBox"
           id="scrollableTaggingContainer"
-          style={returnCSSForTagging(containerRef)}>
+          style={returnCSSForTagging(containerRef)}
+        >
           <InfiniteScroll
             loader={null}
             hasMore={loadMoreTaggingUsers}
             next={getTags}
             dataLength={taggingMemberList.length}
-            scrollableTarget="scrollableTaggingContainer">
+            scrollableTarget="scrollableTaggingContainer"
+          >
             {taggingMemberList?.map!((item: any) => {
               return (
                 <button
@@ -615,40 +620,40 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                   onClick={(e) => {
                     e.preventDefault();
 
-                    let focusNode = window.getSelection()!.focusNode;
+                    const focusNode = window.getSelection()!.focusNode;
                     if (focusNode === null) {
                       return;
                     }
 
-                    let div = focusNode.parentElement;
-                    let text = div!.childNodes;
+                    const div = focusNode.parentElement;
+                    const text = div!.childNodes;
                     if (focusNode === null || text.length === 0) {
                       return;
                     }
 
-                    let textContentFocusNode = focusNode.textContent;
+                    const textContentFocusNode = focusNode.textContent;
                     if (textContentFocusNode === null) {
                       return;
                     }
 
-                    let tagOp = findTag(textContentFocusNode);
+                    const tagOp = findTag(textContentFocusNode);
 
                     // ('the tag string is ', tagOp!.tagString);
                     if (tagOp === undefined) return;
 
                     const { limitLeft, limitRight } = tagOp;
 
-                    let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                    const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
 
-                    let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                    const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                    let textNode1 = document.createTextNode(textNode1Text);
-                    let anchorNode = document.createElement('a');
+                    const textNode1 = document.createTextNode(textNode1Text);
+                    const anchorNode = document.createElement('a');
                     anchorNode.id = item?.id;
                     anchorNode.href = '#';
                     anchorNode.textContent = `@${item?.name.trim()}`;
                     anchorNode.contentEditable = 'false';
-                    let textNode2 = document.createTextNode(textNode2Text);
+                    const textNode2 = document.createTextNode(textNode2Text);
                     const dummyNode = document.createElement('span');
                     div!.replaceChild(textNode2, focusNode);
 
@@ -658,12 +663,14 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                     // setTaggingMemberList([]);
                     anchorNode.focus();
                     setCursorAtEnd(contentEditableDiv);
-                  }}>
+                  }}
+                >
                   <div
                     style={{
                       display: 'flex',
                       alignItems: 'center'
-                    }}>
+                    }}
+                  >
                     {setTagUserImage(item)}
                     <div
                       style={{
@@ -671,7 +678,8 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                         textTransform: 'capitalize',
                         overflowY: 'hidden',
                         textOverflow: 'ellipsis'
-                      }}>
+                      }}
+                    >
                       {item?.name}
                     </div>
                   </div>
@@ -684,13 +692,15 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
       <div className="create-post-feed-dialog-wrapper--container" ref={containerRef}>
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
-          onClick={closeDialogBox}>
+          onClick={closeDialogBox}
+        >
           <svg
             width="18"
             height="18"
             viewBox="0 0 18 18"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
               fill="#484F67"
@@ -751,31 +761,33 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
                 if (selection === null) return;
-                let focusNode = selection.focusNode;
+                const focusNode = selection.focusNode;
                 if (focusNode === null) {
                   return;
                 }
-                let div = focusNode.parentElement;
+                const div = focusNode.parentElement;
                 if (div === null) {
                   return;
                 }
-                let text = div.childNodes;
+                const text = div.childNodes;
                 if (focusNode === null || text.length === 0) {
                   return;
                 }
-                let textContentFocusNode = focusNode.textContent;
+                const textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
+                const tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 } else {
                   setTagString(null);
                 }
-              }}></div>
+              }}
+            ></div>
           </div>
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            onClick={postFeed}>
+            onClick={postFeed}
+          >
             Edit Post
           </div>
         </div>

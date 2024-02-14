@@ -135,7 +135,8 @@ const PostHeader: React.FC = () => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -149,14 +150,16 @@ const PostHeader: React.FC = () => {
         <div
           style={{
             marginRight: '1rem'
-          }}>
+          }}
+        >
           {' '}
           <svg
             width="20"
             height="20"
             viewBox="0 0 20 20"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M10.0053 20.001C15.4832 20.001 20 15.4842 20 10.0063C20 4.51779 15.4832 0.000976562 9.99466 0.000976562C4.50614 0.000976562 0 4.51779 0 10.0063C0 15.4842 4.51682 20.001 10.0053 20.001ZM10.0053 18.9438C5.05072 18.9438 1.05713 14.9503 1.05713 10.0063C1.05713 5.06238 5.05072 1.0581 9.99466 1.0581C14.9386 1.0581 18.9429 5.06238 18.9429 10.0063C18.9536 14.9503 14.9493 18.9438 10.0053 18.9438ZM6.05446 12.1206C6.05446 12.4836 6.31073 12.7079 6.68446 12.7079H9.55686V14.9289C9.55686 15.7404 9.85585 16.4345 9.99466 16.4345C10.1335 16.4345 10.4431 15.7404 10.4431 14.9289V12.7079H13.2942C13.6893 12.7079 13.9349 12.4836 13.9349 12.1206C13.9349 10.9567 13.0272 9.80343 11.575 9.31224L11.4042 6.74951C12.0021 6.39713 12.6215 5.91662 12.9204 5.53221C13.0593 5.36136 13.1233 5.17983 13.1233 5.04102C13.1233 4.77407 12.9311 4.58186 12.6108 4.58186H7.38922C7.07955 4.58186 6.86599 4.77407 6.86599 5.04102C6.86599 5.19051 6.95142 5.37204 7.10091 5.56424C7.39989 5.94865 8.00854 6.40781 8.59584 6.74951L8.41431 9.31224C6.97277 9.80343 6.05446 10.9567 6.05446 12.1206Z"
               fill="#484F67"
@@ -195,7 +198,8 @@ const PostHeader: React.FC = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         {setPinnedIcon()}
         <IconButton onClick={handleOpenMoreOptionsMenu}>
           <MoreHorizIcon />
@@ -216,14 +220,16 @@ const PostHeader: React.FC = () => {
             paddingY: '0px',
             boxShadow: '0px 1px 16px 0px rgba(0, 0, 0, 0.24)'
           }}
-          onClose={handleCloseMoreOptionsMenu}>
+          onClose={handleCloseMoreOptionsMenu}
+        >
           {postMenuOptions?.map((menuItem: IMenuItem) => {
             return (
               <div
                 className="lmOverflowMenuTitle"
                 onClick={onClickHandler}
                 id={menuItem?.id?.toString()}
-                key={menuItem?.id}>
+                key={menuItem?.id}
+              >
                 {menuItem?.title}
               </div>
             );
@@ -233,7 +239,8 @@ const PostHeader: React.FC = () => {
           open={openDialogBox}
           onClose={() => {
             setOpenDialog(false);
-          }}>
+          }}
+        >
           <ReportPostDialogBox
             uuid={user?.uuid}
             closeBox={() => {

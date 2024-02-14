@@ -2,7 +2,6 @@ import {
   LMFeedClient,
   InitiateUserRequest,
   GetFeedRequest,
-  GetFeedResponse,
   GetTaggingListRequest,
   Attachment,
   AddPostRequest,
@@ -27,7 +26,7 @@ import {
   GetCommentLikesRequest,
   GetTopicsRequest,
   EditCommentRequest
-} from '@likeminds.community/feed-js';
+} from '@likeminds.community/feed-js-beta';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
 
@@ -40,8 +39,10 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   public constructor() {
     super();
     this.client = LMFeedClient.Builder()
-      .setApiKey(process.env.REACT_APP_API_KEY!)
-      .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
+      // .setApiKey(process.env.REACT_APP_API_KEY!)
+      .setApiKey('69edd43f-4a5e-4077-9c50-2b7aa740acce')
+      // .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
+      .setPlatformCode('rt')
       // .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
       .setVersionCode(1)
       .build();
@@ -51,10 +52,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
-          // .setUUID(userUniqueId)
-          .setUUID('')
+          .setUUID('testUser1')
           .setIsGuest(isGuestMember)
-          .setUserName(username!)
+          .setUserName('testUser1')
           .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);
@@ -63,7 +63,12 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     }
   }
 
-  async addPost(text: string, topicIds: string[] | null, attachmentArr?: any, tempId?: string) {
+  async addPost(
+    text: string,
+    topicIds: string[] | null,
+    attachmentArr?: Attachment[] | null,
+    tempId?: string
+  ) {
     try {
       const apiCallResponse = await this.client.addPost(
         AddPostRequest.builder()
@@ -78,9 +83,14 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       console.log(error);
     }
   }
-  async addPostWithOGTags(text: string, topicIds: string[] | null, ogTags: any, tempId?: string) {
+  async addPostWithOGTags(
+    text: string,
+    topicIds: string[] | null,
+    ogTags: unknown,
+    tempId?: string
+  ) {
     try {
-      let attachmentArr: Attachment[] = [];
+      const attachmentArr: Attachment[] = [];
       attachmentArr.push(
         Attachment.builder()
           .setAttachmentType(4)
@@ -524,7 +534,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   }
   async editPostWithOGTags(postId: string, text: string, ogTags: any, topicIds: string[] | null) {
     try {
-      let attachmentArr: Attachment[] = [];
+      const attachmentArr: Attachment[] = [];
       attachmentArr.push(
         Attachment.builder()
           .setAttachmentType(4)

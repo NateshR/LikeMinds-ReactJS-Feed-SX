@@ -137,7 +137,8 @@ const Header: React.FC<HeaderProps> = () => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -167,7 +168,7 @@ const Header: React.FC<HeaderProps> = () => {
     lmFeedClient.markReadNotification(activity?.Id);
     setActivityArray(
       (function () {
-        let newArr = [...activityArray];
+        const newArr = [...activityArray];
         newArr[index].isRead = true;
         return newArr;
       })()
@@ -198,20 +199,23 @@ const Header: React.FC<HeaderProps> = () => {
         <Menu
           open={Boolean(notificationAnchor)}
           anchorEl={notificationAnchor}
-          onClose={() => setNotificationAnchor(null)}>
+          onClose={() => setNotificationAnchor(null)}
+        >
           <div
             id="activityHolder"
             style={{
               maxHeight: '650px',
               overflowY: 'auto'
-            }}>
+            }}
+          >
             {activityArray.length > 0 ? (
               <InfiniteScroll
                 dataLength={activityArray.length}
                 hasMore={hasMoreUnreadActivities}
                 next={getNotifications}
                 loader={null}
-                scrollableTarget="activityHolder">
+                scrollableTarget="activityHolder"
+              >
                 <div className="lmNotification">
                   <div className="title">Notification</div>
                   {activityArray.map((activity: IActivity, index: number) => {
@@ -222,7 +226,8 @@ const Header: React.FC<HeaderProps> = () => {
                         onClick={() => handleNotification(activity, index)}
                         style={{
                           background: activity?.isRead ? 'none' : '#e8e8e8'
-                        }}>
+                        }}
+                      >
                         <div className="notificationIist">
                           <div className="notiImg">
                             {setUserImage(
@@ -234,7 +239,8 @@ const Header: React.FC<HeaderProps> = () => {
                               className="lmNoti"
                               dangerouslySetInnerHTML={{
                                 __html: convertTextToHTML(activity?.activityText)?.innerHTML
-                              }}></div>
+                              }}
+                            ></div>
                             <div className="notiTime">{dayjs(activity?.updatedAt).fromNow()}</div>
                           </div>
                           <div>
@@ -250,7 +256,8 @@ const Header: React.FC<HeaderProps> = () => {
                             open={Boolean(menuAnchor)}
                             onClose={() => setMenuAnchor(null)}
                             anchorEl={menuAnchor}
-                            className="menu-block">
+                            className="menu-block"
+                          >
                             <div className="menu-block-item">Remove this notification</div>
                             <div className="menu-block-item">Mute this notification</div>
                           </Menu>
@@ -282,7 +289,8 @@ const Header: React.FC<HeaderProps> = () => {
               }
             }
           }}
-          id="activityHolder">
+          id="activityHolder"
+        >
           <div className="lmNoNotification noNotifications">
             <CircularProgress />
           </div>
@@ -303,10 +311,12 @@ const Header: React.FC<HeaderProps> = () => {
               setNotificationAnchor(e.currentTarget);
               getNotifications();
               // setNotificationsCount(0);
-            }}>
+            }}
+          >
             <Badge
               badgeContent={parseInt(notificationsCount.toString()) <= 0 ? 0 : notificationsCount}
-              color="primary">
+              color="primary"
+            >
               <NotificationsIcon />
             </Badge>
           </IconButton>
@@ -318,7 +328,8 @@ const Header: React.FC<HeaderProps> = () => {
               setNotificationAnchor(e.currentTarget);
               getNotifications();
               // setNotificationsCount(0);
-            }}>
+            }}
+          >
             <NotificationsIcon />
           </IconButton>
         )}

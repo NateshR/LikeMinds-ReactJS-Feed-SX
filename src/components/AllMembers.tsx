@@ -77,7 +77,8 @@ function AllMembers() {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -136,7 +137,8 @@ function AllMembers() {
           hasMore={loadMore}
           dataLength={allMembersArray.length}
           next={getAllMembers}
-          scrollableTarget="allMembersScrollWrapper">
+          scrollableTarget="allMembersScrollWrapper"
+        >
           {renderComponent()}
         </InfiniteScroll>
       </div>

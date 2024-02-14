@@ -28,7 +28,8 @@ function ImageMedia({ attachment }: ImageMediaProps) {
     <div
       style={{
         backgroundColor: 'black'
-      }}>
+      }}
+    >
       <img
         src={attachment.attachmentMeta.url}
         alt="Your Image"

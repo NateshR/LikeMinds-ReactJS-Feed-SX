@@ -88,15 +88,15 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
     return lmFeedClient.savePost(Id);
   }
   async function getPostComments() {
-    let response: any = await lmFeedClient.getPostDetails(Id, pageCount);
+    const response: any = await lmFeedClient.getPostDetails(Id, pageCount);
     setPageCount(pageCount + 1);
-    let commentArray = response?.data?.post?.replies;
+    const commentArray = response?.data?.post?.replies;
 
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
     if (pageCount === 1) {
       const tempArr: { [key: string]: number } = {};
       commentList.forEach((item: Comment) => (tempArr[item.Id] = 1));
-      let newResponseReplies = commentArray?.filter((item: Comment) => {
+      const newResponseReplies = commentArray?.filter((item: Comment) => {
         if (tempArr[item.Id] != 1) {
           return item;
         }
@@ -118,7 +118,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          fill="none">
+          fill="none"
+        >
           <path
             d="M12.534 19.8662L20.1278 12.2725C21.9934 10.3975 22.2653 7.33187 20.5028 5.37249C20.0607 4.87872 19.5227 4.48026 18.9215 4.20145C18.3203 3.92264 17.6685 3.76933 17.0061 3.75091C16.3436 3.73248 15.6844 3.84932 15.0686 4.09428C14.4528 4.33924 13.8934 4.70718 13.4246 5.17562L11.9996 6.60999L10.7715 5.37249C8.89652 3.50687 5.83089 3.23499 3.87152 4.99749C3.37774 5.43951 2.97928 5.97756 2.70047 6.57877C2.42166 7.17999 2.26836 7.83173 2.24993 8.49419C2.23151 9.15665 2.34834 9.81591 2.5933 10.4317C2.83826 11.0475 3.2062 11.6068 3.67464 12.0756L11.4653 19.8662C11.6075 20.0071 11.7995 20.0861 11.9996 20.0861C12.1998 20.0861 12.3918 20.0071 12.534 19.8662Z"
             fill="#FB1609"
@@ -136,7 +137,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <path
             d="M12.534 19.8662L20.1278 12.2725C21.9934 10.3975 22.2653 7.33187 20.5028 5.37249C20.0607 4.87872 19.5227 4.48026 18.9215 4.20145C18.3203 3.92264 17.6685 3.76933 17.0061 3.75091C16.3436 3.73248 15.6844 3.84932 15.0686 4.09428C14.4528 4.33924 13.8934 4.70718 13.4246 5.17562L11.9996 6.60999L10.7715 5.37249C8.89652 3.50687 5.83089 3.23499 3.87152 4.99749C3.37774 5.43951 2.97928 5.97756 2.70047 6.57877C2.42166 7.17999 2.26836 7.83173 2.24993 8.49419C2.23151 9.15665 2.34834 9.81591 2.5933 10.4317C2.83826 11.0475 3.2062 11.6068 3.67464 12.0756L11.4653 19.8662C11.6075 20.0071 11.7995 20.0861 11.9996 20.0861C12.1998 20.0861 12.3918 20.0071 12.534 19.8662Z"
             stroke="#484F67"
@@ -158,7 +160,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          fill="none">
+          fill="none"
+        >
           <path
             d="M8.25 4H15.75C16.4404 4 17 4.55103 17 5.23077V20L12 15.0769L7 20V5.23077C7 4.55103 7.55964 4 8.25 4Z"
             fill="#484F67"
@@ -177,7 +180,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          fill="none">
+          fill="none"
+        >
           <path
             d="M8.25 4H15.75C16.4404 4 17 4.55103 17 5.23077V20L12 15.0769L7 20V5.23077C7 4.55103 7.55964 4 8.25 4Z"
             stroke="#484F67"
@@ -219,7 +223,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -257,7 +262,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}>
+          }}
+        >
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -313,7 +319,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
             className="inputDiv"
             style={{
               overflow: 'visible'
-            }}>
+            }}
+          >
             <div
               ref={contentEditableDiv}
               contentEditable={true}
@@ -338,7 +345,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
               onKeyDown={async (e: React.KeyboardEvent) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  let textContent: string = extractTextFromNode(contentEditableDiv.current);
+                  const textContent: string = extractTextFromNode(contentEditableDiv.current);
                   if (textContent.length === 0) {
                     return;
                   }
@@ -367,25 +374,26 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
                 if (selection === null) return;
-                let focusNode = selection.focusNode;
+                const focusNode = selection.focusNode;
                 if (focusNode === null) {
                   return;
                 }
-                let div = focusNode.parentElement;
+                const div = focusNode.parentElement;
                 if (div === null) {
                   return;
                 }
-                let text = div.childNodes;
+                const text = div.childNodes;
                 if (focusNode === null || text.length === 0) {
                   return;
                 }
-                let textContentFocusNode = focusNode.textContent;
+                const textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
+                const tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                   setTagString(tagOp?.tagString!);
                 }
-              }}></div>
+              }}
+            ></div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
               <div className="taggingBox">
                 {taggingMemberList?.map!((item: any) => {
@@ -395,49 +403,51 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                       className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
+                        const focusNode = window.getSelection()!.focusNode;
                         if (focusNode === null) {
                           return;
                         }
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
+                        const div = focusNode.parentElement;
+                        const text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
-                        let textContentFocusNode = focusNode.textContent;
+                        const textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
-                        let tagOp = findTag(textContentFocusNode);
+                        const tagOp = findTag(textContentFocusNode);
                         if (tagOp === undefined) return;
-                        let substr = tagOp?.tagString;
+                        const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
                         // if (!substr || substr.length === 0) {
                         //   return;
                         // }
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                        const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                        const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
+                        const textNode1 = document.createTextNode(textNode1Text);
+                        const anchorNode = document.createElement('a');
                         anchorNode.id = item?.id;
                         anchorNode.href = '#';
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
                         const dummyNode = document.createElement('span');
-                        let textNode2 = document.createTextNode(textNode2Text);
+                        const textNode2 = document.createTextNode(textNode2Text);
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(dummyNode, anchorNode);
                         div!.insertBefore(textNode1, anchorNode);
                         setTaggingMemberList([]);
                         setCursorAtEnd(contentEditableDiv);
-                      }}>
+                      }}
+                    >
                       <div
                         style={{
                           display: 'flex',
                           alignItems: 'center'
-                        }}>
+                        }}
+                      >
                         {setTagUserImage(item)}
                         <div
                           style={{
@@ -445,7 +455,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                             textTransform: 'capitalize',
                             overflowY: 'hidden',
                             textOverflow: 'ellipsis'
-                          }}>
+                          }}
+                        >
                           {item?.name}
                         </div>
                       </div>
@@ -478,7 +489,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
               className="commentCountDiv"
               style={{
                 display: commentList && commentList.length ? 'block' : 'none'
-              }}>
+              }}
+            >
               <span>
                 {postCommentsCount}{' '}
                 {postCommentsCount === 0 || postCommentsCount > 1 ? 'Comments' : 'Comment'}
@@ -491,7 +503,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                   loader={null}
                   next={getPostComments}
                   hasMore={hasMoreComments}
-                  scrollableTarget={'postDetailsContainer'}>
+                  scrollableTarget={'postDetailsContainer'}
+                >
                   {commentList.map((comment: Comment, index: number, commentArray: Comment[]) => {
                     return (
                       <PostComents
@@ -593,7 +606,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
   // function renamed to post comments
   async function postComment(timeStamp: string) {
     try {
-      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      const textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
         return;
       }
@@ -680,7 +693,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                 padding: '0',
                 cursor: 'pointer'
               }}
-              onClick={likePost}>
+              onClick={likePost}
+            >
               {setLikeButton()}
             </span>{' '}
             <span
@@ -704,7 +718,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                 } else {
                   likePost();
                 }
-              }}>
+              }}
+            >
               {postLikesCount ? postLikesCount : null} {postLikesCount > 1 ? 'Likes' : 'Like'}
             </span>
           </div>
@@ -722,13 +737,15 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                     }
                   });
                 }
-              }}>
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
-                fill="none">
+                fill="none"
+              >
                 <path
                   d="M4.25602 16.5937C3.13935 14.7097 2.74875 12.4829 3.15755 10.3314C3.56636 8.1798 4.74645 6.25143 6.47628 4.90829C8.20611 3.56514 10.3667 2.89958 12.5525 3.03657C14.7383 3.17355 16.7989 4.10365 18.3475 5.65226C19.8961 7.20086 20.8262 9.26148 20.9632 11.4472C21.1002 13.633 20.4346 15.7936 19.0915 17.5235C17.7483 19.2533 15.8199 20.4334 13.6684 20.8422C11.5168 21.251 9.29001 20.8604 7.40602 19.7437V19.7437L4.29352 20.625C4.16599 20.6623 4.03079 20.6646 3.90207 20.6317C3.77335 20.5987 3.65586 20.5318 3.56191 20.4378C3.46796 20.3439 3.40101 20.2264 3.36809 20.0977C3.33516 19.969 3.33747 19.8338 3.37477 19.7062L4.25602 16.5937Z"
                   stroke="#484F67"
@@ -759,7 +776,8 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                   setOpenCommentsSection(!openCommentsSection);
                 }
                 getPostComments();
-              }}>
+              }}
+            >
               {postCommentsCount > 0 ? postCommentsCount + ' ' : null}
               {postCommentsCount === 0
                 ? 'Add Comment'

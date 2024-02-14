@@ -13,7 +13,7 @@
   margin: 0.25rem;
 }
 
-.attachmentHolder__imgBlock>img {
+.attachmentHolder__imgBlock > img {
   margin: auto;
   width: 100%;
 }
@@ -29,14 +29,13 @@
   justify-content: center;
 }
 
-.attachmentHolder__singleBlock>div {
+.attachmentHolder__singleBlock > div {
   max-height: 100%;
   background-color: rgba(35, 32, 32, 0.5);
   margin: 0;
 }
 
-.attachmentHolder__imgBlock>img {
-
+.attachmentHolder__imgBlock > img {
   height: 100%;
   width: auto;
 }
@@ -57,7 +56,7 @@
   left: 1rem;
 }
 
-.attachmentHolder__addMoreButton>svg {
+.attachmentHolder__addMoreButton > svg {
   margin-right: 0.25rem;
 }
 
@@ -84,7 +83,6 @@ input[type='file'] {
   top: 1rem;
   right: 2rem;
   cursor: pointer;
-
 }
 
 .initiateMediaUploadBox--headingOne {
@@ -103,7 +101,7 @@ input[type='file'] {
   margin: 0;
 }
 
-.initiateMediaUploadBox>input[type='file'] {
+.initiateMediaUploadBox > input[type='file'] {
   display: none;
 }
 
@@ -122,7 +120,7 @@ input[type='file'] {
 }
 
 .documentAttachmentWrapperContainer {
-  width: 100%
+  width: 100%;
 }
 
 .documentAttachmentContainer {
@@ -139,7 +137,7 @@ input[type='file'] {
   cursor: pointer;
 }
 
-.documentAttachmentContainer--addMoreContainer>span {
+.documentAttachmentContainer--addMoreContainer > span {
   font-size: 1rem;
   line-height: 1.25rem;
   color: #484f67;
@@ -152,7 +150,7 @@ input[type='file'] {
   align-items: center;
 }
 
-.attachedDocumentWrapper>span {
+.attachedDocumentWrapper > span {
   padding: 1rem;
 }
 
@@ -199,7 +197,7 @@ input[type='file'] {
   align-items: center;
 }
 
-.ogTagPreviewContainer__wrapper--imageWrapper>img {
+.ogTagPreviewContainer__wrapper--imageWrapper > img {
   height: 100%;
   width: auto;
   margin-left: auto;
@@ -215,7 +213,7 @@ input[type='file'] {
   margin: 0;
   font-size: 1rem;
   line-height: 1.25rem;
-  color: #484F67;
+  color: #484f67;
   font-weight: 500;
 }
 
@@ -223,13 +221,13 @@ input[type='file'] {
   margin: 0;
   font-size: 0.75rem;
   line-height: 1.25rem;
-  color: #484F67;
+  color: #484f67;
 }
 
 .postMediaAttachment {
   /* height: 300px; */
   width: 100%;
-  height: auto
+  height: auto;
 }
 
 .postMediaAttachment--image {
