@@ -6,7 +6,14 @@ import Header from './components/Header';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-function LMFeed() {
+
+interface LMFeedProps {
+  username?: string;
+  userId: string;
+  hasRouter: boolean;
+}
+
+function LMFeed({ username, userId, hasRouter }: LMFeedProps) {
   const [, setCallBack] = useState<null | ((action: string, index: number, value: never) => void)>(
     null
   );
@@ -16,13 +23,21 @@ function LMFeed() {
         <Header />
       </div>
       <section className="mainBlock">
-        <BrowserRouter>
+        {hasRouter ? (
           <div className="main">
             <Provider store={store}>
-              <FeedComponent setCallBack={setCallBack} />
+              <FeedComponent setCallBack={setCallBack} userId={userId} username={username} />
             </Provider>
           </div>
-        </BrowserRouter>
+        ) : (
+          <BrowserRouter>
+            <div className="main">
+              <Provider store={store}>
+                <FeedComponent setCallBack={setCallBack} userId={userId} username={username} />
+              </Provider>
+            </div>
+          </BrowserRouter>
+        )}
       </section>
     </div>
   );
