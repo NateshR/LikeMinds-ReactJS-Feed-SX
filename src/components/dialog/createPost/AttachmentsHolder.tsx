@@ -79,13 +79,15 @@ const AttachmentsHolder = ({
             {/* Image upload icon */}
             <span
               className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
-              onClick={setAttachmentTypeImage}>
+              onClick={setAttachmentTypeImage}
+            >
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M15.75 9.375C15.75 9.67337 15.6315 9.95952 15.4205 10.1705C15.2095 10.3815 14.9234 10.5 14.625 10.5C14.3266 10.5 14.0405 10.3815 13.8295 10.1705C13.6185 9.95952 13.5 9.67337 13.5 9.375C13.5 9.07663 13.6185 8.79048 13.8295 8.5795C14.0405 8.36853 14.3266 8.25 14.625 8.25C14.9234 8.25 15.2095 8.36853 15.4205 8.5795C15.6315 8.79048 15.75 9.07663 15.75 9.375ZM21.75 5.25V17.25V18.75C21.75 19.1478 21.592 19.5294 21.3107 19.8107C21.0294 20.092 20.6478 20.25 20.25 20.25H3.75C3.35218 20.25 2.97064 20.092 2.68934 19.8107C2.40804 19.5294 2.25 19.1478 2.25 18.75V15.75V5.25C2.25 4.85218 2.40804 4.47064 2.68934 4.18934C2.97064 3.90804 3.35218 3.75 3.75 3.75H20.25C20.6478 3.75 21.0294 3.90804 21.3107 4.18934C21.592 4.47064 21.75 4.85218 21.75 5.25ZM20.25 15.4406V5.25H3.75V13.9406L7.19062 10.5C7.47302 10.2217 7.85355 10.0658 8.25 10.0658C8.64645 10.0658 9.02698 10.2217 9.30938 10.5L13.5 14.6906L15.4406 12.75C15.723 12.4717 16.1036 12.3158 16.5 12.3158C16.8964 12.3158 17.277 12.4717 17.5594 12.75L20.25 15.4406Z"
                   fill="#ED8031"
@@ -95,13 +97,15 @@ const AttachmentsHolder = ({
             {/* Video upload icons */}
             <span
               className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
-              onClick={setAttachmentTypeImage}>
+              onClick={setAttachmentTypeImage}
+            >
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M16.5 8.625V17.625C16.5 18.0228 16.342 18.4044 16.0607 18.6857C15.7794 18.967 15.3978 19.125 15 19.125H4.5C4.00754 19.125 3.51991 19.028 3.06494 18.8395C2.60997 18.6511 2.19657 18.3749 1.84835 18.0267C1.14509 17.3234 0.75 16.3696 0.75 15.375V6.375C0.75 5.97718 0.908035 5.59564 1.18934 5.31434C1.47064 5.03304 1.85218 4.875 2.25 4.875H12.75C13.7446 4.875 14.6984 5.27009 15.4017 5.97335C16.1049 6.67661 16.5 7.63044 16.5 8.625ZM22.875 6.85312C22.762 6.78442 22.6323 6.74808 22.5 6.74808C22.3677 6.74808 22.238 6.78442 22.125 6.85312L18.375 8.99063C18.26 9.05702 18.1647 9.15276 18.0988 9.26806C18.0329 9.38336 17.9988 9.51408 18 9.64688V14.3531C17.9988 14.4859 18.0329 14.6166 18.0988 14.7319C18.1647 14.8472 18.26 14.943 18.375 15.0094L22.125 17.1469C22.2393 17.2124 22.3683 17.2479 22.5 17.25C22.6319 17.2492 22.7612 17.2136 22.875 17.1469C22.9899 17.0828 23.0854 16.9888 23.1514 16.875C23.2174 16.7611 23.2515 16.6316 23.25 16.5V7.5C23.2515 7.36841 23.2174 7.23886 23.1514 7.12501C23.0854 7.01116 22.9899 6.91723 22.875 6.85312Z"
                   fill="#7B61FF"
@@ -111,13 +115,15 @@ const AttachmentsHolder = ({
 
             <span
               className="create-post-feed-dialog-wrapper_container_post-wrapper_post-attachment-dialog--icon"
-              onClick={setAttachmentTypeDocument}>
+              onClick={setAttachmentTypeDocument}
+            >
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   d="M18 17.25C18 16.8358 17.6642 16.5 17.25 16.5H6.5C4.29 16.5 2.5 14.71 2.5 12.5C2.5 10.29 4.29 8.5 6.5 8.5H19C20.38 8.5 21.5 9.62 21.5 11C21.5 12.38 20.38 13.5 19 13.5H10.5C9.95 13.5 9.5 13.05 9.5 12.5C9.5 11.95 9.95 11.5 10.5 11.5H17.25C17.6642 11.5 18 11.1642 18 10.75C18 10.3358 17.6642 10 17.25 10H10.5C9.12 10 8 11.12 8 12.5C8 13.88 9.12 15 10.5 15H19C21.21 15 23 13.21 23 11C23 8.79 21.21 7 19 7H6.5C3.46 7 1 9.46 1 12.5C1 15.54 3.46 18 6.5 18H17.25C17.6642 18 18 17.6642 18 17.25Z"
                   fill="#484F67"
@@ -187,7 +193,8 @@ const AttachmentsHolder = ({
         className="attachmentHolder"
         style={{
           display: showOGTagPreview ? 'block' : 'flex'
-        }}>
+        }}
+      >
         {/* <MaxTwoImage /> */}
         {setOGTagPreviewBlock()}
         {setInitiateUploadBlock()}
@@ -231,7 +238,8 @@ function DocumentUploadAttachmentContainer({
                 height="36"
                 viewBox="0 0 28 36"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                xmlns="http://www.w3.org/2000/svg"
+              >
                 <path
                   fillRule="evenodd"
                   clipRule="evenodd"
@@ -277,7 +285,8 @@ function DocumentUploadAttachmentContainer({
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M4 12C4 12.2205 4.07919 12.41 4.23757 12.5685C4.39595 12.7201 4.58188 12.7959 4.79535 12.7959H11.2098V19.2145C11.2098 19.4281 11.2856 19.6107 11.4371 19.7623C11.5954 19.9208 11.7848 20 12.0052 20C12.2186 20 12.4011 19.9208 12.5526 19.7623C12.7041 19.6107 12.7799 19.4281 12.7799 19.2145V12.7959H19.215C19.4284 12.7959 19.6109 12.7201 19.7624 12.5685C19.9208 12.41 20 12.2205 20 12C20 11.7864 19.9208 11.6038 19.7624 11.4522C19.6109 11.2937 19.4284 11.2145 19.215 11.2145H12.7799V4.78553C12.7799 4.57881 12.7041 4.39621 12.5526 4.23773C12.4011 4.07924 12.2186 4 12.0052 4C11.7848 4 11.5954 4.07924 11.4371 4.23773C11.2856 4.39621 11.2098 4.57881 11.2098 4.78553V11.2145H4.79535C4.58188 11.2145 4.39595 11.2937 4.23757 11.4522C4.07919 11.6038 4 11.7864 4 12Z"
                 fill="#484F67"
@@ -341,7 +350,8 @@ const InitiateUploadView = ({
               height="18"
               viewBox="0 0 20 18"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M13.75 6.375C13.75 6.67337 13.6315 6.95952 13.4205 7.1705C13.2095 7.38147 12.9234 7.5 12.625 7.5C12.3266 7.5 12.0405 7.38147 11.8295 7.1705C11.6185 6.95952 11.5 6.67337 11.5 6.375C11.5 6.07663 11.6185 5.79048 11.8295 5.5795C12.0405 5.36853 12.3266 5.25 12.625 5.25C12.9234 5.25 13.2095 5.36853 13.4205 5.5795C13.6315 5.79048 13.75 6.07663 13.75 6.375ZM19.75 2.25V14.25V15.75C19.75 16.1478 19.592 16.5294 19.3107 16.8107C19.0294 17.092 18.6478 17.25 18.25 17.25H1.75C1.35218 17.25 0.970644 17.092 0.68934 16.8107C0.408035 16.5294 0.25 16.1478 0.25 15.75V12.75V2.25C0.25 1.85218 0.408035 1.47064 0.68934 1.18934C0.970644 0.908035 1.35218 0.75 1.75 0.75H18.25C18.6478 0.75 19.0294 0.908035 19.3107 1.18934C19.592 1.47064 19.75 1.85218 19.75 2.25ZM18.25 12.4406V2.25H1.75V10.9406L5.19062 7.5C5.47302 7.22175 5.85355 7.06577 6.25 7.06577C6.64645 7.06577 7.02698 7.22175 7.30938 7.5L11.5 11.6906L13.4406 9.75C13.723 9.47175 14.1036 9.31577 14.5 9.31577C14.8964 9.31577 15.277 9.47175 15.5594 9.75L18.25 12.4406Z"
                 fill="#ED8031"
@@ -371,7 +381,8 @@ const InitiateUploadView = ({
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              xmlns="http://www.w3.org/2000/svg">
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
                 d="M18 17.25C18 16.8358 17.6642 16.5 17.25 16.5H6.5C4.29 16.5 2.5 14.71 2.5 12.5C2.5 10.29 4.29 8.5 6.5 8.5H19C20.38 8.5 21.5 9.62 21.5 11C21.5 12.38 20.38 13.5 19 13.5H10.5C9.95 13.5 9.5 13.05 9.5 12.5C9.5 11.95 9.95 11.5 10.5 11.5H17.25C17.6642 11.5 18 11.1642 18 10.75C18 10.3358 17.6642 10 17.25 10H10.5C9.12 10 8 11.12 8 12.5C8 13.88 9.12 15 10.5 15H19C21.21 15 23 13.21 23 11C23 8.79 21.21 7 19 7H6.5C3.46 7 1 9.46 1 12.5C1 15.54 3.46 18 6.5 18H17.25C17.6642 18 18 17.6642 18 17.25Z"
                 fill="#484F67"
@@ -405,13 +416,15 @@ const InitiateUploadView = ({
       {/* close icon for the upload box */}
       <span
         className="initiateMediaUploadBox--closeIcon"
-        onClick={handleCloseIconInitiateMediaUploadBox}>
+        onClick={handleCloseIconInitiateMediaUploadBox}
+      >
         <svg
           width="26"
           height="26"
           viewBox="0 0 26 26"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg">
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <circle cx="13" cy="13" r="12" stroke="#484F67" />
           <path
             fillRule="evenodd"
@@ -449,7 +462,8 @@ function renderMediaItem(attachment: File) {
           style={{
             background: 'black',
             height: '100%'
-          }}>
+          }}
+        >
           <img
             // className="postMediaAttachment--image"
             src={URL.createObjectURL(attachment)}
@@ -470,7 +484,8 @@ function renderMediaItem(attachment: File) {
         <div
           style={{
             background: 'black'
-          }}>
+          }}
+        >
           <video
             className="postMediaAttachment--video"
             src={URL.createObjectURL(attachment)}
@@ -491,7 +506,8 @@ function renderMediaItem(attachment: File) {
           data={URL.createObjectURL(attachment)}
           type="application/pdf"
           width="100%"
-          height="100%">
+          height="100%"
+        >
           <p>
             Alternative text - include a link{' '}
             <a href="http://africau.edu/images/default/sample.pdf">to the PDF!</a>
@@ -508,7 +524,7 @@ function ImageVideoAttachmentView({
   const [selectedSlide, setSelectedSlide] = useState<number>(0);
   const [rI, setRI] = useState<any>(null);
   function removeAMedia(index: number) {
-    let newMediaArray = [...imageOrVideoUploadArray!];
+    const newMediaArray = [...imageOrVideoUploadArray!];
     newMediaArray.splice(index, 1);
     if (newMediaArray.length === 0) {
       setShowInitiateUploadComponent(true);
@@ -523,19 +539,22 @@ function ImageVideoAttachmentView({
           position: 'relative',
           height: '100%',
           width: '100%'
-        }}>
+        }}
+      >
         <span
           className="initiateMediaUploadBox--closeIcon"
           onClick={() => removeAMedia(selectedSlide)}
           style={{
             zIndex: 1
-          }}>
+          }}
+        >
           <svg
             width="26"
             height="26"
             viewBox="0 0 26 26"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <circle cx="13" cy="13" r="12" stroke="white" />
             <path
               fillRule="evenodd"
@@ -557,7 +576,8 @@ function ImageVideoAttachmentView({
           dynamicHeight={false}
           onChange={(index: number) => {
             setSelectedSlide(index);
-          }}>
+          }}
+        >
           {renderAttachments(imageOrVideoUploadArray!)}
         </Carousel>
       </div>
@@ -573,20 +593,23 @@ function ImageVideoAttachmentView({
       className="attachmentHolder__singleBlock"
       style={{
         height: '100%'
-      }}>
+      }}
+    >
       <label>
         <span
           className="attachmentHolder__addMoreButton"
           style={{
             zIndex: 1
-          }}>
+          }}
+        >
           <input type="file" onChange={addMoreImages} accept="image/*, video/*" />
           <svg
             width="16"
             height="16"
             viewBox="0 0 16 16"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M0 8C0 8.2205 0.0791909 8.40999 0.237573 8.56847C0.395954 8.72007 0.581881 8.79587 0.795352 8.79587H7.20981V15.2145C7.20981 15.4281 7.28556 15.6107 7.43706 15.7623C7.59544 15.9208 7.78481 16 8.00517 16C8.21864 16 8.40112 15.9208 8.55262 15.7623C8.70411 15.6107 8.77986 15.4281 8.77986 15.2145V8.79587H15.215C15.4284 8.79587 15.6109 8.72007 15.7624 8.56847C15.9208 8.40999 16 8.2205 16 8C16 7.78639 15.9208 7.60379 15.7624 7.4522C15.6109 7.29371 15.4284 7.21447 15.215 7.21447H8.77986V0.78553C8.77986 0.578811 8.70411 0.39621 8.55262 0.237726C8.40112 0.079242 8.21864 0 8.00517 0C7.78481 0 7.59544 0.079242 7.43706 0.237726C7.28556 0.39621 7.20981 0.578811 7.20981 0.78553V7.21447H0.795352C0.581881 7.21447 0.395954 7.29371 0.237573 7.4522C0.0791909 7.60379 0 7.78639 0 8Z"
               fill="#5046E5"
@@ -620,7 +643,8 @@ export function HolderWithCross({
             height="26"
             viewBox="0 0 26 26"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <circle cx="13" cy="13" r="12" fill="white" stroke="#484F67" />
             <path
               fillRule="evenodd"

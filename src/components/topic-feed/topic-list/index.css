@@ -1,37 +1,37 @@
 .topicTile {
-    width: 279px;
-    height: 56px;
-    padding: 16px;
-    padding-left: 0px;
-    display: flex;
+  width: 279px;
+  height: 56px;
+  padding: 16px;
+  padding-left: 0px;
+  display: flex;
 }
 
 .topicTile:hover {
-    background-color: white;
+  background-color: white;
 }
 
 .allTopicButton {
-    width: 122px;
-    height: 36px;
-    border-radius: 4px;
-    padding: 10px 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-    font-size: 16px;
-    line-height: 20px;
-    font-family: Roboto;
-    font-weight: 400;
-    border: 1px solid #D0D8E2;
-    cursor: pointer;
-    color: #666666;
+  width: 122px;
+  height: 36px;
+  border-radius: 4px;
+  padding: 10px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  font-size: 16px;
+  line-height: 20px;
+  font-family: Roboto;
+  font-weight: 400;
+  border: 1px solid #d0d8e2;
+  cursor: pointer;
+  color: #666666;
 }
 
 .topicNameContainer {
-    max-width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    margin-left: 28px;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-left: 28px;
 }

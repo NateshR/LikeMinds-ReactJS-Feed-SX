@@ -1,31 +1,31 @@
-.lmPostLikesWrapper{
-    width: 300px;
-    height: 500px;
-    position: relative;
-    /* padding: 1rem */
+.lmPostLikesWrapper {
+  width: 300px;
+  height: 500px;
+  position: relative;
+  /* padding: 1rem */
 }
-.likesUserTile{
-    padding: 1rem;
-    display: flex;
-    cursor: pointer;
+.likesUserTile {
+  padding: 1rem;
+  display: flex;
+  cursor: pointer;
 }
-.likesUserTile:hover{
-    background: rgba(230, 235, 245, 1);
+.likesUserTile:hover {
+  background: rgba(230, 235, 245, 1);
 }
-.likesUserTile--userImage{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.likesUserTile--userImage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.likesUserTile--userName{
-    padding-left: 1rem;
-    display: flex;
+.likesUserTile--userName {
+  padding-left: 1rem;
+  display: flex;
 
-    align-items: center;
-    flex-grow: 1;
+  align-items: center;
+  flex-grow: 1;
 }
-.lmPostLikesWrapper--likesCount{
-    padding: 1.5rem 1rem;
-    font-size: 1rem;
-    font-weight: 500;
+.lmPostLikesWrapper--likesCount {
+  padding: 1.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
 }

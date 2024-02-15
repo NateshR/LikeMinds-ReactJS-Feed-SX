@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import '../assets/css/get-likes.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 interface SeePostLikesProps {

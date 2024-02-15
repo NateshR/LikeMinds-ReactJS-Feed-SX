@@ -65,7 +65,7 @@ const Post: React.FC<PostProps> = ({ rightSidebarHandler }) => {
 
 export default Post;
 
-let a = (
+const a = (
   <>
     <div className="lmWrapper__feed__post">
       {/* header */}

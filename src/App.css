@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'Roboto', sans-serif;
+}
+
+
 * {
   box-sizing: border-box;
 }
@@ -510,9 +524,9 @@
   overflow-y: auto;
   overflow-x: hidden;
   position: absolute;
-  box-shadow: 0px 1px 16px 0 #0000003D;
+  box-shadow: 0px 1px 16px 0 #0000003d;
   border-radius: 8px;
-  z-index: 9
+  z-index: 9;
 }
 
 .taggingTile,
@@ -592,14 +606,14 @@
   font-weight: 500;
   line-height: 20px;
   color: #484f67;
-  margin: 0 0 5px 0px
+  margin: 0 0 5px 0px;
 }
 
 .lmPdfViewer .pdfInfo .desc span {
   font-size: 1rem;
   font-weight: 400;
   line-height: 20px;
-  color: #0000003D;
+  color: #0000003d;
   margin-right: 10px;
 }
 
@@ -621,7 +635,7 @@
 }
 
 .postTaggingTile:hover {
-  background: #E6EBF5;
+  background: #e6ebf5;
 }
 
 .slide.selected {

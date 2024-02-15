@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostComents from './PostComments';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import { Dialog } from '@mui/material';
 import {
   SHOW_POST_LIKES_BAR,
@@ -88,15 +88,15 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
     return lmFeedClient.savePost(Id);
   }
   async function getPostComments() {
-    let response: any = await lmFeedClient.getPostDetails(Id, pageCount);
+    const response: any = await lmFeedClient.getPostDetails(Id, pageCount);
     setPageCount(pageCount + 1);
-    let commentArray = response?.data?.post?.replies;
+    const commentArray = response?.data?.post?.replies;
 
     setPostUsersMap({ ...postUsersMap, ...response?.data?.users });
     if (pageCount === 1) {
       const tempArr: { [key: string]: number } = {};
       commentList.forEach((item: Comment) => (tempArr[item.Id] = 1));
-      let newResponseReplies = commentArray?.filter((item: Comment) => {
+      const newResponseReplies = commentArray?.filter((item: Comment) => {
         if (tempArr[item.Id] != 1) {
           return item;
         }
@@ -292,7 +292,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
       text: text,
       updatedAt: 1701118115396,
       userId: '',
-      uuid: currentUser?.uuid!
+      uuid: currentUser?.uuid || ''
     };
     return tempComment;
   }
@@ -338,7 +338,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
               onKeyDown={async (e: React.KeyboardEvent) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  let textContent: string = extractTextFromNode(contentEditableDiv.current);
+                  const textContent: string = extractTextFromNode(contentEditableDiv.current);
                   if (textContent.length === 0) {
                     return;
                   }
@@ -367,23 +367,23 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
                 if (selection === null) return;
-                let focusNode = selection.focusNode;
+                const focusNode = selection.focusNode;
                 if (focusNode === null) {
                   return;
                 }
-                let div = focusNode.parentElement;
+                const div = focusNode.parentElement;
                 if (div === null) {
                   return;
                 }
-                let text = div.childNodes;
+                const text = div.childNodes;
                 if (focusNode === null || text.length === 0) {
                   return;
                 }
-                let textContentFocusNode = focusNode.textContent;
+                const textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
+                const tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
-                  setTagString(tagOp?.tagString!);
+                  setTagString(tagOp?.tagString);
                 }
               }}></div>
             {taggingMemberList && taggingMemberList?.length > 0 ? (
@@ -395,37 +395,37 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                       className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
+                        const focusNode = window.getSelection()!.focusNode;
                         if (focusNode === null) {
                           return;
                         }
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
+                        const div = focusNode.parentElement;
+                        const text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
-                        let textContentFocusNode = focusNode.textContent;
+                        const textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
-                        let tagOp = findTag(textContentFocusNode);
+                        const tagOp = findTag(textContentFocusNode);
                         if (tagOp === undefined) return;
-                        let substr = tagOp?.tagString;
+                        const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
                         // if (!substr || substr.length === 0) {
                         //   return;
                         // }
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                        const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                        const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
+                        const textNode1 = document.createTextNode(textNode1Text);
+                        const anchorNode = document.createElement('a');
                         anchorNode.id = item?.id;
                         anchorNode.href = '#';
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
                         const dummyNode = document.createElement('span');
-                        let textNode2 = document.createTextNode(textNode2Text);
+                        const textNode2 = document.createTextNode(textNode2Text);
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
                         div!.insertBefore(dummyNode, anchorNode);
@@ -593,7 +593,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
   // function renamed to post comments
   async function postComment(timeStamp: string) {
     try {
-      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      const textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
         return;
       }

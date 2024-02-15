@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, {
   KeyboardEventHandler,
   useCallback,
@@ -10,7 +11,7 @@ import React, {
 import './createPostDialog.css';
 import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 
-import { lmFeedClient } from '../../..';
+import { lmFeedClient } from '../../../client';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX, OgTags } from '../../../services/models';
 import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
@@ -43,7 +44,7 @@ export interface TagInfo {
   limitRight: number;
 }
 export function getCharacterWidth(character: string): number {
-  let font: string = 'Roboto',
+  const font: string = 'Roboto',
     fontSize: number = 16;
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -638,40 +639,40 @@ const CreatePostDialog = ({
                   onClick={(e) => {
                     e.preventDefault();
 
-                    let focusNode = window.getSelection()!.focusNode;
+                    const focusNode = window.getSelection()!.focusNode;
                     if (focusNode === null) {
                       return;
                     }
 
-                    let div = focusNode.parentElement;
-                    let text = div!.childNodes;
+                    const div = focusNode.parentElement;
+                    const text = div!.childNodes;
                     if (focusNode === null || text.length === 0) {
                       return;
                     }
 
-                    let textContentFocusNode = focusNode.textContent;
+                    const textContentFocusNode = focusNode.textContent;
                     if (textContentFocusNode === null) {
                       return;
                     }
 
-                    let tagOp = findTag(textContentFocusNode);
+                    const tagOp = findTag(textContentFocusNode);
 
                     // ('the tag string is ', tagOp!.tagString);
                     if (tagOp === undefined) return;
 
                     const { limitLeft, limitRight } = tagOp;
 
-                    let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                    const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
 
-                    let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                    const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                    let textNode1 = document.createTextNode(textNode1Text);
-                    let anchorNode = document.createElement('a');
+                    const textNode1 = document.createTextNode(textNode1Text);
+                    const anchorNode = document.createElement('a');
                     anchorNode.id = item?.id;
                     anchorNode.href = '#';
                     anchorNode.textContent = `@${item?.name.trim()}`;
                     anchorNode.contentEditable = 'false';
-                    let textNode2 = document.createTextNode(textNode2Text);
+                    const textNode2 = document.createTextNode(textNode2Text);
                     const dummyNode = document.createElement('span');
                     div!.replaceChild(textNode2, focusNode);
 
@@ -787,21 +788,21 @@ const CreatePostDialog = ({
                     const selection = window.getSelection();
                     setText(event.currentTarget.textContent!);
                     if (selection === null) return;
-                    let focusNode = selection.focusNode;
+                    const focusNode = selection.focusNode;
                     if (focusNode === null) {
                       return;
                     }
-                    let div = focusNode.parentElement;
+                    const div = focusNode.parentElement;
                     if (div === null) {
                       return;
                     }
-                    let text = div.childNodes;
+                    const text = div.childNodes;
                     if (focusNode === null || text.length === 0) {
                       return;
                     }
-                    let textContentFocusNode = focusNode.textContent;
+                    const textContentFocusNode = focusNode.textContent;
 
-                    let tagOp = findTag(textContentFocusNode!);
+                    const tagOp = findTag(textContentFocusNode!);
 
                     if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
                       setTagString(tagOp?.tagString!);
@@ -840,7 +841,7 @@ const CreatePostDialog = ({
                 });
                 dispatch(addNewLocalPost(tempPost));
                 const topicMap: Record<string, Topic> = {};
-                for (let topic of topics) {
+                for (const topic of topics) {
                   topicMap[topic.Id] = { ...topic };
                 }
                 dispatch(addNewTopics(topicMap));

@@ -6,7 +6,7 @@ dayjs.extend(relativeTime);
 import React, { useContext, useEffect, useState } from 'react';
 import { Dialog, IconButton, Menu } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
 import EditPost from './dialog/editPost/EditPost';
 import { IPost, IMenuItem } from '@likeminds.community/feed-js';
@@ -235,7 +235,7 @@ const PostHeader: React.FC = () => {
             setOpenDialog(false);
           }}>
           <ReportPostDialogBox
-            uuid={user?.uuid}
+            uuid={post?.uuid || ''}
             closeBox={() => {
               setOpenDialog(false);
             }}

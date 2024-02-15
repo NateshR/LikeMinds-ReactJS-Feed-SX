@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostOptions from './PostOptions';
 import DialogBox from './dialog/DialogBox';
 import CreatePostDialog from './dialog/createPost/CreatePostDialog';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import { Dialog } from '@mui/material';
 import { IPost } from '@likeminds.community/feed-js';
 import { useSelector } from 'react-redux';

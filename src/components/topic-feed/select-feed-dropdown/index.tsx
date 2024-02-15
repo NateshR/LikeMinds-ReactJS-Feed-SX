@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './index.css';
 import { LMFeedTopics } from '@likeminds.community/feed-js';
-import { lmFeedClient } from '../../..';
+import { lmFeedClient } from '../../../client';
 import { Checkbox, FormControl, InputLabel, Menu, MenuItem, Select } from '@mui/material';
 import TopicList from '../topic-list';
 import TopicListItem from '../topic-list';
@@ -357,8 +357,7 @@ const TopicFeedDropdownSelector = ({
           isCreateMode ? true : null
         );
         const existingAddedTopicList = existingSelectedTopics?.map((topic) => topic.Id);
-        console.log('The existing topics list');
-        console.log(existingAddedTopicList);
+
         let newTopicList: LMFeedTopics[] = call.data.topics;
         newTopicList = newTopicList.filter((topic) => {
           if (!existingAddedTopicList?.includes(topic.Id)) {
@@ -367,19 +366,16 @@ const TopicFeedDropdownSelector = ({
         });
         if (pageNo) {
           setPage(2);
-          console.log('triggering with pageNo as argument');
+
           setTopicList(newTopicList);
           if (newTopicList.length && searchKey === '') {
             setShouldHide(false);
           }
         } else {
-          console.log('triggering without pageNo as argument');
           setPage(page + 1);
           if (page === 1) {
-            console.log('triggering without pageNo as argument and page === 1');
             setTopicList(newTopicList);
           } else {
-            console.log('triggering without pageNo as argument and page !== 1');
             setTopicList(topicList.concat(newTopicList));
           }
         }

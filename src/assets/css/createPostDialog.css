@@ -34,7 +34,7 @@
   padding: 20px 0px 36px 0px;
 }
 
-.create-post-feed-dialog-wrapper_container_post-wrapper--heading>p {
+.create-post-feed-dialog-wrapper_container_post-wrapper--heading > p {
   font-size: 1.25rem;
   font-weight: 500;
   line-height: 1.5rem;
@@ -67,7 +67,7 @@
   /* position: relative; */
 }
 
-.create-post-feed-dialog-wrapper_container_post-wrapper--post-container>textarea {
+.create-post-feed-dialog-wrapper_container_post-wrapper--post-container > textarea {
   width: 100%;
   resize: none;
   border: none;
@@ -76,7 +76,7 @@
   font-family: Roboto;
 }
 
-.create-post-feed-dialog-wrapper_container_post-wrapper--post-container>textarea:focus-visible {
+.create-post-feed-dialog-wrapper_container_post-wrapper--post-container > textarea:focus-visible {
   outline-offset: none;
   outline: none;
 }
@@ -129,6 +129,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  background: var(--bg-grey-40, rgba(208, 216, 226, 0.40));
+  background: var(--bg-grey-40, rgba(208, 216, 226, 0.4));
   margin-top: 16px;
 }
