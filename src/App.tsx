@@ -10,9 +10,10 @@ import { store } from './store/store';
 interface LMFeedProps {
   username?: string;
   userId: string;
+  hasRouter: boolean;
 }
 
-function LMFeed({ username, userId }: LMFeedProps) {
+function LMFeed({ username, userId, hasRouter }: LMFeedProps) {
   const [, setCallBack] = useState<null | ((action: string, index: number, value: never) => void)>(
     null
   );
@@ -22,13 +23,21 @@ function LMFeed({ username, userId }: LMFeedProps) {
         <Header />
       </div>
       <section className="mainBlock">
-        <BrowserRouter>
+        {hasRouter ? (
           <div className="main">
             <Provider store={store}>
               <FeedComponent setCallBack={setCallBack} userId={userId} username={username} />
             </Provider>
           </div>
-        </BrowserRouter>
+        ) : (
+          <BrowserRouter>
+            <div className="main">
+              <Provider store={store}>
+                <FeedComponent setCallBack={setCallBack} userId={userId} username={username} />
+              </Provider>
+            </div>
+          </BrowserRouter>
+        )}
       </section>
     </div>
   );
