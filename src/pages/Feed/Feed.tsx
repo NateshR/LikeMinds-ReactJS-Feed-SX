@@ -42,8 +42,10 @@ import { addNewTopics } from '../../store/topics/topicsSlice';
 import { addNewUsers } from '../../store/users/usersSlice';
 interface FeedProps {
   setCallBack: React.Dispatch<((action: string, index: number, value: never) => void) | null>;
+  userId: string;
+  username?: string;
 }
-const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
+const FeedComponent: React.FC<FeedProps> = ({ setCallBack, userId, username }) => {
   const user = useSelector((state: RootState) => state.currentUser.user);
 
   const feedPosts = useSelector((state: RootState) => state.posts);
@@ -336,7 +338,7 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
 
   useEffect(() => {
     async function setUserState() {
-      const userResponse = await lmFeedClient.initiateUser('', false);
+      const userResponse = await lmFeedClient.initiateUser(userId, false, username);
       const memberStateResponse: any = await lmFeedClient.getMemberState();
       dispatch(setMemberState(memberStateResponse.data));
       dispatch(setUser(userResponse?.data?.user));
