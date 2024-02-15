@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { FeedPost } from '../../models/feedPost';
 
-let feedPostArray: FeedPost[] = [];
+const feedPostArray: FeedPost[] = [];
 
 export const feedsSlice = createSlice({
   name: 'feeds',

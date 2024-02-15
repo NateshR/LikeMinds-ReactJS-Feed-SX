@@ -13,7 +13,8 @@ const TopicListItem = ({ topic, checkedList, clickHandler }: TopicListProps) => 
       className="topicTile"
       onClick={() => {
         clickHandler(topic);
-      }}>
+      }}
+    >
       <Checkbox
         disableRipple={true}
         sx={{

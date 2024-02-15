@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './../assets/css/header.css';
 import { Badge, CircularProgress, IconButton, Menu, MenuItem } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import { IActivity, IUser } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import noNotification from '../assets/images/default.svg';
@@ -167,7 +167,7 @@ const Header: React.FC<HeaderProps> = () => {
     lmFeedClient.markReadNotification(activity?.Id);
     setActivityArray(
       (function () {
-        let newArr = [...activityArray];
+        const newArr = [...activityArray];
         newArr[index].isRead = true;
         return newArr;
       })()

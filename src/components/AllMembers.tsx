@@ -1,6 +1,6 @@
 import { IMember } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Skeleton } from '@mui/material';

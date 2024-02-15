@@ -2,7 +2,7 @@
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useEffect, useState } from 'react';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 // import { getReportingOptions } from "../../../sdkFunctions";
 
 type ReportConversationDialogBoxType = {
@@ -77,6 +77,10 @@ const ReportPostDialogBox = ({
           <button
             disabled={!(selectedId > 0)}
             onClick={() => {
+              console.log(reportedPostId);
+              console.log(uuid);
+              console.log(entity);
+              console.log(otherReasonsText);
               lmFeedClient.reportPost(
                 reportedPostId,
                 uuid,

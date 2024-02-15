@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
 import { useNavigate, useParams } from 'react-router-dom';
-import { lmFeedClient } from '../..';
+import { lmFeedClient } from '../../client';
 import AllMembers from '../AllMembers';
 import { POST_DOESNT_EXISTS, SHOW_SNACKBAR } from '../../services/feedModerationActions';
 import { CircularProgress } from '@mui/material';

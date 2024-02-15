@@ -5,7 +5,7 @@ import defaultUserImage from '../assets/images/defaultUserImage.png';
 import { Dialog, IconButton, Menu, MenuItem, Skeleton } from '@mui/material';
 import { IMenuItem, IUser } from '@likeminds.community/feed-js';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Parser } from 'html-to-react';
@@ -498,23 +498,23 @@ const PostComents: React.FC<CommentProps> = ({
                 setText(event.currentTarget.textContent!);
                 const selection = window.getSelection();
                 if (selection === null) return;
-                let focusNode = selection.focusNode;
+                const focusNode = selection.focusNode;
                 if (focusNode === null) {
                   return;
                 }
-                let div = focusNode.parentElement;
+                const div = focusNode.parentElement;
                 if (div === null) {
                   return;
                 }
-                let text = div.childNodes;
+                const text = div.childNodes;
                 // if (focusNode === null || text.length === 0) {
                 //   return;
                 // }
-                let textContentFocusNode = focusNode.textContent;
+                const textContentFocusNode = focusNode.textContent;
 
-                let tagOp = findTag(textContentFocusNode!);
+                const tagOp = findTag(textContentFocusNode!);
                 if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
-                  setTagString(tagOp?.tagString!);
+                  setTagString(tagOp?.tagString);
                 }
               }}>
               {/*  */}
@@ -528,39 +528,39 @@ const PostComents: React.FC<CommentProps> = ({
                       className="postTaggingTile"
                       onClick={(e) => {
                         e.preventDefault();
-                        let focusNode = window.getSelection()!.focusNode;
+                        const focusNode = window.getSelection()!.focusNode;
                         if (focusNode === null) {
                           return;
                         }
                         ('A');
-                        let div = focusNode.parentElement;
-                        let text = div!.childNodes;
+                        const div = focusNode.parentElement;
+                        const text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
                         ('B');
-                        let textContentFocusNode = focusNode.textContent;
+                        const textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
                         ('C');
-                        let tagOp = findTag(textContentFocusNode);
+                        const tagOp = findTag(textContentFocusNode);
                         ('D');
                         if (tagOp === undefined) return;
                         ('E');
-                        let substr = tagOp?.tagString;
+                        const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
 
-                        let textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
-                        let textNode2Text = textContentFocusNode.substring(limitRight + 1);
+                        const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
+                        const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
-                        let textNode1 = document.createTextNode(textNode1Text);
-                        let anchorNode = document.createElement('a');
+                        const textNode1 = document.createTextNode(textNode1Text);
+                        const anchorNode = document.createElement('a');
                         anchorNode.id = item?.id;
                         anchorNode.href = '#';
                         anchorNode.textContent = `@${item?.name.trim()}`;
                         anchorNode.contentEditable = 'false';
-                        let textNode2 = document.createTextNode(textNode2Text);
+                        const textNode2 = document.createTextNode(textNode2Text);
                         const dummyNode = document.createElement('span');
                         div!.replaceChild(textNode2, focusNode);
                         div!.insertBefore(anchorNode, textNode2);
@@ -592,11 +592,6 @@ const PostComents: React.FC<CommentProps> = ({
               </div>
             ) : null}
           </div>
-          {/* <div className="postCommentButton">
-            <IconButton onClick={postReply}>
-              <SendIcon />
-            </IconButton>
-          </div> */}
         </div>
       );
     } else {
@@ -644,13 +639,13 @@ const PostComents: React.FC<CommentProps> = ({
       text: text,
       updatedAt: 1701118115396,
       userId: '',
-      uuid: currentUser?.uuid!
+      uuid: currentUser?.uuid || ''
     };
     return tempComment;
   }
   async function postReply() {
     try {
-      let textContent: string = extractTextFromNode(contentEditableDiv.current);
+      const textContent: string = extractTextFromNode(contentEditableDiv.current);
       if (textContent.length === 0) {
         return;
       }

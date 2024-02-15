@@ -1,20 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import CreatePost from '../../components/CreatePost';
-import FeedFilter from '../../components/FeedFilter';
-import Post from '../../components/Post';
-import { lmFeedClient } from '../..';
-import DialogBox from '../../components/dialog/DialogBox';
-import CreatePostDialog from '../../components/dialog/createPost/CreatePostDialog';
-import { IPost, IUser, IMemberState, LMFeedTopics } from '@likeminds.community/feed-js';
-import InfiniteScroll from 'react-infinite-scroll-component';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { LMFeedTopics } from '@likeminds.community/feed-js';
 import { CircularProgress, Dialog, Skeleton, Snackbar } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useDispatch, useSelector } from 'react-redux';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import { lmFeedClient } from '../../client';
+import '../../assets/css/skeleton-post.css';
+import AllMembers from '../../components/AllMembers';
+import CreatePost from '../../components/CreatePost';
+import Post from '../../components/Post';
+import PostLikesList from '../../components/PostLikesList';
+import EditPost from '../../components/dialog/editPost/EditPost';
+import PostDetails from '../../components/post-details';
+import TopicFeedDropdownSelector from '../../components/topic-feed/select-feed-dropdown';
+import { PostContext } from '../../contexts/postContext';
+import { FeedPost } from '../../models/feedPost';
+import { Topic } from '../../models/topics';
 import {
   ADD_NEW_POST,
   ADD_POST_LOCALLY,
   DELETE_POST,
   EDIT_POST,
   LIKE_POST,
-  REFRESH_LIKES_LIST,
   SAVE_POST,
   SHOW_COMMENTS_LIKES_BAR,
   SHOW_POST_LIKES_BAR,
@@ -24,40 +33,25 @@ import {
   UPDATE_LIKES_COUNT_INCREMENT,
   UPDATE_LIKES_COUNT_INCREMENT_POST
 } from '../../services/feedModerationActions';
-import Header from '../../components/Header';
-import EditPost from '../../components/dialog/editPost/EditPost';
-import AllMembers from '../../components/AllMembers';
-import { Route, Routes, useNavigate } from 'react-router-dom';
-import PostDetails from '../../components/post-details';
-import PostLikesList from '../../components/PostLikesList';
-import '../../assets/css/skeleton-post.css';
-import TopicFeedDropdownSelector from '../../components/topic-feed/select-feed-dropdown';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
 import { setMemberState, setUser } from '../../store/currentUser/currentUserSlice';
+import { setSelectedTopicsArray } from '../../store/extrasSlice/extraSlice';
 import { addNewPosts, clearPosts, setNewFeedPosts } from '../../store/feedPosts/feedsSlice';
+import { handleEditDialogState, hideSnackbar } from '../../store/snackbar/snackbarSlice';
+import { RootState } from '../../store/store';
 import { addNewTopics } from '../../store/topics/topicsSlice';
 import { addNewUsers } from '../../store/users/usersSlice';
-import { FeedPost } from '../../models/feedPost';
-import { PostContext } from '../../contexts/postContext';
-import { Topic } from '../../models/topics';
-import { handleEditDialogState, hideSnackbar } from '../../store/snackbar/snackbarSlice';
-import { setSelectedTopicsArray } from '../../store/extrasSlice/extraSlice';
 interface FeedProps {
-  setCallBack: React.Dispatch<((action: string, index: number, value: any) => void) | null>;
+  setCallBack: React.Dispatch<((action: string, index: number, value: never) => void) | null>;
 }
 const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
   const user = useSelector((state: RootState) => state.currentUser.user);
-  const memberStateRights = useSelector((state: RootState) => state.currentUser.memberState);
+
   const feedPosts = useSelector((state: RootState) => state.posts);
   const users = useSelector((state: RootState) => state.users);
   const topics = useSelector((state: RootState) => state.topics);
   const snackbarState = useSelector((state: RootState) => state.snackbar);
   const dispatch = useDispatch();
-  // const [user, setUser] = useState(null);
-  // const [memberStateRights, setMemberStateRights] = useState<IMemberState | null>(null);
-  // const [feedPostsArray, setFeedPostsArray] = useState<IPost[]>([]);
-  // const [usersMap, setUsersMap] = useState<{ [key: string]: IUser }>({});
+
   const [hasMoreFeed, setHasMoreFeed] = useState<boolean>(true);
   const [openSnackBar, setOpenSnackBar] = useState<boolean>(false);
   const [snackBarMessage, setSnackBarMessage] = useState<string>('');
@@ -99,12 +93,8 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
       setHasMoreFeed(false);
     }
     setPageCount(pageCount + 1);
-    // setFeedPostsArray([...feedPostsArray].concat(feeds?.posts!));
-    // setTopics({ ...topics, ...feeds.topics });
-    // setUsersMap({ ...usersMap, ...feeds.users });
-    console.log('The feeds are');
-    console.log(feeds);
-    dispatch(addNewPosts(feeds?.posts!));
+
+    dispatch(addNewPosts(feeds?.posts));
     dispatch(addNewTopics(feeds.topics));
     dispatch(addNewUsers(feeds.users));
   };
@@ -153,26 +143,11 @@ const FeedComponent: React.FC<FeedProps> = ({ setCallBack }) => {
         setSnackBarMessage(value);
         break;
       }
-      // add in CH
+
       case ADD_NEW_POST: {
-        // const { post } = value;
-        // const newFeedArray = [...feedPostsArray];
-        // console.log(feedPostsArray);
-        // const tempPost = newFeedArray.findIndex(
-        //   (postObject) => postObject?.Id?.toString() === post?.tempId?.toString(0)
-        // );
-        // const newFeedsArray = [{ ...value.post }].concat([...feedPostsArray]);
-        // const newTopics = { ...value.topics, ...topics };
-        // setFeedPostsArray(newFeedsArray);
-        // setTopics(newTopics);
         break;
       }
       case ADD_POST_LOCALLY: {
-        // console.log('locallyb adding: ', value.post);
-        // const newFeedsArray = [{ ...value.post }].concat([...feedPostsArray]);
-        // const newTopics = { ...value.topics, ...topics };
-        // setFeedPostsArray(newFeedsArray);
-        // setTopics(newTopics);
         break;
       }
       default:

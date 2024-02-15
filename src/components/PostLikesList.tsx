@@ -1,6 +1,6 @@
 import { IMember } from '@likeminds.community/feed-js';
 import React, { useContext, useEffect, useState } from 'react';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {
@@ -105,14 +105,14 @@ function PostLikesList({
       }
     }
 
-    setUserMap({ ...userMap, [userContext.user?.uuid.toString()!]: userContext.user });
+    setUserMap({ ...userMap, [userContext.user?.uuid.toString() || '']: userContext.user });
   }
   async function getAllMembersThrice() {
     try {
       if (entityType === 1) {
-        let r1: any = await lmFeedClient.getPostLikes(postId, 1);
-        let r2: any = await lmFeedClient.getPostLikes(postId, 2);
-        let r3: any = await lmFeedClient.getPostLikes(postId, 3);
+        const r1: any = await lmFeedClient.getPostLikes(postId, 1);
+        const r2: any = await lmFeedClient.getPostLikes(postId, 2);
+        const r3: any = await lmFeedClient.getPostLikes(postId, 3);
         const membersArrayOne: IMember[] = r1?.data?.likes;
         const membersArrayTwo: IMember[] = r2?.data?.likes;
         const membersArrayThree: IMember[] = r3?.data?.likes;
@@ -122,9 +122,9 @@ function PostLikesList({
         setPostLikesArray([...membersArrayOne, ...membersArrayTwo, ...membersArrayThree]);
         setUserMap({ ...membersObjectOne, ...membersObjectTwo, ...membersObjectThree });
       } else {
-        let r1: any = await lmFeedClient.getCommentLikes(postId, 1, entityId!);
-        let r2: any = await lmFeedClient.getCommentLikes(postId, 2, entityId!);
-        let r3: any = await lmFeedClient.getCommentLikes(postId, 3, entityId!);
+        const r1: any = await lmFeedClient.getCommentLikes(postId, 1, entityId!);
+        const r2: any = await lmFeedClient.getCommentLikes(postId, 2, entityId!);
+        const r3: any = await lmFeedClient.getCommentLikes(postId, 3, entityId!);
         const membersArrayOne: IMember[] = r1?.data?.likes;
         const membersArrayTwo: IMember[] = r2?.data?.likes;
         const membersArrayThree: IMember[] = r3?.data?.likes;

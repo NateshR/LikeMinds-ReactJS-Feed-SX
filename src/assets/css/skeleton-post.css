@@ -1,17 +1,17 @@
-.skeletonPostContainer{
-    max-width: 576px;
-    height: 250px;
-    background: white;
-    border-radius: 8px;
-    margin-top: 8px;
+.skeletonPostContainer {
+  max-width: 576px;
+  height: 250px;
+  background: white;
+  border-radius: 8px;
+  margin-top: 8px;
 }
-.skeletonHeader{
-    padding: 1rem;
-    display: flex;
-    align-items: center; 
-    padding-bottom: 0;
+.skeletonHeader {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  padding-bottom: 0;
 }
 
-.skeletonContent{
-    padding: 1rem
+.skeletonContent {
+  padding: 1rem;
 }

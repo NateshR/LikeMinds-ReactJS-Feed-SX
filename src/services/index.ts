@@ -2,7 +2,6 @@ import {
   LMFeedClient,
   InitiateUserRequest,
   GetFeedRequest,
-  GetFeedResponse,
   GetTaggingListRequest,
   Attachment,
   AddPostRequest,
@@ -42,8 +41,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     this.client = LMFeedClient.Builder()
       .setApiKey(process.env.REACT_APP_API_KEY!)
       .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
-      // .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
-      .setVersionCode(1)
+      .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
       .build();
   }
 
@@ -51,10 +49,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
-          // .setUUID(userUniqueId)
-          .setUUID('')
+          .setUUID(userUniqueId)
           .setIsGuest(isGuestMember)
-          .setUserName(username!)
+          .setUserName(username || '')
           .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);
@@ -63,7 +60,12 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     }
   }
 
-  async addPost(text: string, topicIds: string[] | null, attachmentArr?: any, tempId?: string) {
+  async addPost(
+    text: string,
+    topicIds: string[] | null,
+    attachmentArr?: Attachment[] | null,
+    tempId?: string
+  ) {
     try {
       const apiCallResponse = await this.client.addPost(
         AddPostRequest.builder()
@@ -78,9 +80,14 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
       console.log(error);
     }
   }
-  async addPostWithOGTags(text: string, topicIds: string[] | null, ogTags: any, tempId?: string) {
+  async addPostWithOGTags(
+    text: string,
+    topicIds: string[] | null,
+    ogTags: unknown,
+    tempId?: string
+  ) {
     try {
-      let attachmentArr: Attachment[] = [];
+      const attachmentArr: Attachment[] = [];
       attachmentArr.push(
         Attachment.builder()
           .setAttachmentType(4)
@@ -524,7 +531,7 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   }
   async editPostWithOGTags(postId: string, text: string, ogTags: any, topicIds: string[] | null) {
     try {
-      let attachmentArr: Attachment[] = [];
+      const attachmentArr: Attachment[] = [];
       attachmentArr.push(
         Attachment.builder()
           .setAttachmentType(4)

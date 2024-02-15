@@ -112,7 +112,7 @@ const PostBody: React.FC = () => {
     switch (attachment.attachmentType) {
       case 1: {
         const img = new Image();
-        img.src = attachment?.attachmentMeta?.url!;
+        img.src = attachment?.attachmentMeta?.url || '';
         return (
           <ImageMedia
             attachment={attachment}
@@ -280,7 +280,7 @@ const PreviewForOGTag = ({
     setOgTagPreview(false);
     setHasPreviewClosedOnce(true);
   }
-  console.log(ogTagPreviewData);
+
   if (!ogTagPreviewData) {
     return null;
   }
