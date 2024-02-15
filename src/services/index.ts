@@ -26,7 +26,7 @@ import {
   GetCommentLikesRequest,
   GetTopicsRequest,
   EditCommentRequest
-} from '@likeminds.community/feed-js-beta';
+} from '@likeminds.community/feed-js';
 import { HelperFunctionsClass } from './helper';
 import { FileModel, UploadMediaModel } from './models';
 
@@ -39,12 +39,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   public constructor() {
     super();
     this.client = LMFeedClient.Builder()
-      // .setApiKey(process.env.REACT_APP_API_KEY!)
-      .setApiKey('69edd43f-4a5e-4077-9c50-2b7aa740acce')
-      // .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
-      .setPlatformCode('rt')
-      // .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
-      .setVersionCode(1)
+      .setApiKey(process.env.REACT_APP_API_KEY!)
+      .setPlatformCode(process.env.REACT_APP_PLATFORM_CODE!)
+      .setVersionCode(parseInt(process.env.REACT_APP_VERSION_CODE!))
       .build();
   }
 
@@ -52,9 +49,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
     try {
       const apiCallResponse = await this.client.initiateUser(
         InitiateUserRequest.builder()
-          .setUUID('testUser1')
+          .setUUID(userUniqueId)
           .setIsGuest(isGuestMember)
-          .setUserName('testUser1')
+          .setUserName(username || '')
           .build()
       );
       return this.parseDataLayerResponse(apiCallResponse);

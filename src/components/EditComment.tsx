@@ -11,7 +11,7 @@ import {
 } from '../services/utilityFunctions';
 
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import TaggingUserBlock from './TaggingUserBlock';
 interface InputFieldProps {
   width?: string;
@@ -125,7 +125,7 @@ function EditCommentBox({
     const tagOp = findTag(textContentFocusNode!, setTaggingPageCount);
 
     if (tagOp?.tagString !== null && tagOp?.tagString !== undefined) {
-      setTagString(tagOp?.tagString!);
+      setTagString(tagOp?.tagString);
     } else {
       setTagString(null);
     }
@@ -224,21 +224,18 @@ function EditCommentBox({
     <div
       style={{
         position: 'relative'
-      }}
-    >
+      }}>
       {taggingMemberList && taggingMemberList?.length > 0 ? (
         <div
           className="taggingBox"
           id="scrollableTaggingContainer"
-          style={returnCSSForTagging(containerRef)}
-        >
+          style={returnCSSForTagging(containerRef)}>
           <InfiniteScroll
             loader={null}
             hasMore={loadMoreTaggingUsers}
             next={getTags}
             dataLength={taggingMemberList.length}
-            scrollableTarget="scrollableTaggingContainer"
-          >
+            scrollableTarget="scrollableTaggingContainer">
             {taggingMemberList?.map!((item: any) => {
               return (
                 <TaggingUserBlock
@@ -271,8 +268,7 @@ function EditCommentBox({
           //         }
           //     }
           // }}
-          onInput={handleInput}
-        ></div>
+          onInput={handleInput}></div>
       </div>
       {/* <div className="separator"></div> */}
     </div>

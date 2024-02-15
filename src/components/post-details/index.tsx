@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../assets/css/post-details-header.css';
 import backIcon from '../../assets/images/postDetailsBackIcon.png';
 import Post from '../Post';
 import { useNavigate, useParams } from 'react-router-dom';
-import { lmFeedClient } from '../..';
+import { lmFeedClient } from '../../client';
 import AllMembers from '../AllMembers';
 import { POST_DOESNT_EXISTS, SHOW_SNACKBAR } from '../../services/feedModerationActions';
 import { CircularProgress } from '@mui/material';
@@ -69,22 +69,19 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
       style={{
         maxHeight: '100vh',
         overflowY: 'auto'
-      }}
-    >
+      }}>
       <div className="lmWrapper">
         <div
           style={{
             flexGrow: 1
-          }}
-        >
+          }}>
           <div className="postDetailsHeaderWrapper">
             <div
               className="postDetailsHeaderWrapper--backIconHolder"
               onClick={() => {
                 //   navigate('/');
                 window.history.back();
-              }}
-            >
+              }}>
               <img src={backIcon} alt="back icon" />
             </div>
             <div className="postDetailsHeaderWrapper--toolBarArea">
@@ -100,8 +97,7 @@ function PostDetails({ rightSidebarHandler, rightSideBar }: PostDetailsProps) {
                     user,
                     topics,
                     index
-                  }}
-                >
+                  }}>
                   <Post rightSidebarHandler={rightSidebarHandler} />
                 </PostContext.Provider>
               </div>

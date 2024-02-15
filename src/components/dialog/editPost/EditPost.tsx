@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import '../createPost/createPostDialog.css';
-import { lmFeedClient } from '../../..';
+import { lmFeedClient } from '../../../client';
 import { DecodeUrlModelSX } from '../../../services/models';
 import { Attachment, AttachmentMeta, IPost, LMFeedTopics } from '@likeminds.community/feed-js';
 import { returnCSSForTagging, setCursorAtEnd } from '../createPost/CreatePostDialog';
@@ -131,8 +132,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             color: '#fff',
             letterSpacing: '1px',
             borderRadius: '50%'
-          }}
-        >
+          }}>
           {currentUser?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -159,11 +159,10 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   function setTopicsForTopicFeed(topics: LMFeedTopics[]) {
-    console.log('Called');
     const newSelectedTopics = topics?.map((topic) => {
       return topic.Id;
     });
-    console.log(newSelectedTopics);
+
     if (newSelectedTopics && newSelectedTopics.length) {
       setSelectedTopics(newSelectedTopics);
     } else {
@@ -355,8 +354,6 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
         textContent = '';
       }
 
-      let response: any;
-
       if (textContent === '') {
         dispatch(showSnackbar('Please Add Text to create a post'));
         return;
@@ -375,24 +372,16 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
         return item;
       });
       const disabledTopicList: string[] = [];
-      console.log('the selected topicIds are');
-      console.log(selectedTopics);
+
       selectedTopics?.forEach((topicId: string) => {
         const tempTopic = topics[topicId];
-        console.log(tempTopic?.isEnabled);
+
         if (tempTopic && !tempTopic?.isEnabled) {
           disabledTopicList.push(tempTopic?.name);
         }
       });
-      console.log('The Disabled Topic List is');
-      console.log(disabledTopicList);
+
       if (disabledTopicList.length) {
-        // dispatch(
-        //   showSnackbar(`
-        //   The following topics have been disabled. Please remove them to save the post.
-        //   ${disabledTopicList.join(',')}
-        //   `)
-        // );
         setOpenSnackbar(true);
         setSnackbarMessage(`
         The following topics have been disabled. Please remove them to save the post.
@@ -401,7 +390,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
         return;
       }
       closeDialogBox();
-      response = await lmFeedClient.editPost(
+      const response: any = await lmFeedClient.editPost(
         post?.Id!,
         textContent,
         [...imageOrVideoUploadArray, ...documentUploadArray, ...previewOGTagData],
@@ -549,8 +538,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     const selectedTopicsList = postTopics?.map((topicId: string) => {
       return topics[topicId];
     });
-    console.log('The selected topics list is');
-    console.log(selectedTopicsList);
+
     setExistingSelectedTopics(selectedTopicsList);
   }, [topics, post]);
   function setTagUserImage(user: any) {
@@ -583,8 +571,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}
-        >
+          }}>
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -597,21 +584,18 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
     <div
       style={{
         position: 'relative'
-      }}
-    >
+      }}>
       {taggingMemberList && taggingMemberList?.length > 0 ? (
         <div
           className="taggingBox"
           id="scrollableTaggingContainer"
-          style={returnCSSForTagging(containerRef)}
-        >
+          style={returnCSSForTagging(containerRef)}>
           <InfiniteScroll
             loader={null}
             hasMore={loadMoreTaggingUsers}
             next={getTags}
             dataLength={taggingMemberList.length}
-            scrollableTarget="scrollableTaggingContainer"
-          >
+            scrollableTarget="scrollableTaggingContainer">
             {taggingMemberList?.map!((item: any) => {
               return (
                 <button
@@ -663,14 +647,12 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                     // setTaggingMemberList([]);
                     anchorNode.focus();
                     setCursorAtEnd(contentEditableDiv);
-                  }}
-                >
+                  }}>
                   <div
                     style={{
                       display: 'flex',
                       alignItems: 'center'
-                    }}
-                  >
+                    }}>
                     {setTagUserImage(item)}
                     <div
                       style={{
@@ -678,8 +660,7 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                         textTransform: 'capitalize',
                         overflowY: 'hidden',
                         textOverflow: 'ellipsis'
-                      }}
-                    >
+                      }}>
                       {item?.name}
                     </div>
                   </div>
@@ -692,15 +673,13 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
       <div className="create-post-feed-dialog-wrapper--container" ref={containerRef}>
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
-          onClick={closeDialogBox}
-        >
+          onClick={closeDialogBox}>
           <svg
             width="18"
             height="18"
             viewBox="0 0 18 18"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+            xmlns="http://www.w3.org/2000/svg">
             <path
               d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
               fill="#484F67"
@@ -781,13 +760,11 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
                 } else {
                   setTagString(null);
                 }
-              }}
-            ></div>
+              }}></div>
           </div>
           <div
             className="create-post-feed-dialog-wrapper_container_post-wrapper--send-post"
-            onClick={postFeed}
-          >
+            onClick={postFeed}>
             Edit Post
           </div>
         </div>

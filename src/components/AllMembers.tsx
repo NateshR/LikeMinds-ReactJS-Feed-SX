@@ -1,6 +1,6 @@
 import { IMember } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
-import { lmFeedClient } from '..';
+import { lmFeedClient } from '../client';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { Skeleton } from '@mui/material';
@@ -77,8 +77,7 @@ function AllMembers() {
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}
-        >
+          }}>
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -137,8 +136,7 @@ function AllMembers() {
           hasMore={loadMore}
           dataLength={allMembersArray.length}
           next={getAllMembers}
-          scrollableTarget="allMembersScrollWrapper"
-        >
+          scrollableTarget="allMembersScrollWrapper">
           {renderComponent()}
         </InfiniteScroll>
       </div>

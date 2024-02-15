@@ -16,9 +16,6 @@ function LMFeed() {
         <Header />
       </div>
       <section className="mainBlock">
-        {/* <div className="nav">
-          <Nav />
-        </div> */}
         <BrowserRouter>
           <div className="main">
             <Provider store={store}>

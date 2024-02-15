@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable no-useless-escape */
 import React from 'react';
 // import { PostSchema } from '../components/resource-creation';
@@ -34,8 +35,7 @@ export function setUserImage(user: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}
-      >
+        }}>
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}
@@ -214,8 +214,7 @@ export function setTagUserImage(user: any, userContext: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}
-      >
+        }}>
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}
@@ -353,8 +352,7 @@ export function setTagUserImageInResourceView(user: any, userContext: any) {
           fontWeight: 'bold',
           color: '#fff',
           letterSpacing: '1px'
-        }}
-      >
+        }}>
         {user?.name?.split(' ').map((part: string) => {
           return part.charAt(0)?.toUpperCase();
         })}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, {
   KeyboardEventHandler,
   useCallback,
@@ -10,7 +11,7 @@ import React, {
 import './createPostDialog.css';
 import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 
-import { lmFeedClient } from '../../..';
+import { lmFeedClient } from '../../../client';
 import AttachmentsHolder from './AttachmentsHolder';
 import { DecodeUrlModelSX, OgTags } from '../../../services/models';
 import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
@@ -258,8 +259,7 @@ const CreatePostDialog = ({
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}
-        >
+          }}>
           {currentUser!.name!.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -297,8 +297,7 @@ const CreatePostDialog = ({
             fontWeight: 'bold',
             color: '#fff',
             letterSpacing: '1px'
-          }}
-        >
+          }}>
           {user?.name?.split(' ').map((part: string) => {
             return part.charAt(0)?.toUpperCase();
           })}
@@ -620,21 +619,18 @@ const CreatePostDialog = ({
     <div
       style={{
         position: 'relative'
-      }}
-    >
+      }}>
       {taggingMemberList && taggingMemberList?.length > 0 ? (
         <div
           className="taggingBox"
           id="scrollableTaggingContainer"
-          style={returnCSSForTagging(containerRef)}
-        >
+          style={returnCSSForTagging(containerRef)}>
           <InfiniteScroll
             loader={null}
             hasMore={loadMoreTaggingUsers}
             next={getTags}
             dataLength={taggingMemberList.length}
-            scrollableTarget="scrollableTaggingContainer"
-          >
+            scrollableTarget="scrollableTaggingContainer">
             {taggingMemberList?.map!((item: any) => {
               return (
                 <button
@@ -685,14 +681,12 @@ const CreatePostDialog = ({
                     div!.insertBefore(textNode1, dummyNode);
                     setTaggingMemberList([]);
                     setCursorAtEnd(contentEditableDiv);
-                  }}
-                >
+                  }}>
                   <div
                     style={{
                       display: 'flex',
                       alignItems: 'center'
-                    }}
-                  >
+                    }}>
                     {setTagUserImage(item)}
                     <div
                       style={{
@@ -700,8 +694,7 @@ const CreatePostDialog = ({
                         textTransform: 'capitalize',
                         overflowY: 'hidden',
                         textOverflow: 'ellipsis'
-                      }}
-                    >
+                      }}>
                       {item?.name}
                     </div>
                   </div>
@@ -714,15 +707,13 @@ const CreatePostDialog = ({
       <div className="create-post-feed-dialog-wrapper--container" ref={containerRef}>
         <span
           className="create-post-feed-dialog-wrapper_container--closeicon"
-          onClick={closeDialogBox}
-        >
+          onClick={closeDialogBox}>
           <svg
             width="18"
             height="18"
             viewBox="0 0 18 18"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+            xmlns="http://www.w3.org/2000/svg">
             <path
               d="M0.477066 17.5254C0.898941 17.9356 1.59035 17.9356 1.98879 17.5254L8.9966 10.5176L16.0044 17.5254C16.4146 17.9356 17.106 17.9473 17.5161 17.5254C17.9263 17.1035 17.938 16.4121 17.5278 16.002L10.52 8.99416L17.5278 1.99806C17.938 1.58791 17.938 0.884781 17.5161 0.474625C17.0943 0.0644686 16.4146 0.0644686 16.0044 0.474625L8.9966 7.48244L1.98879 0.474625C1.59035 0.0644686 0.887223 0.0527498 0.477066 0.474625C0.06691 0.8965 0.06691 1.58791 0.477066 1.99806L7.47316 8.99416L0.477066 16.002C0.06691 16.4121 0.0551912 17.1152 0.477066 17.5254Z"
               fill="#484F67"
@@ -753,8 +744,7 @@ const CreatePostDialog = ({
                 maxHeight: '324px',
                 overflowY: 'auto',
                 height: 'auto'
-              }}
-            >
+              }}>
               <div className="create-post-feed-dialog-wrapper_container_post-wrapper--post-container">
                 <div
                   ref={contentEditableDiv}
@@ -819,8 +809,7 @@ const CreatePostDialog = ({
                     } else {
                       setTagString(null);
                     }
-                  }}
-                ></div>
+                  }}></div>
               </div>
               <AttachmentsHolder {...attachmentProps} />
             </div>
@@ -859,8 +848,7 @@ const CreatePostDialog = ({
                 postFeed(timeStamp).then((res: any) => {
                   dispatch(replaceLocalPost(res));
                 });
-              }}
-            >
+              }}>
               Post
             </div>
           </div>
