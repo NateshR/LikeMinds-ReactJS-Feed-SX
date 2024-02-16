@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { FeedPost } from '../../models/feedPost';
+
 import { Topic } from '../../models/topics';
-import { feedsSlice } from '../feedPosts/feedsSlice';
 
 const extras: {
   selectedTopics: Topic[];

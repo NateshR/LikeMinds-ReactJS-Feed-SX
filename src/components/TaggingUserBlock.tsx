@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { setTagUserImage } from '../services/utilityFunctions';
 import { useSelector } from 'react-redux';
@@ -13,14 +14,12 @@ function TaggingUserBlock({ clickHandler, item }: TaggingUserBlockProps) {
       className="taggingTile"
       onClick={(e) => {
         clickHandler(e, item);
-      }}
-    >
+      }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'center'
-        }}
-      >
+        }}>
         {setTagUserImage(item, currentUser)}
         <div
           style={{
@@ -28,8 +27,7 @@ function TaggingUserBlock({ clickHandler, item }: TaggingUserBlockProps) {
             textTransform: 'capitalize',
             overflowY: 'hidden',
             textOverflow: 'ellipsis'
-          }}
-        >
+          }}>
           {item?.name}
         </div>
       </div>

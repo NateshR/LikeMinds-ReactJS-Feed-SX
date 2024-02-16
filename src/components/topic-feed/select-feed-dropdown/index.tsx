@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './index.css';
 import { LMFeedTopics } from '@likeminds.community/feed-js';
 import { lmFeedClient } from '../../../client';
-import { Checkbox, FormControl, InputLabel, Menu, MenuItem, Select } from '@mui/material';
-import TopicList from '../topic-list';
+import { Menu, MenuItem } from '@mui/material';
+
 import TopicListItem from '../topic-list';
 import TopicBlock from '../topic';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -33,6 +35,7 @@ const TopicFeedDropdownSelector = ({
     extras.selectedTopics.length ? false : true
   );
   const [searchKey, setSearchKey] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hasMoreTopics, setHasMoreTopics] = useState<boolean>(true);
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchKey(e.target.value);

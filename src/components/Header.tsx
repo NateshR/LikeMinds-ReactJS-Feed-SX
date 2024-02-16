@@ -1,16 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // src/Header/Header.tsx
 
-import React, { useEffect, useState } from 'react';
-import './../assets/css/header.css';
-import { Badge, CircularProgress, IconButton, Menu, MenuItem } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { lmFeedClient } from '../client';
 import { IActivity, IUser } from '@likeminds.community/feed-js';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import noNotification from '../assets/images/default.svg';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import { Badge, CircularProgress, IconButton, Menu } from '@mui/material';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import React, { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { lmFeedClient } from '../client';
+import noNotification from '../assets/images/default.svg';
+import './../assets/css/header.css';
 dayjs.extend(relativeTime);
 interface HeaderProps {
   // user: any;

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import PostComents from './PostComments';
 import { lmFeedClient } from '../client';
@@ -319,7 +322,6 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
               contentEditable={true}
               suppressContentEditableWarning
               tabIndex={0}
-              placeholder="hello world"
               id="editableDiv"
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
@@ -412,9 +414,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                         if (tagOp === undefined) return;
                         const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
-                        // if (!substr || substr.length === 0) {
-                        //   return;
-                        // }
+
                         const textNode1Text = textContentFocusNode.substring(0, limitLeft - 1);
                         const textNode2Text = textContentFocusNode.substring(limitRight + 1);
 
@@ -455,12 +455,6 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
               </div>
             ) : null}
           </div>
-          {/* Post comment send icon */}
-          {/* <div className="postCommentButton">
-            <IconButton onClick={postComment}>
-              <SendIcon />
-            </IconButton>
-          </div> */}
         </>
       );
     } else {
@@ -605,10 +599,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
       const comment = response?.data?.comment;
       const user = response?.data?.users;
       setPostUsersMap({ ...postUsersMap, ...user });
-      // setCommentList([{ ...comment }].concat(commentList));
 
-      // setPostCommentsCount(postCommentsCount + 1);
-      // setOpenCommentsSection(true);
       return {
         status: true,
         post: comment
@@ -700,7 +691,6 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
                       totalLikes: postLikesCount
                     });
                   }
-                  // setOpenSeeLikesDialog(true);
                 } else {
                   likePost();
                 }
@@ -770,32 +760,12 @@ const PostFooter: React.FC<PostFooterProps> = ({ rightSidebarHandler }) => {
           </div>
         </div>
         <div className="lmWrapper__feed__post__footer__actions__right">
-          <div className="lm-cursor-pointer">
-            {/* <IconButton
-              title="Save"
-              style={{
-                margin: '0',
-                padding: '0'
-              }} */}
-
-            {/* > */}
-            {setSavePostButton()}
-            {/* </IconButton> */}
-          </div>
+          <div className="lm-cursor-pointer">{setSavePostButton()}</div>
         </div>
       </div>
       {/* Comments */}
       {showPostScreenSection(location.pathname.includes('/post') ? true : false)}
       {/* Comments */}
-
-      {/* <Dialog open={openSeeLikesDialog} onClose={() => setOpenSeeLikesDialog(false)}>
-        <SeePostLikes
-          entityId={post?.Id!}
-          onClose={() => setOpenSeeLikesDialog(false)}
-          likesCount={postLikesCount}
-          entityType={1}
-        />
-      </Dialog> */}
     </div>
   );
 };

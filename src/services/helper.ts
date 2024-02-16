@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as AWS from 'aws-sdk';
-import { UploadMediaModel } from './models';
 
 interface HelperFunctionsInterface {
   detectLinks(text: string): any[];
