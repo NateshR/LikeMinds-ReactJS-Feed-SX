@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
@@ -710,7 +712,6 @@ const EditPost = ({ closeCreatePostDialog }: CreatePostDialogProps) => {
               contentEditable={true}
               suppressContentEditableWarning
               tabIndex={0}
-              placeholder="hello world"
               id="editableDiv"
               style={{
                 width: '100%',

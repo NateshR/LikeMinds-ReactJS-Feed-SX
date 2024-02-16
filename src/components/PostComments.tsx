@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/Header/Header.tsx
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -472,7 +475,6 @@ const PostComents: React.FC<CommentProps> = ({
               contentEditable={true}
               suppressContentEditableWarning
               tabIndex={0}
-              placeholder="hello world"
               id="editableDiv"
               onBlur={() => {
                 if (contentEditableDiv && contentEditableDiv.current) {
@@ -532,22 +534,22 @@ const PostComents: React.FC<CommentProps> = ({
                         if (focusNode === null) {
                           return;
                         }
-                        ('A');
+
                         const div = focusNode.parentElement;
                         const text = div!.childNodes;
                         if (focusNode === null || text.length === 0) {
                           return;
                         }
-                        ('B');
+
                         const textContentFocusNode = focusNode.textContent;
                         if (textContentFocusNode === null) {
                           return;
                         }
-                        ('C');
+
                         const tagOp = findTag(textContentFocusNode);
-                        ('D');
+
                         if (tagOp === undefined) return;
-                        ('E');
+
                         const substr = tagOp?.tagString;
                         const { limitLeft, limitRight } = tagOp;
 
@@ -1040,140 +1042,7 @@ const PostComents: React.FC<CommentProps> = ({
       <Dialog open={openDeleteConfirmationDialog} onClose={closeDeleteDialog}>
         <DeleteDialog onClose={closeDeleteDialog} deleteComment={deleteComment} type={2} />
       </Dialog>
-      {/* <div className="commentWrapper--upperLayer">
-        <div className="commentWrapper__upperLayer--contentBox">
-          <div className="commentWrapper--username">
-            <span className="displayName">{user?.name}</span>
-            <span className="displayTitle"></span>
-          </div>
-          <div className="commentWrapper--commentContent">
-            <div
-              className="commentWrapper__commentContent--content"
-              style={{
-                overflowWrap: 'anywhere'
-              }}>
-              {isReadMore && comment.text.length > 300
-                ? Parser().parse(convertTextToHTML(comment.text.substring(0, 300)).innerHTML)
-                : Parser().parse(convertTextToHTML(comment.text).innerHTML)}
-              {isReadMore && comment.text.length > 300 ? (
-                <span
-                  style={{
-                    color: 'gray',
-                    fontWeight: '400',
-                    cursor: 'pointer',
 
-                    fontSize: '14px'
-                  }}
-                  onClick={() => setIsReadMore(false)}>
-                  ...ReadMore
-                </span>
-              ) : null}
-            </div>
-          </div>
-        </div>
-        <div className="commentWrapper__upperLayer--menuActionArea">
-          <IconButton
-            onClick={openMenu}
-            style={{
-              height: '24px',
-              width: '24px',
-              marginLeft: '8px',
-              marginRight: '16px',
-              cursor: 'pointer'
-            }}
-            sx={{
-              $hover: {
-                background: 'none'
-              }
-            }}>
-            <img
-              src={overflowIcon}
-              alt="overflow icon"
-              style={{
-                cursor: 'pointer'
-              }}
-            />
-          </IconButton>
-          {renderMenu()}
-        </div>
-      </div> */}
-      {/* <div className="commentWrapper--commentActions">
-        <span
-          className="like"
-          style={{
-            height: '24px',
-            width: '24px',
-            textAlign: 'center'
-          }}
-          onClick={likeComment}>
-          {renderLikeButton()}
-        </span>
-        <span
-          className="likes-count"
-          onClick={() => {
-            if (likesCount) {
-              rightSidebarHandler(SHOW_COMMENTS_LIKES_BAR, {
-                postId: postId,
-                entityType: 2,
-                totalLikes: likesCount,
-                commentId: comment.Id
-              });
-            } else {
-              likeComment();
-            }
-          }}
-          style={{ cursor: 'pointer' }}>
-          {likesCount ? likesCount : null} {likesCount > 1 ? 'Likes' : 'Like'}
-        </span>
-        {comment.level === 0 ? (
-          <>
-            {' '}
-            <span className="replies"> | </span>
-            <span className="replies">
-              <span
-                style={{
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  setOpenReplyBox(!openReplyBox);
-                  setOpenCommentsSection(true);
-                }}>
-                {commentsCount > 0 ? <span className="dotAfter">Reply</span> : 'Reply'}
-              </span>{' '}
-              <span
-                style={{
-                  cursor: 'pointer',
-                  color:
-                    openCommentsSection && commentsCount > 0 ? '#5046E5' : 'rgba(72, 79, 103, 0.7)'
-                }}
-                className="replyCount"
-                onClick={() => {
-                  if (commentsCount !== repliesArray.length) {
-                    getComments();
-                  }
-                  setOpenCommentsSection(!openCommentsSection);
-                  // if (commentsCount > 0) {
-
-                  // }
-                }}>
-                <span>
-                  {commentsCount > 0 ? commentsCount + ' ' : null}
-                  {commentsCount === 0 ? '' : commentsCount > 1 ? 'Replies' : 'Reply'}
-                </span>
-              </span>
-            </span>
-          </>
-        ) : null}
-
-        <span
-          className="replies"
-          style={{
-            flexGrow: 1,
-            textAlign: 'right'
-          }}>
-          {dayjs(comment.createdAt).fromNow()}
-        </span>
-      </div> */}
       {renderCommentContainer()}
       {showReplyBox()}
       <div

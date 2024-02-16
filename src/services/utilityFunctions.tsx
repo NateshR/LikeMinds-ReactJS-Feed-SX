@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable no-useless-escape */
 import React from 'react';
@@ -87,7 +88,6 @@ export function returnCSSForTagging(refObject: React.MutableRefObject<HTMLDivEle
   if (selection === null) {
     return {};
   }
-  const boundingsForDiv = refObject.current?.getBoundingClientRect();
   const focusNodeParentBoundings = selection.focusNode?.parentElement?.getBoundingClientRect();
   resObject.top = (
     focusNodeParentBoundings?.top! -
@@ -321,7 +321,7 @@ export function validateUrl(str: string) {
   return false;
 }
 
-export function setTagUserImageInResourceView(user: any, userContext: any) {
+export function setTagUserImageInResourceView(user: any) {
   const dimension = '52px';
   const imageLink = user?.imageUrl;
   if (imageLink !== '') {
@@ -395,7 +395,7 @@ export function convertTextToHTML(text: string) {
         userObject.link = text;
       }
       if (userObject.type === 1) {
-        const matchText = matches[i].slice(2, -2); // Remove '<<' and '>>'
+        // const matchText = matches[i].slice(2, -2); // Remove '<<' and '>>'
         const linkNode = document.createElement('a');
         linkNode.href = '#'; // You can set the appropriate URL here
         linkNode.textContent = userObject.displayName!;

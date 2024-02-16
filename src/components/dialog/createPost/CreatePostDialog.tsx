@@ -1,29 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import React, {
-  KeyboardEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import './createPostDialog.css';
-import defaultUserImage from '../../../assets/images/defaultUserImage.png';
 
-import { lmFeedClient } from '../../../client';
-import AttachmentsHolder from './AttachmentsHolder';
-import { DecodeUrlModelSX, OgTags } from '../../../services/models';
-import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
+import { LMFeedTopics } from '@likeminds.community/feed-js';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
-import { ADD_NEW_POST, ADD_POST_LOCALLY } from '../../../services/feedModerationActions';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/store';
-import { addNewLocalPost, replaceLocalPost } from '../../../store/feedPosts/feedsSlice';
-import { addNewTopics } from '../../../store/topics/topicsSlice';
+import { lmFeedClient } from '../../../client';
 import { Topic } from '../../../models/topics';
+import { ADD_NEW_POST, ADD_POST_LOCALLY } from '../../../services/feedModerationActions';
+import { DecodeUrlModelSX } from '../../../services/models';
+import { addNewLocalPost, replaceLocalPost } from '../../../store/feedPosts/feedsSlice';
 import { showSnackbar } from '../../../store/snackbar/snackbarSlice';
+import { RootState } from '../../../store/store';
+import { addNewTopics } from '../../../store/topics/topicsSlice';
+import TopicFeedDropdownSelector from '../../topic-feed/select-feed-dropdown';
+import AttachmentsHolder from './AttachmentsHolder';
 
 interface CreatePostDialogProps {
   dialogBoxRef?: React.RefObject<HTMLDivElement>; // Replace "HTMLElement" with the actual type of the ref
@@ -78,7 +71,7 @@ export function returnCSSForTagging(refObject: React.MutableRefObject<HTMLDivEle
   if (selection === null) {
     return {};
   }
-  const boundingsForDiv = refObject.current?.getBoundingClientRect();
+
   const focusNodeParentBoundings = selection.focusNode?.parentElement?.getBoundingClientRect();
   resObject.top = (
     focusNodeParentBoundings?.top! -
@@ -184,6 +177,7 @@ const CreatePostDialog = ({
   const [showOGTagPreview, setShowOGTagPreview] = useState<boolean>(false);
   const [previewOGTagData, setPreviewOGTagData] = useState<DecodeUrlModelSX | null>(null);
   const [hasPreviewClosedOnce, setHasPreviewClosedOnce] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [limits, setLimits] = useState<Limits>({
     left: 0,
     right: 0
@@ -193,7 +187,7 @@ const CreatePostDialog = ({
   const contentEditableDiv = useRef<HTMLDivElement | null>(null);
   const [loadMoreTaggingUsers, setLoadMoreTaggingUsers] = useState<boolean>(true);
   const [taggingPageCount, setTaggingPageCount] = useState<number>(1);
-  const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
+  // const [previewTagsUrl, setPreviewTagsUrl] = useState<boolean>(false);
   const [selectedTopics, setSelectedTopics] = useState<null | string[]>(null);
   const [topics, setTopics] = useState<any[]>([]);
   function setTopicsForTopicFeed(topics: LMFeedTopics[]) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Attachment } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
 import './image-media.css';
@@ -28,8 +29,7 @@ function ImageMedia({ attachment }: ImageMediaProps) {
     <div
       style={{
         backgroundColor: 'black'
-      }}
-    >
+      }}>
       <img
         src={attachment.attachmentMeta.url}
         alt="Your Image"

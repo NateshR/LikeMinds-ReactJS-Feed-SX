@@ -1,24 +1,23 @@
-import userImg from '../assets/images/user.png';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { IMenuItem } from '@likeminds.community/feed-js';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Dialog, IconButton, Menu } from '@mui/material';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
-import React, { useContext, useEffect, useState } from 'react';
-import { Dialog, IconButton, Menu } from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { lmFeedClient } from '../client';
-import { DELETE_POST, EDIT_POST } from '../services/feedModerationActions';
-import EditPost from './dialog/editPost/EditPost';
-import { IPost, IMenuItem } from '@likeminds.community/feed-js';
-import ReportPostDialogBox from './ReportPost';
+import React, { useContext, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import DeleteDialog from './DeleteDialog';
+import { lmFeedClient } from '../client';
 import { PostContext } from '../contexts/postContext';
 import { MenuItem } from '../models/menuItem';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store/store';
 import { deleteAPost } from '../store/feedPosts/feedsSlice';
 import { handleEditDialogState, setTemporaryPost } from '../store/snackbar/snackbarSlice';
+import { RootState } from '../store/store';
+import DeleteDialog from './DeleteDialog';
+import ReportPostDialogBox from './ReportPost';
+dayjs.extend(relativeTime);
 
 const PostHeader: React.FC = () => {
   const { post, topics, index, user } = useContext(PostContext);

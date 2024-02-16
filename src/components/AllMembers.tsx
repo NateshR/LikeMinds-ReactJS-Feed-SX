@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IMember } from '@likeminds.community/feed-js';
 import React, { useEffect, useState } from 'react';
 import { lmFeedClient } from '../client';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   LMFeedClient,
   InitiateUserRequest,
@@ -39,9 +40,9 @@ export class LMClient extends HelperFunctionsClass implements LMFeedClientInterf
   public constructor() {
     super();
     this.client = LMFeedClient.Builder()
-      .setApiKey(process.env.REACT_LM_FEED_API_KEY!)
-      .setPlatformCode(process.env.REACT_LM_FEED_PLATFORM_CODE!)
-      .setVersionCode(parseInt(process.env.REACT_LM_FEED_VERSION_CODE!))
+      .setApiKey(process.env.REACT_APP_LM_FEED_API_KEY!)
+      .setPlatformCode(process.env.REACT_APP_LM_FEED_PLATFORM_CODE!)
+      .setVersionCode(parseInt(process.env.REACT_APP_LM_FEED_VERSION_CODE!))
       .build();
   }
 

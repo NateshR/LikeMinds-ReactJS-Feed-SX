@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 
 function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
@@ -22,8 +23,7 @@ function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
         height: '288px',
         width: '400px',
         borderRadius: '16px'
-      }}
-    >
+      }}>
       <span
         style={{
           position: 'absolute',
@@ -31,15 +31,13 @@ function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
           right: '1.5rem',
           cursor: 'pointer'
         }}
-        onClick={onClose}
-      >
+        onClick={onClose}>
         <svg
           width="26"
           height="26"
           viewBox="0 0 26 26"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+          xmlns="http://www.w3.org/2000/svg">
           <circle cx="13" cy="13" r="12" fill="white" stroke="#484F67" />
           <path
             fillRule="evenodd"
@@ -57,16 +55,14 @@ function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
         style={{
           padding: '20px 0px 36px 0px',
           height: '80px'
-        }}
-      >
+        }}>
         <p
           style={{
             lineHeight: '24px',
             fontWeight: 500,
             fontSize: '20px',
             textAlign: 'center'
-          }}
-        >
+          }}>
           {type === 1 ? 'Delete Post' : 'Delete Comment'}
         </p>
       </div>
@@ -74,15 +70,13 @@ function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
         style={{
           padding: '0px 36px 36px 36px',
           height: '168px'
-        }}
-      >
+        }}>
         <p
           style={{
             fontSize: '16px',
             lineHeight: '20px',
             marginBottom: '24px'
-          }}
-        >
+          }}>
           {type === 1
             ? 'Are you sure you want to delete this post permanently. Once confirmed, this action can’t be reversed.'
             : 'Are you sure you want to delete this comment permanently. Once confirmed, this action can’t be reversed.'}
@@ -100,8 +94,7 @@ function DeleteDialog({ onClose, deleteComment, deletePost, type }: any) {
             border: 'none',
             cursor: 'pointer'
           }}
-          onClick={handleConfirm}
-        >
+          onClick={handleConfirm}>
           Confirm
         </button>
       </div>

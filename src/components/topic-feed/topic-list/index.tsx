@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { memo } from 'react';
 import './index.css';
 import { LMFeedTopics } from '@likeminds.community/feed-js';
-import { Checkbox, MenuItem } from '@mui/material';
+import { Checkbox } from '@mui/material';
 interface TopicListProps {
   topic: LMFeedTopics;
   checkedList: LMFeedTopics[];
@@ -13,8 +14,7 @@ const TopicListItem = ({ topic, checkedList, clickHandler }: TopicListProps) => 
       className="topicTile"
       onClick={() => {
         clickHandler(topic);
-      }}
-    >
+      }}>
       <Checkbox
         disableRipple={true}
         sx={{
