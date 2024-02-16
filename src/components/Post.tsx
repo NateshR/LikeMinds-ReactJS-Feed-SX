@@ -1,19 +1,18 @@
-import userImg from '../assets/images/user.png';
-import liked from '../assets/images/liked.svg';
-import comment from '../assets/images/comment.svg';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import bookmark from '../assets/images/bookmark.svg';
+import comment from '../assets/images/comment.svg';
+import liked from '../assets/images/liked.svg';
 import share from '../assets/images/share.svg';
+import userImg from '../assets/images/user.png';
 
 import React, { useContext, useEffect, useState } from 'react';
-import PostHeader from './PostHeader';
-import PostBody from './PostBody';
-import PostFooter from './PostFooter';
-import { IPost, IUser, LMFeedTopics } from '@likeminds.community/feed-js';
-import PostTopicBlock from './topic-feed/post-topic-block';
-import { FeedPost } from '../models/feedPost';
-import { User } from '../models/User';
 import { PostContext } from '../contexts/postContext';
 import { Topic } from '../models/topics';
+import PostBody from './PostBody';
+import PostFooter from './PostFooter';
+import PostHeader from './PostHeader';
+import PostTopicBlock from './topic-feed/post-topic-block';
 
 interface PostProps {
   rightSidebarHandler: (action: string, value: any) => void;
@@ -37,14 +36,7 @@ const Post: React.FC<PostProps> = ({ rightSidebarHandler }) => {
   if (!post) {
     return null;
   }
-  // useEffect(() => {
-  //   console.log('The topics are', topics);
-  //   if (topics) {
-  //     for (let [key, val] of Object.entries(topics)) {
-  //       console.log(val);
-  //     }
-  //   }
-  // }, [topics]);
+
   return (
     <div>
       {/* Post */}

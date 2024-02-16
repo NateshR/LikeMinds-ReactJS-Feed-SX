@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import '../../assets/css/post-details-header.css';
-import backIcon from '../../assets/images/postDetailsBackIcon.png';
-import Post from '../Post';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from 'react';
+import { CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { lmFeedClient } from '../../client';
-import AllMembers from '../AllMembers';
-import { POST_DOESNT_EXISTS, SHOW_SNACKBAR } from '../../services/feedModerationActions';
-import { CircularProgress } from '@mui/material';
+import '../../assets/css/post-details-header.css';
+import backIcon from '../../assets/images/postDetailsBackIcon.png';
+import { PostContext } from '../../contexts/postContext';
 import { User } from '../../models/User';
 import { FeedPost } from '../../models/feedPost';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-import { showSnackbar } from '../../store/snackbar/snackbarSlice';
 import { Topic } from '../../models/topics';
-import { PostContext } from '../../contexts/postContext';
-import SeePostLikes from '../SeePostLikes';
+import { POST_DOESNT_EXISTS } from '../../services/feedModerationActions';
+import { showSnackbar } from '../../store/snackbar/snackbarSlice';
+import { RootState } from '../../store/store';
+import Post from '../Post';
 interface PostDetailsProps {
   rightSidebarHandler: (action: string, value: any) => void;
   rightSideBar: any;

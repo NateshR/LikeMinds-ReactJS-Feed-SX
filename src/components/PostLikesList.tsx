@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IMember } from '@likeminds.community/feed-js';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { lmFeedClient } from '../client';
 import '../assets/css/all-members.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -34,19 +35,15 @@ function PostLikesList({
   const [commentLikesArray, setCommentLikesArray] = useState<IMember[]>([]);
   const [pageCount, setPageCount] = useState<number>(4);
   const [loadMore, setLoadMore] = useState<boolean>(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalMembers, setTotalMembers] = useState<number>(0);
   const [userMap, setUserMap] = useState<any>({});
   const userContext = useSelector((state: RootState) => state.currentUser);
   const [showLoadingBars, setShowLoadingBars] = useState<boolean>(true);
 
-  // useEffect(() => {
-  //     // console.log()
-  //     handleActions();
-  // }, [initiateAction?.action]);
   useEffect(() => {
     async function initiateLikesScreen() {
       await getAllMembersThrice();
-      // handleActions();
     }
     initiateLikesScreen();
     return () => {

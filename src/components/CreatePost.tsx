@@ -1,14 +1,11 @@
-import userImg from '../assets/images/user.png';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import PostOptions from './PostOptions';
-import DialogBox from './dialog/DialogBox';
-import CreatePostDialog from './dialog/createPost/CreatePostDialog';
-import { lmFeedClient } from '../client';
 import { Dialog } from '@mui/material';
-import { IPost } from '@likeminds.community/feed-js';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import PostOptions from './PostOptions';
+import CreatePostDialog from './dialog/createPost/CreatePostDialog';
 interface CreateFeedProps {
   feedModerationHandler: any;
 }
@@ -34,7 +31,7 @@ const CreatePost: React.FC<CreateFeedProps> = ({ feedModerationHandler }) => {
       ref.current.blur();
     }
   }, [openCreatePostDialog]);
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
 
   function setUserImage() {
     const imageLink = currentUser?.imageUrl;

@@ -11,7 +11,7 @@ export const feedsSlice = createSlice({
       state = state.concat(action.payload);
       return state;
     },
-    clearPosts: (state) => {
+    clearPosts: () => {
       return [];
     },
     setNewFeedPosts: (state, action: PayloadAction<FeedPost[]>) => {

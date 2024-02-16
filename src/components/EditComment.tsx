@@ -1,6 +1,8 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import '../assets/css/input-area.css';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useRef, useState } from 'react';
 import '../assets/css/createPostDialog.css';
+import '../assets/css/input-area.css';
 import {
   convertTextToHTML,
   extractTextFromNode,
